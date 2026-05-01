@@ -1,11 +1,12 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Filter, Search } from 'lucide-react';
 import DestinationCard from '@/components/ui/DestinationCard';
 import { destinations } from '@/data/content';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 const regions = [
   { id: 'all', label: 'All' },
@@ -15,7 +16,7 @@ const regions = [
   { id: 'south', label: 'South' },
 ];
 
-export default function DestinationsPage() {
+function DestinationsContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') ?? '';
   const [searchQuery, setSearchQuery] = useState(initialQuery);
@@ -91,5 +92,34 @@ export default function DestinationsPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function DestinationsContentFallback() {
+  return (
+    <div className="min-h-screen bg-[#f7f1e8] pt-20">
+      <section className="bg-secondary-900 py-20 text-white">
+        <div className="container-main">
+          <div className="h-8 w-64 animate-pulse rounded bg-white/20" />
+        </div>
+      </section>
+      <section className="py-12">
+        <div className="container-main">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-80 animate-pulse rounded-[28px] bg-secondary-200" />
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export default function DestinationsPage() {
+  return (
+    <Suspense fallback={<DestinationsContentFallback />}>
+      <DestinationsContent />
+    </Suspense>
   );
 }
