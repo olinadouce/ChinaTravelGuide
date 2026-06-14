@@ -38,11 +38,39 @@ export interface HeroStat {
   label: string;
 }
 
+export interface InlineRun {
+  text: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+}
+
+export type RichBlock =
+  | { kind: 'heading'; level: 2 | 3; text: string }
+  | { kind: 'paragraph'; runs: InlineRun[] }
+  | { kind: 'list'; ordered: boolean; items: InlineRun[][] }
+  | { kind: 'table'; headers: InlineRun[]; rows: InlineRun[][][] }
+  | { kind: 'callout'; tone: 'info' | 'warning' | 'tip'; runs: InlineRun[] }
+  | { kind: 'code'; language?: string; text: string }
+  | { kind: 'divider' }
+  | {
+      kind: 'steps';
+      steps: Array<{
+        label: string;
+        caption?: string;
+        tone?: 'primary' | 'accent' | 'jade' | 'secondary' | 'warning';
+      }>;
+    };
+
 export interface PracticalGuide {
   slug: string;
   title: string;
   summary: string;
-  points: string[];
+  icon: string;
+  accent: 'primary' | 'accent' | 'jade' | 'secondary';
+  readMinutes: number;
+  preview: string[];
+  body: RichBlock[];
   faqs: Array<{ question: string; answer: string }>;
 }
 

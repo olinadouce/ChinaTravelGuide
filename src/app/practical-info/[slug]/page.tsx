@@ -1,54 +1,75 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, FileCheck2 } from 'lucide-react';
 import { practicalGuides } from '@/data/content';
+import { getGuideBySlug } from '@/lib/content';
+import RichBlocks, { guideIconMap } from '@/components/ui/RichBlocks';
+import type { LucideIcon } from 'lucide-react';
 
 export function generateStaticParams() {
   return practicalGuides.map((guide) => ({ slug: guide.slug }));
 }
 
+const accentClassMap: Record<string, string> = {
+  primary: 'bg-primary/10 text-primary',
+  accent: 'bg-accent/10 text-accent',
+  jade: 'bg-emerald-500/10 text-emerald-600',
+  secondary: 'bg-secondary-100 text-secondary-700',
+};
+
 export default function PracticalGuidePage({ params }: { params: { slug: string } }) {
-  const guide = practicalGuides.find((item) => item.slug === params.slug);
+  const guide = getGuideBySlug(params.slug);
 
   if (!guide) {
     notFound();
   }
 
+  const Icon: LucideIcon = guideIconMap[guide.icon] ?? FileCheck2;
+  const iconWrap = accentClassMap[guide.accent] ?? accentClassMap.secondary;
+
   return (
     <div className="min-h-screen bg-[#f7f1e8] pt-20">
       <section className="bg-white py-14">
         <div className="container-main max-w-4xl">
-          <Link href="/practical-info" className="mb-6 inline-flex items-center gap-2 text-sm text-secondary-500 hover:text-primary">
+          <Link
+            href="/practical-info"
+            className="mb-6 inline-flex items-center gap-2 text-sm text-secondary-500 hover:text-primary"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to practical info
           </Link>
+          <div className="mb-6 flex items-center gap-4">
+            <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${iconWrap}`}>
+              <Icon className="h-7 w-7" />
+            </div>
+            <span className="rounded-full bg-secondary-50 px-3 py-1 text-xs uppercase tracking-[0.16em] text-secondary-500">
+              {guide.readMinutes} min read
+            </span>
+          </div>
           <p className="text-sm uppercase tracking-[0.24em] text-secondary-500">Guide module</p>
-          <h1 className="mt-4 text-5xl font-bold text-secondary-900">{guide.title}</h1>
+          <h1 className="mt-3 text-5xl font-bold text-secondary-900">{guide.title}</h1>
           <p className="mt-6 text-lg leading-8 text-secondary-700">{guide.summary}</p>
         </div>
       </section>
 
       <section className="py-12">
-        <div className="container-main grid gap-8 lg:grid-cols-[1fr_0.85fr]">
-          <div className="rounded-[32px] bg-white p-8 shadow-sm">
-            <h2 className="text-3xl font-bold text-secondary-900">Planning checklist</h2>
-            <div className="mt-6 space-y-4">
-              {guide.points.map((point, index) => (
-                <div key={point} className="flex gap-4 rounded-3xl bg-secondary-50 p-5">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
-                    {index + 1}
-                  </div>
-                  <p className="leading-7 text-secondary-700">{point}</p>
-                </div>
-              ))}
-            </div>
+        <div className="container-main max-w-4xl">
+          <div className="rounded-[32px] bg-white p-8 shadow-sm sm:p-10">
+            <RichBlocks blocks={guide.body} />
           </div>
+        </div>
+      </section>
 
-          <div className="rounded-[32px] bg-secondary-900 p-8 text-white shadow-xl">
+      <section className="pb-16">
+        <div className="container-main max-w-4xl">
+          <div className="rounded-[32px] bg-secondary-900 p-8 text-white shadow-xl sm:p-10">
             <h2 className="text-3xl font-bold">Traveler questions</h2>
-            <div className="mt-6 space-y-5">
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
               {guide.faqs.map((faq) => (
-                <div key={faq.question} className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                <div
+                  key={faq.question}
+                  className="rounded-3xl border border-white/10 bg-white/5 p-5"
+                >
                   <p className="font-semibold">{faq.question}</p>
                   <p className="mt-3 text-sm leading-7 text-white/72">{faq.answer}</p>
                 </div>

@@ -1,6 +1,15 @@
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FileCheck2 } from 'lucide-react';
 import { practicalGuides } from '@/data/content';
+import { guideIconMap } from '@/components/ui/RichBlocks';
+import type { LucideIcon } from 'lucide-react';
+
+const accentClassMap: Record<string, string> = {
+  primary: 'bg-primary/10 text-primary',
+  accent: 'bg-accent/10 text-accent',
+  jade: 'bg-emerald-500/10 text-emerald-600',
+  secondary: 'bg-secondary-100 text-secondary-700',
+};
 
 export default function PracticalInfoPage() {
   return (
@@ -10,28 +19,46 @@ export default function PracticalInfoPage() {
           <p className="mb-4 text-sm uppercase tracking-[0.24em] text-white/55">Practical information</p>
           <h1 className="text-5xl font-bold">Reduce uncertainty before travelers arrive.</h1>
           <p className="mt-6 text-lg leading-8 text-white/75">
-            Entry prep, transport planning, payment readiness, and digital essentials are often what make or break an overseas visitor’s confidence.
+            Accommodation, medical care, food culture, transportation, payment, and language — the six essentials that decide whether a China trip feels easy on day one.
           </p>
         </div>
       </section>
 
       <section className="py-12">
         <div className="container-main grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {practicalGuides.map((guide) => (
-            <Link key={guide.slug} href={`/practical-info/${guide.slug}`} className="group rounded-[28px] bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-              <h2 className="text-2xl font-bold text-secondary-900">{guide.title}</h2>
-              <p className="mt-4 text-sm leading-7 text-secondary-600">{guide.summary}</p>
-              <ul className="mt-5 space-y-2 text-sm text-secondary-500">
-                {guide.points.slice(0, 3).map((point) => (
-                  <li key={point}>• {point}</li>
-                ))}
-              </ul>
-              <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary transition-all group-hover:gap-3">
-                Open guide
-                <ArrowRight className="h-4 w-4" />
-              </div>
-            </Link>
-          ))}
+          {practicalGuides.map((guide) => {
+            const Icon: LucideIcon = guideIconMap[guide.icon] ?? FileCheck2;
+            const iconWrap = accentClassMap[guide.accent] ?? accentClassMap.secondary;
+            return (
+              <Link
+                key={guide.slug}
+                href={`/practical-info/${guide.slug}`}
+                className="group flex flex-col rounded-[28px] bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              >
+                <div className="mb-5 flex items-start justify-between">
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${iconWrap}`}>
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <span className="rounded-full bg-secondary-50 px-3 py-1 text-xs uppercase tracking-[0.16em] text-secondary-500">
+                    {guide.readMinutes} min read
+                  </span>
+                </div>
+                <h2 className="text-2xl font-bold text-secondary-900">{guide.title}</h2>
+                <p className="mt-3 text-sm leading-7 text-secondary-600">{guide.summary}</p>
+                <ul className="mt-5 space-y-2 text-sm text-secondary-500">
+                  {guide.preview.slice(0, 3).map((point) => (
+                    <li key={point}>• {point}</li>
+                  ))}
+                </ul>
+                <div className="mt-auto pt-6">
+                  <div className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-all group-hover:gap-3">
+                    Open guide
+                    <ArrowRight className="h-4 w-4" />
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
     </div>
