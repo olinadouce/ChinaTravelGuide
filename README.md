@@ -96,3 +96,5 @@ npm run lint     # 代码检查
 ---
 
 *Built with ❤️ for China travelers*
+
+<!-- auto-deploy-test: trigger first GitHub → Vercel auto-deploy on 2026-06-14 -->
