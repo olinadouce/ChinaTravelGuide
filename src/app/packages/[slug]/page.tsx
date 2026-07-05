@@ -21,9 +21,11 @@ import {
   getPaidHtml,
 } from '@/data/packages';
 
-export function generateStaticParams() {
-  return getAllPackages().map((p) => ({ slug: p.slug }));
-}
+// Detail pages embed the full HTML inside an iframe (srcDoc), which can push
+// the pre-rendered HTML well past Vercel's 20 MB ISR limit. Render on demand
+// instead — file reads are cheap and traffic is low for this MVP.
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
 
 export async function generateMetadata({
   params,
