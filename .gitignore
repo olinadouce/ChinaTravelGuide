@@ -30,3 +30,11 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# Packet: source assets we don't need at build time
+packet/**/__MACOSX/
+packet/**/*.docx
+packet/**/*.pdf
+packet/**/*.zip
+packet/**/Thumbs.db
+packet/**/.DS_Store

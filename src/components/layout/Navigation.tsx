@@ -1,23 +1,42 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Globe2, Menu, Monitor, Moon, Search, Sun, X } from 'lucide-react';
+import { Globe2, Menu, Monitor, Moon, Search, Sun, User, X } from 'lucide-react';
 import { popularSearches, siteNavigation } from '@/data/content';
 import { useTheme } from '@/hooks/useTheme';
+import { useAuth } from '@/components/auth/MockAuthProvider';
+import { PointsBadge } from '@/components/packages/PointsBadge';
 import { cn } from '@/lib/utils';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 24);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!isUserMenuOpen) return;
+    const handler = (event: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isUserMenuOpen]);
 
   const ThemeIcon = resolvedTheme === 'dark' ? Moon : resolvedTheme === 'light' ? Sun : Monitor;
 
@@ -83,6 +102,80 @@ export default function Navigation() {
                 <Search className={cn('h-5 w-5', isScrolled ? 'text-secondary-700 dark:text-white' : 'text-black')} />
               </button>
 
+              <PointsBadge scrolled={isScrolled} />
+
+              {isAuthenticated ? (
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    onClick={() => setIsUserMenuOpen((v) => !v)}
+                    aria-label="Account menu"
+                    className={cn(
+                      'flex items-center gap-2 rounded-full px-2 py-1.5 text-sm font-medium transition-colors',
+                      isScrolled
+                        ? 'hover:bg-secondary-100 dark:hover:bg-secondary-800'
+                        : 'hover:bg-white/10'
+                    )}
+                  >
+                    <img
+                      src={user?.avatar}
+                      alt={user?.name}
+                      className="h-7 w-7 rounded-full ring-2 ring-white/40"
+                    />
+                    <span
+                      className={cn(
+                        'hidden md:inline',
+                        isScrolled ? 'text-secondary-700 dark:text-white' : 'text-black'
+                      )}
+                    >
+                      {user?.name}
+                    </span>
+                  </button>
+
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-2xl border border-black/5 bg-white shadow-xl">
+                      <div className="border-b border-secondary-100 p-4">
+                        <p className="text-sm font-bold text-secondary-900">{user?.name}</p>
+                        <p className="mt-1 text-xs text-secondary-500">
+                          Points balance: <span className="font-bold text-accent">{user?.points}</span>
+                        </p>
+                        <p className="mt-1 text-xs text-secondary-500">
+                          Unlocked: {user?.unlockedPackages.length} package
+                          {user?.unlockedPackages.length === 1 ? '' : 's'}
+                        </p>
+                      </div>
+                      <Link
+                        href="/packages"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="block px-4 py-3 text-sm font-medium text-secondary-700 transition-colors hover:bg-stone-50"
+                      >
+                        Browse packages
+                      </Link>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="block w-full px-4 py-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className={cn(
+                    'inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold transition-colors',
+                    isScrolled
+                      ? 'bg-primary text-white hover:bg-primary-700'
+                      : 'bg-primary text-white shadow-md shadow-primary/30 hover:bg-primary-700'
+                  )}
+                >
+                  <User className="h-4 w-4" /> Sign in
+                </Link>
+              )}
+
               <div
                 className={cn(
                   'hidden items-center gap-1 rounded-full px-3 py-2 text-sm font-medium sm:flex',
@@ -118,6 +211,29 @@ export default function Navigation() {
           )}
         >
           <div className="container-main space-y-2 py-4">
+            {isAuthenticated ? (
+              <div className="mb-2 flex items-center gap-3 rounded-2xl bg-stone-50 px-4 py-3">
+                <img
+                  src={user?.avatar}
+                  alt={user?.name}
+                  className="h-9 w-9 rounded-full"
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-secondary-900">{user?.name}</p>
+                  <p className="text-xs text-secondary-500">
+                    {user?.points} pts · {user?.unlockedPackages.length} unlocked
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="mb-2 block rounded-2xl bg-primary px-4 py-3 text-center font-bold text-white"
+              >
+                Sign in / Sign up
+              </Link>
+            )}
             {siteNavigation.slice(1).map((link) => (
               <Link
                 key={link.href}
@@ -128,6 +244,17 @@ export default function Navigation() {
                 {link.label}
               </Link>
             ))}
+            {isAuthenticated && (
+              <button
+                onClick={() => {
+                  logout();
+                  setIsOpen(false);
+                }}
+                className="block w-full rounded-2xl px-4 py-3 text-left font-medium text-red-600 transition-colors hover:bg-red-50"
+              >
+                Sign out
+              </button>
+            )}
           </div>
         </div>
       </header>

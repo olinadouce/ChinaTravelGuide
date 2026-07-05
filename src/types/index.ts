@@ -139,3 +139,49 @@ export interface PricingPackage {
   hotelRecommendations?: string[];
   importantNotes?: string[];
 }
+
+// New: Travel Packages — four themes
+
+export type ThemeId = 'landscape' | 'history' | 'themed' | 'ishowspeed';
+
+export type ThemeAccent = 'primary' | 'accent' | 'jade' | 'secondary';
+
+export type ThemeIconName = 'Mountain' | 'Landmark' | 'Compass' | 'Sparkles';
+
+export interface PackageTheme {
+  id: ThemeId;
+  /** Primary display name */
+  name: string;
+  /** Localised name (English by default) */
+  nameEn: string;
+  tagline: string;
+  description: string;
+  /** lucide-react icon name (string, dynamically imported) */
+  icon: ThemeIconName;
+  accent: ThemeAccent;
+  coverImage: string;
+  /** CSS gradient for the theme cover card */
+  gradient: string;
+}
+
+export interface TravelPackage {
+  id: string;
+  slug: string;
+  themeId: ThemeId;
+  name: string;
+  destination: string;
+  duration: string;
+  description: string;
+  shortDescription: string;
+  coverImage: string;
+  badge?: string;
+  popular?: boolean;
+  highlights: string[];
+  tags: string[];
+  /** Points required to unlock */
+  pointsCost: number;
+  /** Path to free-version HTML on disk (relative to cwd) */
+  freeHtmlPath: string;
+  /** Path to paid-version HTML; falls back to free path if missing */
+  paidHtmlPath: string;
+}

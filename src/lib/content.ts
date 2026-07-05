@@ -1,6 +1,5 @@
 import { destinations, heroImages, heroStats, journeys, practicalGuides, popularSearches, travelTools } from '@/data/content';
 import { forumPosts, forumComments } from '@/data/forum';
-import { pricingPackages } from '@/data/packages';
 
 export function getHomePayload() {
   return {
@@ -67,12 +66,4 @@ export function getForumPostBySlug(slug: string) {
 
 export function getForumCommentsByPostId(postId: string) {
   return forumComments.filter((comment) => comment.postId === postId);
-}
-
-export function getPackages() {
-  return pricingPackages;
-}
-
-export function getPackageBySlug(slug: string) {
-  return pricingPackages.find((pkg) => pkg.slug === slug);
 }
