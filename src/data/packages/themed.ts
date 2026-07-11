@@ -15,7 +15,7 @@ export const themedPackages: TravelPackage[] = [
     shortDescription:
       'From morning dim sum to late-night snacks, from arcade lanes to the Pearl River night cruise — an authentic Guangzhou playbook.',
     coverImage:
-      'https://loremflickr.com/1400/1000/guangzhou,china,skyline?random=41',
+      '/packages/covers/guangzhou.png',
     badge: 'Food Theme',
     popular: true,
     highlights: [
@@ -41,7 +41,7 @@ export const themedPackages: TravelPackage[] = [
     shortDescription:
       'Li River bamboo rafting + Yangshuo countryside cycling + Longji rice terraces — the classic northern-Guangxi triangle.',
     coverImage:
-      'https://loremflickr.com/1400/1000/guilin,china,karst?random=42',
+      '/packages/covers/guilin-yangshuo-longji.jpg',
     badge: 'Landscape Theme',
     popular: true,
     highlights: [
@@ -67,7 +67,7 @@ export const themedPackages: TravelPackage[] = [
     shortDescription:
       'A high-plateau pilgrimage from the Potala Palace to the Everest Base Camp.',
     coverImage:
-      'https://loremflickr.com/1400/1000/tibet,mountains,china?random=43',
+      '/packages/covers/tibet.webp',
     badge: 'Plateau Pilgrimage',
     highlights: [
       'Potala Palace',

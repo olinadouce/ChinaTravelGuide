@@ -15,7 +15,7 @@ export const ishowspeedPackages: TravelPackage[] = [
     shortDescription:
       'Replay the Beijing livestream route — Forbidden City / Great Wall / hutongs / Peking duck in one playbook.',
     coverImage:
-      'https://loremflickr.com/1400/1000/beijing,forbidden,china?random=51',
+      '/packages/covers/ishowspeed-beijing.jpg',
     badge: 'IShowSpeed Edition',
     popular: true,
     highlights: [
@@ -41,7 +41,7 @@ export const ishowspeedPackages: TravelPackage[] = [
     shortDescription:
       'From the Bund to the French Concession — a neon-lit xiaolongbao crawl.',
     coverImage:
-      'https://loremflickr.com/1400/1000/shanghai,bund,china?random=52',
+      '/packages/covers/ishowspeed-shanghai.jpg',
     badge: 'IShowSpeed Edition',
     highlights: [
       'The Bund at night',
@@ -66,7 +66,7 @@ export const ishowspeedPackages: TravelPackage[] = [
     shortDescription:
       'Watch pandas, dip hotpot, listen to Sichuan opera — the most authentic Chengdu life.',
     coverImage:
-      'https://loremflickr.com/1400/1000/chengdu,panda,china?random=53',
+      '/packages/covers/ishowspeed-chengdu.jpg',
     badge: 'IShowSpeed Edition',
     popular: true,
     highlights: [
@@ -92,7 +92,7 @@ export const ishowspeedPackages: TravelPackage[] = [
     shortDescription:
       '8D mountain-city, the through-building light rail and original nine-grid hotpot — a sensory overload.',
     coverImage:
-      'https://loremflickr.com/1400/1000/chongqing,china,night?random=54',
+      '/packages/covers/ishowspeed-chongqing.jpg',
     badge: 'IShowSpeed Edition',
     highlights: [
       'Hongya Cave night view',
@@ -106,31 +106,6 @@ export const ishowspeedPackages: TravelPackage[] = [
     paidHtmlPath: `${ROOT}/IShowSpeed_Chongqing_Paid_Guide_Final.html`,
   },
   {
-    id: 'pkg-ishowspeed-henan',
-    slug: 'ishowspeed-henan',
-    themeId: 'ishowspeed',
-    name: 'IShowSpeed Henan: Shaolin & Longmen Grottoes',
-    destination: 'Zhengzhou · Luoyang · Dengfeng',
-    duration: '4 days',
-    description:
-      'Shaolin kung fu shows, the Longmen Grottoes Buddha, Kaifeng night market and the Yellow River scenic area.',
-    shortDescription:
-      'Shaolin kung fu, the Longmen Vairocana Buddha and Kaifeng night market — a Central Plains deep dive.',
-    coverImage:
-      'https://loremflickr.com/1400/1000/luoyang,grottoes,china?random=55',
-    badge: 'IShowSpeed Edition',
-    highlights: [
-      'Shaolin kung fu performance',
-      'Longmen Grottoes',
-      'Kaifeng Drum Tower night market',
-      'Yellow River scenic area',
-    ],
-    tags: ['IShowSpeed', 'History', 'Martial Arts'],
-    pointsCost: 80,
-    freeHtmlPath: `${ROOT}/IShowSpeed_Henan_Free_Guide_Final.html`,
-    paidHtmlPath: `${ROOT}/IShowSpeed_Henan_Paid_Guide_Final.html`,
-  },
-  {
     id: 'pkg-ishowspeed-hong-kong',
     slug: 'ishowspeed-hong-kong',
     themeId: 'ishowspeed',
@@ -142,7 +117,7 @@ export const ishowspeedPackages: TravelPackage[] = [
     shortDescription:
       'Victoria Harbour nights, Star Ferry rides, Temple Street market and dim sum classics — the essential Hong Kong trio.',
     coverImage:
-      'https://loremflickr.com/1400/1000/hongkong,harbour,china?random=56',
+      '/packages/covers/ishowspeed-hong-kong.jpg',
     badge: 'IShowSpeed Edition',
     highlights: [
       'Victoria Peak',
@@ -167,7 +142,7 @@ export const ishowspeedPackages: TravelPackage[] = [
     shortDescription:
       'From Window of the World to Huaqiangbei — feel Shenzhen\'s speed and coastline.',
     coverImage:
-      'https://loremflickr.com/1400/1000/shenzhen,china,skyline?random=57',
+      '/packages/covers/ishowspeed-shenzhen.jpg',
     badge: 'IShowSpeed Edition',
     highlights: [
       'Window of the World / Splendid China',

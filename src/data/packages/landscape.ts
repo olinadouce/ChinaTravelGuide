@@ -15,7 +15,7 @@ export const landscapePackages: TravelPackage[] = [
     shortDescription:
       'Sea of clouds on Huangshan · cliff walkways of Sanqingshan · bamboo rafts on the Nine-Bend Stream — a three-icon East China loop.',
     coverImage:
-      'https://loremflickr.com/1400/1000/huangshan,china,mountains?random=21',
+      '/packages/covers/east-china-mountains.png',
     badge: 'Classic Mountains',
     popular: true,
     highlights: [
@@ -41,7 +41,7 @@ export const landscapePackages: TravelPackage[] = [
     shortDescription:
       "From Qinghai Lake to Crescent Lake — a panoramic sweep of plateau, yardang, salt lake and Gobi.",
     coverImage:
-      'https://loremflickr.com/1400/1000/qinghai,china,lake?random=22',
+      '/packages/covers/gansu-qinghai.png',
     badge: 'Plateau Secrets',
     popular: true,
     highlights: [
@@ -67,7 +67,7 @@ export const landscapePackages: TravelPackage[] = [
     shortDescription:
       'Tiger Leaping Gorge trek + Meili sunrise + Old Town of Dukezong — a deep dive into Yunnan-Tibet culture.',
     coverImage:
-      'https://loremflickr.com/1400/1000/yunnan,china,mountains?random=23',
+      '/packages/covers/northwest-yunnan.jpg',
     badge: 'Snow Trek',
     highlights: [
       'Tiger Leaping Gorge high trail',
@@ -92,7 +92,7 @@ export const landscapePackages: TravelPackage[] = [
     shortDescription:
       'Karst cone peaks, underground rivers and a sea of rapeseed flowers across the southern Yunnan-Guizhou plateau.',
     coverImage:
-      'https://loremflickr.com/1400/1000/guizhou,karst,china?random=24',
+      '/packages/covers/south-china-karst.png',
     badge: 'Karst',
     highlights: [
       'Libo Xiaoqikong',
@@ -117,7 +117,7 @@ export const landscapePackages: TravelPackage[] = [
     shortDescription:
       'From the Chengdu Plain westward to Daocheng Yading — "the last pure land on the blue planet".',
     coverImage:
-      'https://loremflickr.com/1400/1000/sichuan,china,mountains?random=25',
+      '/packages/covers/western-sichuan.png',
     badge: 'Western Sichuan Loop',
     popular: true,
     highlights: [
@@ -143,7 +143,7 @@ export const landscapePackages: TravelPackage[] = [
     shortDescription:
       'The real-life Avatar mountains paired with Enshi\'s deep slot canyons and Pingshan — a vertical landscape double-bill.',
     coverImage:
-      'https://loremflickr.com/1400/1000/zhangjiajie,china,mountains?random=26',
+      '/packages/covers/zhangjiajie-enshi.png',
     badge: 'Floating Peaks',
     highlights: [
       'Zhangjiajie National Forest Park',
