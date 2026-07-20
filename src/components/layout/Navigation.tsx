@@ -1,12 +1,13 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Globe2, Menu, Monitor, Moon, Search, Sun, User, X } from 'lucide-react';
+import { Menu, Monitor, Moon, Search, Sun, User, X } from 'lucide-react';
 import { popularSearches, siteNavigation } from '@/data/content';
 import { useTheme } from '@/hooks/useTheme';
-import { useAuth } from '@/components/auth/MockAuthProvider';
+import { useAuth } from '@/components/auth/FirebaseAuthProvider';
 import { PointsBadge } from '@/components/packages/PointsBadge';
+import { LanguageTranslator } from '@/components/layout/LanguageTranslator';
 import { cn } from '@/lib/utils';
 
 export default function Navigation() {
@@ -44,24 +45,28 @@ export default function Navigation() {
     <>
       <header
         className={cn(
-          'fixed inset-x-0 top-0 z-50 transition-all duration-300',
-          isScrolled ? 'bg-[#f7f1e8]/92 shadow-lg backdrop-blur-md dark:bg-secondary-900/90' : 'bg-transparent'
+          'fixed inset-x-0 top-0 z-50 border-b border-black/5 bg-[#f8f4ec]/94 shadow-sm backdrop-blur-xl transition-all duration-300 dark:border-white/10 dark:bg-secondary-900/92',
+          isScrolled && 'shadow-lg'
         )}
       >
         <nav className="container-main">
           <div className="flex h-16 items-center justify-between md:h-20">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-accent to-jade text-xl font-bold text-white transition-transform group-hover:scale-110">
-                C
-              </div>
-              <div className="hidden sm:block">
-                <p className={cn('font-serif text-xl font-bold', isScrolled ? 'text-secondary-900 dark:text-white' : 'text-black')}>
-                  China Travel Guide
-                </p>
-                <p className={cn('text-xs uppercase tracking-[0.24em]', isScrolled ? 'text-secondary-500' : 'text-black/70')}>
-                  Inbound Tourism MVP
-                </p>
-              </div>
+            <Link href="/" className="group flex items-center gap-3" aria-label="seechinaroute home">
+              <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-[#f8f4ec] shadow-sm ring-1 ring-black/5 transition-transform group-hover:scale-105 dark:bg-secondary-800 dark:ring-white/10 md:h-12 md:w-12">
+                <img
+                  src="/see-china-route-mark.svg"
+                  alt=""
+                  className="h-full w-full"
+                />
+              </span>
+              <span className="hidden sm:block">
+                <span className="block font-serif text-xl font-bold leading-tight text-secondary-900 dark:text-white md:text-2xl">
+                  seechinaroute
+                </span>
+                <span className="block text-xs uppercase tracking-[0.22em] text-secondary-500 dark:text-secondary-300">
+                  See China Route
+                </span>
+              </span>
             </Link>
 
             <div className="hidden items-center gap-8 md:flex">
@@ -71,7 +76,7 @@ export default function Navigation() {
                   href={link.href}
                   className={cn(
                     'text-sm font-medium transition-colors hover:text-primary',
-                    isScrolled ? 'text-secondary-700 dark:text-secondary-100' : 'text-black hover:text-primary'
+                    'text-secondary-700 dark:text-secondary-100'
                   )}
                 >
                   {link.label}
@@ -84,22 +89,22 @@ export default function Navigation() {
                 onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
                 className={cn(
                   'rounded-full p-2.5 transition-colors',
-                  isScrolled ? 'hover:bg-secondary-100 dark:hover:bg-secondary-800' : 'hover:bg-white/10'
+                  'hover:bg-secondary-100 dark:hover:bg-secondary-800'
                 )}
                 aria-label="Toggle theme"
               >
-                <ThemeIcon className={cn('h-5 w-5', isScrolled ? 'text-secondary-700 dark:text-white' : 'text-black')} />
+                <ThemeIcon className="h-5 w-5 text-secondary-700 dark:text-white" />
               </button>
 
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className={cn(
                   'rounded-full p-2.5 transition-colors',
-                  isScrolled ? 'hover:bg-secondary-100 dark:hover:bg-secondary-800' : 'hover:bg-white/10'
+                  'hover:bg-secondary-100 dark:hover:bg-secondary-800'
                 )}
                 aria-label="Open search"
               >
-                <Search className={cn('h-5 w-5', isScrolled ? 'text-secondary-700 dark:text-white' : 'text-black')} />
+                <Search className="h-5 w-5 text-secondary-700 dark:text-white" />
               </button>
 
               <PointsBadge scrolled={isScrolled} />
@@ -111,51 +116,53 @@ export default function Navigation() {
                     aria-label="Account menu"
                     className={cn(
                       'flex items-center gap-2 rounded-full px-2 py-1.5 text-sm font-medium transition-colors',
-                      isScrolled
-                        ? 'hover:bg-secondary-100 dark:hover:bg-secondary-800'
-                        : 'hover:bg-white/10'
+                      'hover:bg-secondary-100 dark:hover:bg-secondary-800'
                     )}
                   >
                     <img
-                      src={user?.avatar}
-                      alt={user?.name}
+                      src={user?.photoURL ?? undefined}
+                      alt={user?.displayName ?? ''}
                       className="h-7 w-7 rounded-full ring-2 ring-white/40"
                     />
                     <span
-                      className={cn(
-                        'hidden md:inline',
-                        isScrolled ? 'text-secondary-700 dark:text-white' : 'text-black'
-                      )}
+                      className="hidden text-secondary-700 dark:text-white md:inline"
                     >
-                      {user?.name}
+                      {user?.displayName}
                     </span>
                   </button>
 
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-2xl border border-black/5 bg-white shadow-xl">
-                      <div className="border-b border-secondary-100 p-4">
-                        <p className="text-sm font-bold text-secondary-900">{user?.name}</p>
-                        <p className="mt-1 text-xs text-secondary-500">
+                    <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-2xl border border-black/5 dark:border-white/10 bg-white dark:bg-secondary-900 shadow-xl">
+                      <div className="border-b border-secondary-100 dark:border-secondary-700 p-4">
+                        <p className="text-sm font-bold text-secondary-900 dark:text-white">{user?.displayName}</p>
+                        <p className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">
                           Points balance: <span className="font-bold text-accent">{user?.points}</span>
                         </p>
-                        <p className="mt-1 text-xs text-secondary-500">
+                        <p className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">
                           Unlocked: {user?.unlockedPackages.length} package
                           {user?.unlockedPackages.length === 1 ? '' : 's'}
                         </p>
                       </div>
                       <Link
+                        href="/account/points"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="block px-4 py-3 text-sm font-medium text-secondary-700 transition-colors hover:bg-stone-50 dark:text-secondary-200 dark:hover:bg-secondary-800"
+                      >
+                        Points account
+                      </Link>
+                      <Link
                         href="/packages"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="block px-4 py-3 text-sm font-medium text-secondary-700 transition-colors hover:bg-stone-50"
+                        className="block px-4 py-3 text-sm font-medium text-secondary-700 transition-colors hover:bg-stone-50 dark:text-secondary-200 dark:hover:bg-secondary-800"
                       >
                         Browse packages
                       </Link>
                       <button
                         onClick={() => {
-                          logout();
+                          void logout();
                           setIsUserMenuOpen(false);
                         }}
-                        className="block w-full px-4 py-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                        className="block w-full px-4 py-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/30"
                       >
                         Sign out
                       </button>
@@ -167,37 +174,27 @@ export default function Navigation() {
                   href="/login"
                   className={cn(
                     'inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold transition-colors',
-                    isScrolled
-                      ? 'bg-primary text-white hover:bg-primary-700'
-                      : 'bg-primary text-white shadow-md shadow-primary/30 hover:bg-primary-700'
+                    'bg-primary text-white shadow-md shadow-primary/25 hover:bg-primary-700'
                   )}
                 >
                   <User className="h-4 w-4" /> Sign in
                 </Link>
               )}
 
-              <div
-                className={cn(
-                  'hidden items-center gap-1 rounded-full px-3 py-2 text-sm font-medium sm:flex',
-                  isScrolled ? 'text-secondary-700 dark:text-white' : 'text-black'
-                )}
-              >
-                <Globe2 className="h-4 w-4" />
-                EN
-              </div>
+              <LanguageTranslator />
 
               <button
                 onClick={() => setIsOpen((value) => !value)}
                 className={cn(
                   'rounded-full p-2.5 transition-colors md:hidden',
-                  isScrolled ? 'hover:bg-secondary-100 dark:hover:bg-secondary-800' : 'hover:bg-white/10'
+                  'hover:bg-secondary-100 dark:hover:bg-secondary-800'
                 )}
                 aria-label="Toggle menu"
               >
                 {isOpen ? (
-                  <X className={cn('h-6 w-6', isScrolled ? 'text-secondary-900 dark:text-white' : 'text-black')} />
+                  <X className="h-6 w-6 text-secondary-900 dark:text-white" />
                 ) : (
-                  <Menu className={cn('h-6 w-6', isScrolled ? 'text-secondary-900 dark:text-white' : 'text-black')} />
+                  <Menu className="h-6 w-6 text-secondary-900 dark:text-white" />
                 )}
               </button>
             </div>
@@ -212,16 +209,16 @@ export default function Navigation() {
         >
           <div className="container-main space-y-2 py-4">
             {isAuthenticated ? (
-              <div className="mb-2 flex items-center gap-3 rounded-2xl bg-stone-50 px-4 py-3">
+              <div className="mb-2 flex items-center gap-3 rounded-2xl bg-stone-50 dark:bg-secondary-800 px-4 py-3">
                 <img
-                  src={user?.avatar}
-                  alt={user?.name}
+                  src={user?.photoURL ?? undefined}
+                  alt={user?.displayName ?? ''}
                   className="h-9 w-9 rounded-full"
                 />
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-secondary-900">{user?.name}</p>
-                  <p className="text-xs text-secondary-500">
-                    {user?.points} pts · {user?.unlockedPackages.length} unlocked
+                  <p className="text-sm font-bold text-secondary-900 dark:text-white">{user?.displayName}</p>
+                  <p className="text-xs text-secondary-500 dark:text-secondary-400">
+                    {user?.points} pts 路 {user?.unlockedPackages.length} unlocked
                   </p>
                 </div>
               </div>
@@ -245,15 +242,24 @@ export default function Navigation() {
               </Link>
             ))}
             {isAuthenticated && (
-              <button
-                onClick={() => {
-                  logout();
-                  setIsOpen(false);
-                }}
-                className="block w-full rounded-2xl px-4 py-3 text-left font-medium text-red-600 transition-colors hover:bg-red-50"
-              >
-                Sign out
-              </button>
+              <>
+                <Link
+                  href="/account/points"
+                  onClick={() => setIsOpen(false)}
+                  className="block rounded-2xl px-4 py-3 font-medium text-secondary-700 transition-colors hover:bg-secondary-100 hover:text-primary dark:text-secondary-100 dark:hover:bg-secondary-800"
+                >
+                  Points account
+                </Link>
+                <button
+                  onClick={() => {
+                    void logout();
+                    setIsOpen(false);
+                  }}
+                  className="block w-full rounded-2xl px-4 py-3 text-left font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/30"
+                >
+                  Sign out
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -272,12 +278,12 @@ export default function Navigation() {
                   autoFocus
                 />
                 <button onClick={() => setIsSearchOpen(false)} className="rounded-full p-2 hover:bg-secondary-100 dark:hover:bg-secondary-700">
-                  <X className="h-5 w-5 text-secondary-500" />
+                  <X className="h-5 w-5 text-secondary-500 dark:text-secondary-400" />
                 </button>
               </div>
 
               <div className="p-5">
-                <p className="mb-3 text-sm text-secondary-500">Popular Searches</p>
+                <p className="mb-3 text-sm text-secondary-500 dark:text-secondary-400">Popular Searches</p>
                 <div className="flex flex-wrap gap-2">
                   {popularSearches.map((term) => (
                     <Link

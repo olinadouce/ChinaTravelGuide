@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { travelTools } from '@/data/content';
@@ -15,11 +15,11 @@ const toolGuides: Record<string, { headline: string; details: string[] }> = {
     details: [
       'Schedule the first day lightly and avoid tight domestic transfers if possible.',
       'Use meal timing and daylight exposure to reset more quickly after arrival.',
-      'For multi-city routes, China’s single time standard keeps internal travel simple once visitors land.',
+      'For multi-city routes, China鈥檚 single time standard keeps internal travel simple once visitors land.',
     ],
   },
   distance: {
-    headline: 'Strong route planning depends on understanding how China’s scale affects day count, transport choice, and traveler energy.',
+    headline: 'Strong route planning depends on understanding how China鈥檚 scale affects day count, transport choice, and traveler energy.',
     details: [
       'High-speed rail works best on shorter city pairs with strong central station access.',
       'Cross-country jumps often justify flying even in premium leisure itineraries.',
@@ -37,16 +37,16 @@ export default function ToolGuidePage({ params }: { params: { slug: string } }) 
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f1e8] pt-20">
-      <section className="bg-white py-16">
+    <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220] pt-20">
+      <section className="bg-white dark:bg-secondary-900 py-16">
         <div className="container-main max-w-4xl">
-          <Link href="/tools" className="mb-6 inline-flex items-center gap-2 text-sm text-secondary-500 hover:text-primary">
+          <Link href="/tools" className="mb-6 inline-flex items-center gap-2 text-sm text-secondary-500 dark:text-secondary-400 hover:text-primary">
             <ArrowLeft className="h-4 w-4" />
             Back to tools
           </Link>
-          <p className="text-sm uppercase tracking-[0.24em] text-secondary-500">Guide tool</p>
-          <h1 className="mt-4 text-5xl font-bold text-secondary-900">{tool.title}</h1>
-          <p className="mt-6 text-lg leading-8 text-secondary-700">{guide.headline}</p>
+          <p className="text-sm uppercase tracking-[0.24em] text-secondary-500 dark:text-secondary-400">Guide tool</p>
+          <h1 className="mt-4 text-5xl font-bold text-secondary-900 dark:text-white">{tool.title}</h1>
+          <p className="mt-6 text-lg leading-8 text-secondary-700 dark:text-secondary-200">{guide.headline}</p>
         </div>
       </section>
 

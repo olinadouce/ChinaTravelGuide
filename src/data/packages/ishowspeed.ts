@@ -1,6 +1,6 @@
-import type { TravelPackage } from '@/types';
+﻿import type { TravelPackage } from '@/types';
 
-const ROOT = 'packet/甲亢哥中国行7个城市word方案包+html/甲亢哥中国行7个城市word方案包+html';
+const ROOT = 'public/ishowspeed';
 
 export const ishowspeedPackages: TravelPackage[] = [
   {
@@ -11,11 +11,10 @@ export const ishowspeedPackages: TravelPackage[] = [
     destination: 'Beijing',
     duration: '4 days',
     description:
-      'Follow the IShowSpeed livestream through the capital — Forbidden City deep dive, Great Wall Mutianyu, hutong nights and Peking duck.',
+      'Follow the IShowSpeed livestream through the capital: Forbidden City deep dive, Great Wall Mutianyu, hutong nights and Peking duck.',
     shortDescription:
-      'Replay the Beijing livestream route — Forbidden City / Great Wall / hutongs / Peking duck in one playbook.',
-    coverImage:
-      '/packages/covers/ishowspeed-beijing.jpg',
+      'Replay the Beijing livestream route: Forbidden City / Great Wall / hutongs / Peking duck in one playbook.',
+    coverImage: '/packages/covers/ishowspeed-beijing.jpg',
     badge: 'IShowSpeed Edition',
     popular: true,
     highlights: [
@@ -25,9 +24,9 @@ export const ishowspeedPackages: TravelPackage[] = [
       'Quanjude Peking duck',
     ],
     tags: ['IShowSpeed', 'Beijing', 'Heritage'],
-    pointsCost: 80,
-    freeHtmlPath: `${ROOT}/IShowSpeed_Beijing_Free_Guide_Final.html`,
-    paidHtmlPath: `${ROOT}/IShowSpeed_Beijing_Paid_Guide_Final.html`,
+    pointsCost: 120,
+    freeHtmlPath: `${ROOT}/beijing/free.html`,
+    paidHtmlPath: `${ROOT}/beijing/paid.html`,
   },
   {
     id: 'pkg-ishowspeed-shanghai',
@@ -37,11 +36,10 @@ export const ishowspeedPackages: TravelPackage[] = [
     destination: 'Shanghai',
     duration: '3 days',
     description:
-      'Bund nights, Yu Garden morning, Nanjing Road buzz and Xiaolongbao pilgrimages in the French Concession.',
+      'Bund nights, Yu Garden morning, Nanjing Road buzz and xiaolongbao pilgrimages in the French Concession.',
     shortDescription:
-      'From the Bund to the French Concession — a neon-lit xiaolongbao crawl.',
-    coverImage:
-      '/packages/covers/ishowspeed-shanghai.jpg',
+      'From the Bund to the French Concession: a neon-lit xiaolongbao crawl.',
+    coverImage: '/packages/covers/ishowspeed-shanghai.jpg',
     badge: 'IShowSpeed Edition',
     highlights: [
       'The Bund at night',
@@ -50,23 +48,22 @@ export const ishowspeedPackages: TravelPackage[] = [
       'Nanxiang xiaolongbao',
     ],
     tags: ['IShowSpeed', 'Shanghai', 'Food'],
-    pointsCost: 80,
-    freeHtmlPath: `${ROOT}/IShowSpeed_Shanghai_Free_Guide_Final.html`,
-    paidHtmlPath: `${ROOT}/IShowSpeed_Shanghai_Paid_Guide_Final.html`,
+    pointsCost: 120,
+    freeHtmlPath: `${ROOT}/shanghai/free.html`,
+    paidHtmlPath: `${ROOT}/shanghai/paid.html`,
   },
   {
     id: 'pkg-ishowspeed-chengdu',
     slug: 'ishowspeed-chengdu',
     themeId: 'ishowspeed',
     name: 'IShowSpeed Chengdu: Pandas & Hotpot',
-    destination: 'Chengdu · Sichuan',
+    destination: 'Chengdu - Sichuan',
     duration: '4 days',
     description:
       'Panda Base, Jinli street, Sichuan opera face-changing, and the spiciest hotpot Chengdu has to offer.',
     shortDescription:
-      'Watch pandas, dip hotpot, listen to Sichuan opera — the most authentic Chengdu life.',
-    coverImage:
-      '/packages/covers/ishowspeed-chengdu.jpg',
+      'Watch pandas, dip hotpot, listen to Sichuan opera: the most authentic Chengdu life.',
+    coverImage: '/packages/covers/ishowspeed-chengdu.jpg',
     badge: 'IShowSpeed Edition',
     popular: true,
     highlights: [
@@ -76,9 +73,9 @@ export const ishowspeedPackages: TravelPackage[] = [
       'Xiaolongkan / Diantai Lane hotpot',
     ],
     tags: ['IShowSpeed', 'Panda', 'Hotpot'],
-    pointsCost: 80,
-    freeHtmlPath: `${ROOT}/IShowSpeed_Chengdu_Free_Guide_Final.html`,
-    paidHtmlPath: `${ROOT}/IShowSpeed_Chengdu_Paid_Guide_Final.html`,
+    pointsCost: 120,
+    freeHtmlPath: `${ROOT}/chengdu/free.html`,
+    paidHtmlPath: `${ROOT}/chengdu/paid.html`,
   },
   {
     id: 'pkg-ishowspeed-chongqing',
@@ -90,9 +87,8 @@ export const ishowspeedPackages: TravelPackage[] = [
     description:
       'Hongya Cave night, the Yangtze cable car crossing, the through-building light rail, and the original Chongqing hotpot.',
     shortDescription:
-      '8D mountain-city, the through-building light rail and original nine-grid hotpot — a sensory overload.',
-    coverImage:
-      '/packages/covers/ishowspeed-chongqing.jpg',
+      '8D mountain-city, the through-building light rail and original nine-grid hotpot: a sensory overload.',
+    coverImage: '/packages/covers/ishowspeed-chongqing.jpg',
     badge: 'IShowSpeed Edition',
     highlights: [
       'Hongya Cave night view',
@@ -101,9 +97,9 @@ export const ishowspeedPackages: TravelPackage[] = [
       'Peijie old hotpot',
     ],
     tags: ['IShowSpeed', 'Hotpot', 'Cyberpunk'],
-    pointsCost: 80,
-    freeHtmlPath: `${ROOT}/IShowSpeed_Chongqing_Free_Guide_Final.html`,
-    paidHtmlPath: `${ROOT}/IShowSpeed_Chongqing_Paid_Guide_Final.html`,
+    pointsCost: 120,
+    freeHtmlPath: `${ROOT}/chongqing/free.html`,
+    paidHtmlPath: `${ROOT}/chongqing/paid.html`,
   },
   {
     id: 'pkg-ishowspeed-hong-kong',
@@ -115,9 +111,8 @@ export const ishowspeedPackages: TravelPackage[] = [
     description:
       'Victoria Peak, Star Ferry, Temple Street night market, dim sum classics and the Symphony of Lights show.',
     shortDescription:
-      'Victoria Harbour nights, Star Ferry rides, Temple Street market and dim sum classics — the essential Hong Kong trio.',
-    coverImage:
-      '/packages/covers/ishowspeed-hong-kong.jpg',
+      'Victoria Harbour nights, Star Ferry rides, Temple Street market and dim sum classics: the essential Hong Kong trio.',
+    coverImage: '/packages/covers/ishowspeed-hong-kong.jpg',
     badge: 'IShowSpeed Edition',
     highlights: [
       'Victoria Peak',
@@ -126,23 +121,22 @@ export const ishowspeedPackages: TravelPackage[] = [
       'Dim sum & pineapple bun',
     ],
     tags: ['IShowSpeed', 'Hong Kong', 'Food'],
-    pointsCost: 80,
-    freeHtmlPath: `${ROOT}/IShowSpeed_Hong_Kong_Free_Guide_Final.html`,
-    paidHtmlPath: `${ROOT}/IShowSpeed_Hong_Kong_Paid_Guide_Final.html`,
+    pointsCost: 120,
+    freeHtmlPath: `${ROOT}/hong-kong/free.html`,
+    paidHtmlPath: `${ROOT}/hong-kong/paid.html`,
   },
   {
     id: 'pkg-ishowspeed-shenzhen',
     slug: 'ishowspeed-shenzhen',
     themeId: 'ishowspeed',
     name: 'IShowSpeed Shenzhen: Tech & Coastal City',
-    destination: 'Shenzhen · Guangdong',
+    destination: 'Shenzhen - Guangdong',
     duration: '2-3 days',
     description:
       'Window of the World, Splendid China, OCT-LOFT creative park and the tech flagship stores of Huaqiangbei.',
     shortDescription:
-      'From Window of the World to Huaqiangbei — feel Shenzhen\'s speed and coastline.',
-    coverImage:
-      '/packages/covers/ishowspeed-shenzhen.jpg',
+      "From Window of the World to Huaqiangbei: feel Shenzhen's speed and coastline.",
+    coverImage: '/packages/covers/ishowspeed-shenzhen.jpg',
     badge: 'IShowSpeed Edition',
     highlights: [
       'Window of the World / Splendid China',
@@ -151,9 +145,8 @@ export const ishowspeedPackages: TravelPackage[] = [
       'Shenzhen Bay Park sunset',
     ],
     tags: ['IShowSpeed', 'Shenzhen', 'Tech'],
-    pointsCost: 80,
-    freeHtmlPath: `${ROOT}/IShowSpeed_Shenzhen_Free_Guide_Final.html`,
-    // Shenzhen currently only has a free version; paid version falls back to the free HTML.
-    paidHtmlPath: `${ROOT}/IShowSpeed_Shenzhen_Free_Guide_Final.html`,
+    pointsCost: 120,
+    freeHtmlPath: `${ROOT}/shenzhen/free.html`,
+    paidHtmlPath: `${ROOT}/shenzhen/free.html`,
   },
 ];

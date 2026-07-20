@@ -43,7 +43,7 @@ export default function CurrencyPage() {
   }, [amount, fromCurrency, toCurrency]);
 
   return (
-    <div className="min-h-screen bg-[#f7f1e8] pt-20">
+    <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220] pt-20">
       <section className="bg-gradient-to-br from-primary via-secondary-900 to-secondary-800 py-16 text-white">
         <div className="container-main max-w-3xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm">
@@ -59,8 +59,8 @@ export default function CurrencyPage() {
 
       <section className="py-12">
         <div className="container-main max-w-3xl">
-          <div className="rounded-[32px] bg-white p-8 shadow-sm">
-            <label className="block text-sm font-medium text-secondary-500">Amount</label>
+          <div className="rounded-[32px] bg-white dark:bg-secondary-900 p-8 shadow-sm">
+            <label className="block text-sm font-medium text-secondary-500 dark:text-secondary-400">Amount</label>
             <input
               type="number"
               min="0"
@@ -71,7 +71,7 @@ export default function CurrencyPage() {
 
             <div className="mt-6 grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
               <div>
-                <label className="block text-sm font-medium text-secondary-500">From</label>
+                <label className="block text-sm font-medium text-secondary-500 dark:text-secondary-400">From</label>
                 <select value={fromCurrency} onChange={(event) => setFromCurrency(event.target.value)} className="input-field mt-2">
                   {currencies.map((currency) => (
                     <option key={currency} value={currency}>
@@ -86,14 +86,14 @@ export default function CurrencyPage() {
                   setFromCurrency(toCurrency);
                   setToCurrency(fromCurrency);
                 }}
-                className="mx-auto rounded-full bg-secondary-100 p-3 text-secondary-700 transition-colors hover:bg-secondary-200"
+                className="mx-auto rounded-full bg-secondary-100 dark:bg-secondary-800 p-3 text-secondary-700 dark:text-secondary-200 transition-colors hover:bg-secondary-200 dark:hover:bg-secondary-700"
                 aria-label="Swap currencies"
               >
                 <ArrowRightLeft className="h-5 w-5" />
               </button>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-500">To</label>
+                <label className="block text-sm font-medium text-secondary-500 dark:text-secondary-400">To</label>
                 <select value={toCurrency} onChange={(event) => setToCurrency(event.target.value)} className="input-field mt-2">
                   {currencies.map((currency) => (
                     <option key={currency} value={currency}>

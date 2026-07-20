@@ -1,8 +1,9 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Coins, Eye, MapPin, Sparkles } from 'lucide-react';
 
 import { getAllPackages, type ClientPackage } from '@/data/packages';
+import { POINTS_RULES } from '@/lib/points-rules';
 
 const accentMap = {
   primary: 'bg-primary',
@@ -31,12 +32,12 @@ export default function FeaturedPackages() {
               Curated Packages
             </span>
           </div>
-          <h2 className="font-serif text-3xl font-bold text-secondary-900 md:text-4xl">
+          <h2 className="font-serif text-3xl font-bold text-secondary-900 dark:text-white md:text-4xl">
             Featured China travel guides
           </h2>
-          <p className="mt-3 max-w-2xl text-secondary-600">
-            Four themes · 17 in-depth guides. Free preview always — sign in to redeem 200 bonus points
-            and unlock the full version.
+          <p className="mt-3 max-w-2xl text-secondary-600 dark:text-secondary-300">
+            Four themes - 17 in-depth guides. Free preview always; sign in to redeem{' '}
+            {POINTS_RULES.SIGNUP_BONUS} bonus points and unlock full guides with points.
           </p>
         </div>
         <Link
@@ -54,7 +55,7 @@ export default function FeaturedPackages() {
             <Link
               key={pkg.id}
               href={`/packages/${pkg.slug}`}
-              className="group flex flex-col overflow-hidden rounded-3xl border border-black/5 bg-white shadow-lg shadow-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10"
+              className="group flex flex-col overflow-hidden rounded-3xl border border-black/5 dark:border-white/10 bg-white dark:bg-secondary-900 shadow-lg shadow-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10"
               style={{ animationDelay: `${index * 80}ms` }}
             >
               <div className="relative aspect-[16/10] overflow-hidden">
@@ -68,7 +69,7 @@ export default function FeaturedPackages() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
                 <div className="absolute left-3 top-3 flex flex-col gap-2">
                   {pkg.badge && (
-                    <div className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-secondary-900 shadow-sm">
+                    <div className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-secondary-900 shadow-sm dark:bg-secondary-950/85 dark:text-secondary-100 dark:ring-1 dark:ring-white/10">
                       {pkg.badge}
                     </div>
                   )}
@@ -79,17 +80,17 @@ export default function FeaturedPackages() {
               </div>
 
               <div className="flex flex-1 flex-col p-5">
-                <div className="mb-2 flex items-center gap-2 text-xs text-secondary-500">
+                <div className="mb-2 flex items-center gap-2 text-xs text-secondary-500 dark:text-secondary-400">
                   <MapPin className="h-3.5 w-3.5 text-primary" />
                   {pkg.destination}
                 </div>
-                <h3 className="line-clamp-1 font-serif text-lg font-bold text-secondary-900">
+                <h3 className="line-clamp-1 font-serif text-lg font-bold text-secondary-900 dark:text-white">
                   {pkg.name}
                 </h3>
-                <p className="mt-1 line-clamp-2 text-sm text-secondary-600">
+                <p className="mt-1 line-clamp-2 text-sm text-secondary-600 dark:text-secondary-300">
                   {pkg.shortDescription}
                 </p>
-                <div className="mt-auto flex items-center justify-between border-t border-secondary-100 pt-4">
+                <div className="mt-auto flex items-center justify-between border-t border-secondary-100 dark:border-secondary-700 pt-4">
                   <span
                     className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold text-white ${accentMap[accent]}`}
                   >

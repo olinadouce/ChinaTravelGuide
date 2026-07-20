@@ -38,3 +38,6 @@ packet/**/*.pdf
 packet/**/*.zip
 packet/**/Thumbs.db
 packet/**/.DS_Store
+
+.vercel
+.env*

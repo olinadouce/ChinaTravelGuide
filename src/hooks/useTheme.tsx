@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
@@ -30,6 +30,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     root.classList.remove('light', 'dark');
     root.classList.add(resolved);
+    root.style.colorScheme = resolved;
     setResolvedTheme(resolved);
     localStorage.setItem('theme', theme);
   }, [theme]);
@@ -43,6 +44,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         const root = window.document.documentElement;
         root.classList.remove('light', 'dark');
         root.classList.add(systemTheme);
+        root.style.colorScheme = systemTheme;
         setResolvedTheme(systemTheme);
       }
     };

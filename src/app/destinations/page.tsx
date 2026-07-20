@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Suspense, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -38,7 +38,7 @@ function DestinationsContent() {
   );
 
   return (
-    <div className="min-h-screen bg-[#f7f1e8] pt-20">
+    <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220] pt-20">
       <section className="bg-secondary-900 py-20 text-white">
         <div className="container-main">
           <div className="max-w-3xl">
@@ -51,7 +51,7 @@ function DestinationsContent() {
         </div>
       </section>
 
-      <section className="sticky top-16 z-20 border-b border-secondary-200 bg-[#f7f1e8]/95 py-5 backdrop-blur">
+      <section className="sticky top-16 z-20 border-b border-secondary-200 dark:border-secondary-700 bg-[#f7f1e8] dark:bg-[#0b1220]/95 py-5 backdrop-blur">
         <div className="container-main flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative max-w-xl flex-1">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-secondary-400" />
@@ -64,14 +64,14 @@ function DestinationsContent() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Filter className="h-4 w-4 text-secondary-500" />
+            <Filter className="h-4 w-4 text-secondary-500 dark:text-secondary-400" />
             {regions.map((region) => (
               <button
                 key={region.id}
                 onClick={() => setSelectedRegion(region.id)}
                 className={cn(
                   'rounded-full px-4 py-2 text-sm font-medium transition-colors',
-                  selectedRegion === region.id ? 'bg-primary text-white' : 'bg-white text-secondary-700 hover:bg-secondary-100'
+                  selectedRegion === region.id ? 'bg-primary text-white' : 'bg-white dark:bg-secondary-900 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100'
                 )}
               >
                 {region.label}
@@ -83,7 +83,7 @@ function DestinationsContent() {
 
       <section className="py-12">
         <div className="container-main">
-          <p className="mb-6 text-sm text-secondary-500">{filteredDestinations.length} destinations matched</p>
+          <p className="mb-6 text-sm text-secondary-500 dark:text-secondary-400">{filteredDestinations.length} destinations matched</p>
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {filteredDestinations.map((destination, index) => (
               <DestinationCard key={destination.id} destination={destination} index={index} featured={index === 0} />
@@ -97,7 +97,7 @@ function DestinationsContent() {
 
 function DestinationsContentFallback() {
   return (
-    <div className="min-h-screen bg-[#f7f1e8] pt-20">
+    <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220] pt-20">
       <section className="bg-secondary-900 py-20 text-white">
         <div className="container-main">
           <div className="h-8 w-64 animate-pulse rounded bg-white/20" />

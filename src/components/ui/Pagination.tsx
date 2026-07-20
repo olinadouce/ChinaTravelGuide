@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -39,7 +39,7 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
           'flex h-10 w-10 items-center justify-center rounded-full transition-colors',
           currentPage === 1
             ? 'pointer-events-none text-secondary-400'
-            : 'text-secondary-600 hover:bg-secondary-100'
+            : 'text-secondary-600 dark:text-secondary-300 hover:bg-secondary-100'
         )}
         aria-disabled={currentPage === 1}
       >
@@ -59,7 +59,7 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
               'flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors',
               page === currentPage
                 ? 'bg-primary text-white'
-                : 'text-secondary-600 hover:bg-secondary-100'
+                : 'text-secondary-600 dark:text-secondary-300 hover:bg-secondary-100'
             )}
           >
             {page}
@@ -73,7 +73,7 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
           'flex h-10 w-10 items-center justify-center rounded-full transition-colors',
           currentPage === totalPages
             ? 'pointer-events-none text-secondary-400'
-            : 'text-secondary-600 hover:bg-secondary-100'
+            : 'text-secondary-600 dark:text-secondary-300 hover:bg-secondary-100'
         )}
         aria-disabled={currentPage === totalPages}
       >

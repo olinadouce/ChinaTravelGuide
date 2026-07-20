@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { motion } from 'framer-motion';
 import { PenLine } from 'lucide-react';
 import { useState } from 'react';
@@ -23,7 +23,7 @@ export default function ForumPage({
   const totalPages = Math.ceil(forumPosts.length / POSTS_PER_PAGE);
 
   return (
-    <div className="min-h-screen bg-[#f7f1e8] pt-20">
+    <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220] pt-20">
       <section className="bg-gradient-to-br from-secondary-900 via-secondary-800 to-accent py-20 text-white">
         <div className="container-main">
           <p className="mb-4 text-sm uppercase tracking-[0.24em] text-white/55">Member community</p>
@@ -36,7 +36,7 @@ export default function ForumPage({
 
       <section className="container-main py-12">
         <div className="mb-6 flex items-center justify-between">
-          <p className="text-sm text-black">{forumPosts.length} posts</p>
+          <p className="text-sm text-secondary-700 dark:text-secondary-300">{forumPosts.length} posts</p>
           <button
             onClick={() => setShowCreateModal(true)}
             className="btn-primary flex items-center gap-2"
@@ -60,19 +60,19 @@ export default function ForumPage({
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-lg rounded-[28px] bg-white p-6 shadow-xl"
+            className="w-full max-w-lg rounded-[28px] bg-white dark:bg-secondary-900 p-6 shadow-xl"
           >
-            <h2 className="text-xl font-bold text-black">Create New Post</h2>
-            <p className="mt-2 text-sm text-black/70">
+            <h2 className="text-xl font-bold text-secondary-900 dark:text-white">Create New Post</h2>
+            <p className="mt-2 text-sm text-secondary-600 dark:text-secondary-300">
               Please <Link href="/login" className="text-primary hover:underline">log in</Link> to create a post.
             </p>
             <div className="mt-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-black">Title</label>
+                <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-200">Title</label>
                 <input type="text" className="input-field mt-1 w-full" placeholder="Your post title..." disabled />
               </div>
               <div>
-                <label className="block text-sm font-medium text-black">Content</label>
+                <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-200">Content</label>
                 <textarea className="input-field mt-1 w-full min-h-[120px] resize-none" placeholder="Share your travel experience..." disabled />
               </div>
               <div className="flex gap-3">

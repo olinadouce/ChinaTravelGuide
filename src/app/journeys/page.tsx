@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useState } from 'react';
 import JourneyCard from '@/components/ui/JourneyCard';
@@ -23,7 +23,7 @@ export default function JourneysPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#f7f1e8] pt-20">
+    <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220] pt-20">
       <section className="bg-gradient-to-br from-secondary-900 via-secondary-800 to-primary py-20 text-white">
         <div className="container-main max-w-4xl">
           <p className="mb-4 text-sm uppercase tracking-[0.24em] text-white/55">Route planning</p>
@@ -34,7 +34,7 @@ export default function JourneysPage() {
         </div>
       </section>
 
-      <section className="border-b border-secondary-200 bg-white py-6">
+      <section className="border-b border-secondary-200 dark:border-secondary-700 bg-white dark:bg-secondary-900 py-6">
         <div className="container-main space-y-4">
           <div className="flex flex-wrap gap-2">
             {themes.map((theme) => (
@@ -43,7 +43,7 @@ export default function JourneysPage() {
                 onClick={() => setSelectedTheme(theme)}
                 className={cn(
                   'rounded-full px-4 py-2 text-sm font-medium transition-colors',
-                  selectedTheme === theme ? 'bg-primary text-white' : 'bg-secondary-100 text-secondary-700 hover:bg-secondary-200'
+                  selectedTheme === theme ? 'bg-primary text-white' : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-200'
                 )}
               >
                 {theme === 'all' ? 'All themes' : theme}
@@ -58,7 +58,7 @@ export default function JourneysPage() {
                 onClick={() => setSelectedDifficulty(level)}
                 className={cn(
                   'rounded-full px-4 py-2 text-sm font-medium transition-colors',
-                  selectedDifficulty === level ? 'bg-secondary-900 text-white' : 'bg-secondary-100 text-secondary-700 hover:bg-secondary-200'
+                  selectedDifficulty === level ? 'bg-secondary-900 text-white' : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-200'
                 )}
               >
                 {level === 'all' ? 'All difficulty' : level}

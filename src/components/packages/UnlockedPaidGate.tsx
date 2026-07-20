@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { Lock } from 'lucide-react';
 import type { ClientPackage } from '@/data/packages';
-import { useAuth } from '@/components/auth/MockAuthProvider';
+import { useAuth } from '@/components/auth/FirebaseAuthProvider';
 import { PackageHtmlFrame } from './PackageHtmlFrame';
 
 interface UnlockedPaidGateProps {
@@ -25,7 +25,7 @@ export function UnlockedPaidGate({ pkg, paidHtml }: UnlockedPaidGateProps) {
   }
 
   return (
-    <div className="relative flex min-h-[280px] items-center justify-center overflow-hidden rounded-2xl border border-dashed border-secondary-300 bg-stone-50 p-8 text-center">
+    <div className="relative flex min-h-[280px] items-center justify-center overflow-hidden rounded-2xl border border-dashed border-secondary-300 bg-stone-50 dark:bg-secondary-800 p-8 text-center">
       <div
         className="pointer-events-none absolute inset-0 opacity-40"
         style={{
@@ -34,15 +34,15 @@ export function UnlockedPaidGate({ pkg, paidHtml }: UnlockedPaidGateProps) {
         }}
       />
       <div className="relative max-w-md">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-secondary-200 text-secondary-500">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-secondary-200 text-secondary-500 dark:text-secondary-400">
           <Lock className="h-5 w-5" />
         </div>
-        <p className="mt-3 font-bold text-secondary-800">
+        <p className="mt-3 font-bold text-secondary-800 dark:text-secondary-100">
           {isAuthenticated
             ? 'Redeem points to view the full version'
             : 'Sign in first, then redeem to view the full version'}
         </p>
-        <p className="mt-1 text-xs text-secondary-500">
+        <p className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">
           Once redeemed, you'll unlock the complete itinerary, restaurant & hotel picks, and emergency plans.
         </p>
       </div>

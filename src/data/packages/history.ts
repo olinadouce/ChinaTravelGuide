@@ -26,7 +26,7 @@ export const historyPackages: TravelPackage[] = [
       'Mt. Hua day-trip (optional)',
     ],
     tags: ['History', 'UNESCO', 'Food', 'Day Trip'],
-    pointsCost: 80,
+    pointsCost: 120,
     freeHtmlPath: `${ROOT}/Xian free.html`,
     paidHtmlPath: `${ROOT}/Xian浠樿垂.html`,
   },
@@ -52,7 +52,7 @@ export const historyPackages: TravelPackage[] = [
       'Yellow River scenic area',
     ],
     tags: ['History', 'UNESCO', 'Martial Arts', 'Heritage'],
-    pointsCost: 80,
+    pointsCost: 120,
     // Files are served from /public/history/henan-history/
     freeHtmlPath: 'public/history/henan-history/free.html',
     paidHtmlPath: 'public/history/henan-history/paid.html',

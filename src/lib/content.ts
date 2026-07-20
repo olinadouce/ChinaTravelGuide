@@ -1,4 +1,4 @@
-import { destinations, heroImages, heroStats, journeys, practicalGuides, popularSearches, travelTools } from '@/data/content';
+﻿import { destinations, heroImages, heroStats, journeys, practicalGuides, popularSearches, travelTools } from '@/data/content';
 import { forumPosts, forumComments } from '@/data/forum';
 
 export function getHomePayload() {

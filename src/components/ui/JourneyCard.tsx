@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -36,7 +36,7 @@ export default function JourneyCard({ journey, index = 0 }: JourneyCardProps) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-            <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-secondary-900">
+            <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-secondary-900 dark:text-white">
               <Clock3 className="h-4 w-4 text-primary" />
               {journey.duration} days
             </div>
@@ -59,7 +59,7 @@ export default function JourneyCard({ journey, index = 0 }: JourneyCardProps) {
                 <Route className="h-4 w-4 text-primary" />
                 Route highlights
               </div>
-              <p className="mt-2 text-sm text-secondary-600 dark:text-secondary-300">{journey.highlights.join(' • ')}</p>
+              <p className="mt-2 text-sm text-secondary-600 dark:text-secondary-300">{journey.highlights.join(' 鈥?')}</p>
             </div>
 
             <div className="mt-6 flex items-center justify-between border-t border-secondary-100 pt-4 dark:border-secondary-700">

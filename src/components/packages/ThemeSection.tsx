@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from 'framer-motion';
 import {
@@ -25,14 +25,14 @@ const accentBg: Record<PackageTheme['accent'], string> = {
   primary: 'bg-primary/10 text-primary',
   accent: 'bg-accent/15 text-accent',
   jade: 'bg-jade/15 text-jade',
-  secondary: 'bg-secondary-100 text-secondary-700',
+  secondary: 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-200',
 };
 
 const accentText: Record<PackageTheme['accent'], string> = {
   primary: 'text-primary',
   accent: 'text-accent',
   jade: 'text-jade',
-  secondary: 'text-secondary-700',
+  secondary: 'text-secondary-700 dark:text-secondary-200',
 };
 
 interface ThemeSectionProps {
@@ -52,8 +52,7 @@ export function ThemeSection({ theme, packages }: ThemeSectionProps) {
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="overflow-hidden rounded-[32px] border border-black/5 bg-white p-6 shadow-lg shadow-black/5 md:p-8"
-        style={{ background: theme.gradient }}
+        className="overflow-hidden rounded-[32px] border border-black/5 bg-white p-6 shadow-lg shadow-black/5 transition-colors duration-300 dark:border-white/10 dark:bg-secondary-900 md:p-8"
       >
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="flex items-start gap-4">
@@ -76,18 +75,18 @@ export function ThemeSection({ theme, packages }: ThemeSectionProps) {
               </p>
               <h2
                 id={`theme-${theme.id}-title`}
-                className="mt-1 font-serif text-2xl font-bold text-secondary-900 md:text-3xl"
+                className="mt-1 font-serif text-2xl font-bold text-secondary-900 dark:text-white md:text-3xl"
               >
                 {theme.name}
               </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-secondary-600">
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-secondary-600 dark:text-secondary-300">
                 {theme.description}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 self-end md:self-start">
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/80 px-3 py-1.5 text-xs font-bold text-secondary-700 shadow-sm backdrop-blur">
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/80 px-3 py-1.5 text-xs font-bold text-secondary-700 shadow-sm backdrop-blur dark:bg-secondary-800/80 dark:text-secondary-200">
               {packages.length} packages
             </span>
           </div>

@@ -1,4 +1,4 @@
-import { ForumPost, ForumComment } from '@/types';
+﻿import { ForumPost, ForumComment } from '@/types';
 
 export const forumPosts: ForumPost[] = [
   {
@@ -197,7 +197,7 @@ Not cheap ($800-1500 per person) but a unique way to see rural China.`,
       isMember: true,
     },
     createdAt: '2026-01-25T08:00:00Z',
-    content: `The Harbin International Ice and Snow Sculpture Festival is unlike anything you've seen. January temperatures drop to -25°C but the spectacle is worth every shiver:
+    content: `The Harbin International Ice and Snow Sculpture Festival is unlike anything you've seen. January temperatures drop to -25掳C but the spectacle is worth every shiver:
 
 **Sun Island**: Located across the Songhua River, features massive snow sculptures. Take the ferry over or walk on the frozen river itself.
 
@@ -207,7 +207,7 @@ Not cheap ($800-1500 per person) but a unique way to see rural China.`,
 
 **Budget tip**: Book accommodations 3+ months ahead. December-January fills up fast. Local hotels near Central Avenue are cheaper than resort options.
 
-**Other activities**: Try the indoor冰雪世界 if you can't handle the real cold. Snow skiing at nearby resorts is excellent.`,
+**Other activities**: Try the indoor鍐伴洩涓栫晫 if you can't handle the real cold. Snow skiing at nearby resorts is excellent.`,
     likesCount: 45,
     commentsCount: 6,
     tags: ['harbin', 'winter', 'ice-festival', 'photography'],
@@ -282,18 +282,18 @@ Not cheap ($800-1500 per person) but a unique way to see rural China.`,
       isMember: true,
     },
     createdAt: '2026-01-08T12:00:00Z',
-    content: `Sichuan food is China's most famous cuisine and for good reason. The numbing-spicy flavor profile (málà) using Sichuan peppercorns is addictive:
+    content: `Sichuan food is China's most famous cuisine and for good reason. The numbing-spicy flavor profile (m谩l脿) using Sichuan peppercorns is addictive:
 
 **Chengdu's Cuisine Highlights**:
-- Huang Cheng La Ma (炙火) - iconic beef offal and tripe noodles
+- Huang Cheng La Ma (鐐欑伀) - iconic beef offal and tripe noodles
 - Kuan Zhai Alley - food stall row with late night dan dan noodles
-- Sichuanese hotpot at 马婆 - not the touristy chain ones
+- Sichuanese hotpot at 椹﹩ - not the touristy chain ones
 
 **Must-try Dishes**:
-- Mapo doufu (mapo tofu) - theauthentic version has real málà flavor
-- Bangbang chicken (棒棒鸡) - poached chicken with spicy sesame sauce
+- Mapo doufu (mapo tofu) - theauthentic version has real m谩l脿 flavor
+- Bangbang chicken (妫掓楦? - poached chicken with spicy sesame sauce
 - Spicy crispy beef tripe
-- Dan dan noodles (担担面)
+- Dan dan noodles (鎷呮媴闈?
 
 **Cooking Class**: I took a morning class at the Sichuan Cooking School in Chengdu. Made mapo tofu, dumplings, and la zi ji (spicy chicken). Best experience of my trip!
 
@@ -325,7 +325,7 @@ Not cheap ($800-1500 per person) but a unique way to see rural China.`,
 - Turpan: Grape vineyards and the Flaming Mountains
 - Urumqi: Take a day to see Tianchi (Heavenly Lake)
 
-**Kashgar**: The Sunday market (艾提尕尔清真寺) is chaos incarnate. Everything from livestock to electronics. The old town is being renovated so see it soon.
+**Kashgar**: The Sunday market (鑹炬彁灏曞皵娓呯湡瀵? is chaos incarnate. Everything from livestock to electronics. The old town is being renovated so see it soon.
 
 **Tip**: Book your beds immediately at ticket opening (15 days before). Popular route!`,
     likesCount: 62,
@@ -346,7 +346,7 @@ Not cheap ($800-1500 per person) but a unique way to see rural China.`,
     createdAt: '2025-12-28T14:00:00Z',
     content: `Shanghai is China's showcase to the world - a city where the ancient and ultra-modern coexist:
 
-**Day 1**: Start at The Bund (外滩) at sunrise for empty photos. Walk the colonial arcade. Cross to Pudong via the Feneng Ferry ($1.50). Afternoon at Shanghai Tower's observation deck (632m - world's highest!).
+**Day 1**: Start at The Bund (澶栨哗) at sunrise for empty photos. Walk the colonial arcade. Cross to Pudong via the Feneng Ferry ($1.50). Afternoon at Shanghai Tower's observation deck (632m - world's highest!).
 
 **Day 2**: Yuyuan Gardens in the morning (avoid weekends). Lunch at the linked food hall. Afternoon at the French Concession - explore hidden lane stores. Evening at Xintiandi for drinks in restored shikumen houses.
 
@@ -381,13 +381,13 @@ Not cheap ($800-1500 per person) but a unique way to see rural China.`,
 
 **Iconic Shots**:
 - The impossibly tall pine trees - the famous Guest-Greeting Pine
-- Sunrise at Dawn Pavilion (曙光亭)
-- Sea of clouds from Paiding (排云亭)
-- The Bright Summit (光明顶) - highest point
+- Sunrise at Dawn Pavilion (鏇欏厜浜?
+- Sea of clouds from Paiding (鎺掍簯浜?
+- The Bright Summit (鍏夋槑椤? - highest point
 
-**Hiking Routes**: Don't attempt in one day. The western route is less crowded with steeper steps. Eastern route (莲花峰) is more accessible but busier.
+**Hiking Routes**: Don't attempt in one day. The western route is less crowded with steeper steps. Eastern route (鑾茶姳宄? is more accessible but busier.
 
-**Accommodation**: Stay at the mountaintop hotels (北海宾馆, 白鹅山庄). Book 6+ months ahead. 4am wake-up for sunrise is mandatory.
+**Accommodation**: Stay at the mountaintop hotels (鍖楁捣瀹鹃, 鐧介箙灞卞簞). Book 6+ months ahead. 4am wake-up for sunrise is mandatory.
 
 **Physical Fitness**: Over 60% of steps are at 45+ degree angles. If you have knee issues, bring hiking poles and consider the cable car.`,
     likesCount: 87,

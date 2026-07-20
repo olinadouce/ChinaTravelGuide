@@ -88,7 +88,7 @@ export default function PhrasesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f1e8] pt-20">
+    <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220] pt-20">
       <section className="bg-gradient-to-br from-jade via-secondary-900 to-secondary-800 py-16 text-white">
         <div className="container-main max-w-3xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm">
@@ -102,7 +102,7 @@ export default function PhrasesPage() {
         </div>
       </section>
 
-      <section className="sticky top-16 z-20 border-b border-secondary-200 bg-white/95 py-5 backdrop-blur">
+      <section className="sticky top-16 z-20 border-b border-secondary-200 dark:border-secondary-700 bg-white/95 dark:bg-secondary-900/95 py-5 backdrop-blur">
         <div className="container-main max-w-3xl">
           <div className="relative">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-secondary-400" />
@@ -117,7 +117,7 @@ export default function PhrasesPage() {
       </section>
 
       {!searchQuery && (
-        <section className="bg-white py-5">
+        <section className="bg-white dark:bg-secondary-900 py-5">
           <div className="container-main flex max-w-3xl flex-wrap gap-2">
             {phraseCategories.map((category) => (
               <button
@@ -125,7 +125,7 @@ export default function PhrasesPage() {
                 onClick={() => setSelectedCategory(category.id)}
                 className={cn(
                   'rounded-full px-4 py-2 text-sm font-medium transition-colors',
-                  selectedCategory === category.id ? 'bg-jade text-white' : 'bg-secondary-100 text-secondary-700 hover:bg-secondary-200'
+                  selectedCategory === category.id ? 'bg-jade text-white' : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-200 dark:hover:bg-secondary-700'
                 )}
               >
                 {category.label}
@@ -138,11 +138,11 @@ export default function PhrasesPage() {
       <section className="py-8">
         <div className="container-main max-w-3xl space-y-3">
           {phrases.map((phrase) => (
-            <div key={`${phrase.chinese}-${phrase.english}`} className="flex items-start justify-between gap-4 rounded-[28px] bg-white p-5 shadow-sm">
+            <div key={`${phrase.chinese}-${phrase.english}`} className="flex items-start justify-between gap-4 rounded-[28px] bg-white dark:bg-secondary-900 p-5 shadow-sm">
               <div>
-                <p className="text-2xl font-medium text-secondary-900">{phrase.chinese}</p>
-                <p className="mt-1 text-secondary-500">{phrase.pinyin}</p>
-                <p className="mt-2 text-secondary-700">{phrase.english}</p>
+                <p className="text-2xl font-medium text-secondary-900 dark:text-white">{phrase.chinese}</p>
+                <p className="mt-1 text-secondary-500 dark:text-secondary-400">{phrase.pinyin}</p>
+                <p className="mt-2 text-secondary-700 dark:text-secondary-200">{phrase.english}</p>
               </div>
               <button
                 onClick={() => speakPhrase(phrase.chinese)}

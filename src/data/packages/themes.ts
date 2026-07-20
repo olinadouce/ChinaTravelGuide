@@ -1,4 +1,4 @@
-import type { PackageTheme } from '@/types';
+﻿import type { PackageTheme } from '@/types';
 
 export const themes: PackageTheme[] = [
   {
@@ -7,7 +7,7 @@ export const themes: PackageTheme[] = [
     nameEn: 'Landscape & Nature',
     tagline: 'Mountains, rivers and untouched wilderness',
     description:
-      "Hand-crafted nature routes across China's most iconic geological wonders — Huangshan's sea of clouds, Zhangjiajie's pillar peaks, the Qinghai plateau mirror lakes, Western Sichuan sacred lakes, Northwest Yunnan glaciers, and South China karst.",
+      "Hand-crafted nature routes across China's most iconic geological wonders 鈥?Huangshan's sea of clouds, Zhangjiajie's pillar peaks, the Qinghai plateau mirror lakes, Western Sichuan sacred lakes, Northwest Yunnan glaciers, and South China karst.",
     icon: 'Mountain',
     accent: 'jade',
     coverImage:
@@ -21,7 +21,7 @@ export const themes: PackageTheme[] = [
     nameEn: 'History & Heritage',
     tagline: 'Walk where dynasties once ruled',
     description:
-      'Heritage-themed deep dives anchored by the 13-dynasty capital Xi\'an — Terracotta Warriors, the Ming city walls, the Muslim Quarter, and Tang Dynasty performance culture.',
+      'Heritage-themed deep dives anchored by the 13-dynasty capital Xi\'an 鈥?Terracotta Warriors, the Ming city walls, the Muslim Quarter, and Tang Dynasty performance culture.',
     icon: 'Landmark',
     accent: 'primary',
     coverImage:
@@ -33,9 +33,9 @@ export const themes: PackageTheme[] = [
     id: 'themed',
     name: 'Themed Routes',
     nameEn: 'Themed Routes',
-    tagline: 'Cantonese dim sum · karst rivers · Tibetan plateau',
+    tagline: 'Cantonese dim sum 路 karst rivers 路 Tibetan plateau',
     description:
-      "Three distinctive themed journeys — the food culture of Guangzhou, the karst landscapes of Guilin & Longji rice terraces, and the high-altitude pilgrimage route of Tibet.",
+      "Three distinctive themed journeys 鈥?the food culture of Guangzhou, the karst landscapes of Guilin & Longji rice terraces, and the high-altitude pilgrimage route of Tibet.",
     icon: 'Compass',
     accent: 'accent',
     coverImage:
@@ -49,7 +49,7 @@ export const themes: PackageTheme[] = [
     nameEn: 'IShowSpeed China Highlights',
     tagline: 'Follow the livestream across 7 cities',
     description:
-      'Relive the IShowSpeed China tour across seven cities — Beijing, Shanghai, Chengdu, Chongqing, Henan, Shenzhen and Hong Kong — with the exact stops, food spots and transit moves from the livestream.',
+      'Relive the IShowSpeed China tour across seven cities 鈥?Beijing, Shanghai, Chengdu, Chongqing, Henan, Shenzhen and Hong Kong 鈥?with the exact stops, food spots and transit moves from the livestream.',
     icon: 'Sparkles',
     accent: 'secondary',
     coverImage:

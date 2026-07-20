@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
 import { ThemeProvider } from "@/hooks/useTheme";
-import { MockAuthProvider } from "@/components/auth/MockAuthProvider";
+import { FirebaseAuthProvider } from "@/components/auth/FirebaseAuthProvider";
 
 export const metadata: Metadata = {
   title: "China Travel Guide | Travel China with Confidence",
@@ -13,6 +13,21 @@ export const metadata: Metadata = {
     "China travel, China itinerary, China tourism website, overseas visitors to China, Beijing, Shanghai, Xi'an, Chengdu",
 };
 
+const themeBootstrapScript = `
+  (() => {
+    try {
+      const stored = localStorage.getItem('theme');
+      const theme = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+      const resolved = theme === 'system'
+        ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : theme;
+      document.documentElement.classList.remove('light', 'dark');
+      document.documentElement.classList.add(resolved);
+      document.documentElement.style.colorScheme = resolved;
+    } catch {}
+  })();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -20,13 +35,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+      </head>
       <body className="font-sans antialiased">
         <ThemeProvider>
-          <MockAuthProvider>
+          <FirebaseAuthProvider>
             <Navigation />
             <main>{children}</main>
             <Footer />
-          </MockAuthProvider>
+          </FirebaseAuthProvider>
         </ThemeProvider>
       </body>
     </html>

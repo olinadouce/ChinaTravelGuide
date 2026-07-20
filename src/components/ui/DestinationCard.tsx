@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -32,10 +32,10 @@ export default function DestinationCard({ destination, index = 0, featured = fal
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
-            <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold capitalize text-secondary-900">
+            <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold capitalize text-secondary-900 dark:text-white">
               {destination.region} China
             </div>
-            <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-secondary-900">
+            <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-secondary-900 dark:text-white">
               <Star className="h-4 w-4 fill-accent text-accent" />
               {destination.rating}
             </div>
@@ -68,7 +68,7 @@ export default function DestinationCard({ destination, index = 0, featured = fal
             </div>
 
             <div className="mt-6 flex items-center justify-between">
-              <span className="text-sm text-secondary-500">{formatNumber(destination.reviewCount)} traveler signals</span>
+              <span className="text-sm text-secondary-500 dark:text-secondary-400">{formatNumber(destination.reviewCount)} traveler signals</span>
               <span className="flex items-center gap-2 text-sm font-semibold text-primary transition-all group-hover:gap-3">
                 Explore
                 <ArrowRight className="h-4 w-4" />

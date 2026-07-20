@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+﻿import { Fragment } from 'react';
 import {
   AlertTriangle,
   BedDouble,
@@ -17,7 +17,7 @@ export function renderRuns(runs: InlineRun[]): React.ReactNode {
   return runs.map((run, index) => {
     if (run.bold) {
       return (
-        <strong key={index} className="font-semibold text-secondary-900">
+        <strong key={index} className="font-semibold text-secondary-900 dark:text-white">
           {run.text}
         </strong>
       );
@@ -47,29 +47,29 @@ function CalloutIcon({ tone }: { tone: 'info' | 'warning' | 'tip' }) {
   if (tone === 'tip') {
     return <Lightbulb className="h-5 w-5 shrink-0 text-emerald-600" />;
   }
-  return <Info className="h-5 w-5 shrink-0 text-secondary-700" />;
+  return <Info className="h-5 w-5 shrink-0 text-secondary-700 dark:text-secondary-200" />;
 }
 
 function calloutClass(tone: 'info' | 'warning' | 'tip'): string {
   if (tone === 'warning') {
-    return 'bg-primary-50 text-secondary-800';
+    return 'bg-primary-50 text-secondary-800 dark:text-secondary-100';
   }
   if (tone === 'tip') {
-    return 'bg-emerald-50 text-secondary-800';
+    return 'bg-emerald-50 text-secondary-800 dark:text-secondary-100';
   }
-  return 'bg-secondary-50 text-secondary-800';
+  return 'bg-secondary-50 text-secondary-800 dark:text-secondary-100';
 }
 
 function Heading({ level, text }: { level: 2 | 3; text: string }) {
   if (level === 2) {
     return (
-      <h2 className="mt-12 mb-4 text-3xl font-bold text-secondary-900 first:mt-0">
+      <h2 className="mt-12 mb-4 text-3xl font-bold text-secondary-900 dark:text-white first:mt-0">
         {text}
       </h2>
     );
   }
   return (
-    <h3 className="mt-8 mb-3 text-2xl font-semibold text-secondary-900">
+    <h3 className="mt-8 mb-3 text-2xl font-semibold text-secondary-900 dark:text-white">
       {text}
     </h3>
   );
@@ -77,7 +77,7 @@ function Heading({ level, text }: { level: 2 | 3; text: string }) {
 
 function ParagraphBlock({ runs }: { runs: InlineRun[] }) {
   return (
-    <p className="mt-4 text-base leading-7 text-secondary-700 first:mt-0">
+    <p className="mt-4 text-base leading-7 text-secondary-700 dark:text-secondary-200 first:mt-0">
       {renderRuns(runs)}
     </p>
   );
@@ -87,7 +87,7 @@ function ListBlock({ ordered, items }: { ordered: boolean; items: InlineRun[][] 
   const Tag = ordered ? 'ol' : 'ul';
   const listClass = ordered ? 'list-decimal' : 'list-disc';
   return (
-    <Tag className={`mt-4 space-y-2 pl-6 text-secondary-700 ${listClass}`}>
+    <Tag className={`mt-4 space-y-2 pl-6 text-secondary-700 dark:text-secondary-200 ${listClass}`}>
       {items.map((item, index) => (
         <li key={index} className="leading-7">
           {renderRuns(item)}
@@ -105,10 +105,10 @@ function TableBlock({
   rows: InlineRun[][][];
 }) {
   return (
-    <div className="mt-6 overflow-x-auto rounded-3xl border border-secondary-200">
+    <div className="mt-6 overflow-x-auto rounded-3xl border border-secondary-200 dark:border-secondary-700">
       <table className="w-full text-left text-sm">
         {headers.length > 0 && (
-          <thead className="bg-secondary-50 text-secondary-900">
+          <thead className="bg-secondary-50 text-secondary-900 dark:text-white">
             <tr>
               {headers.map((header, index) => (
                 <th key={index} className="px-4 py-3 font-semibold">
@@ -124,7 +124,7 @@ function TableBlock({
               {row.map((cell, cellIndex) => (
                 <td
                   key={cellIndex}
-                  className="border-t border-secondary-100 px-4 py-3 text-secondary-700"
+                  className="border-t border-secondary-100 dark:border-secondary-700 px-4 py-3 text-secondary-700 dark:text-secondary-200"
                 >
                   {renderRuns(cell)}
                 </td>
@@ -160,14 +160,14 @@ function CodeBlock({ text, language }: { text: string; language?: string }) {
 }
 
 function DividerBlock() {
-  return <hr className="my-10 border-secondary-200" />;
+  return <hr className="my-10 border-secondary-200 dark:border-secondary-700" />;
 }
 
 const stepToneContainer: Record<string, string> = {
   primary: 'border-primary/20 bg-primary-50',
   accent: 'border-accent/30 bg-accent-50',
   jade: 'border-emerald-300 bg-emerald-50',
-  secondary: 'border-secondary-200 bg-secondary-50',
+  secondary: 'border-secondary-200 dark:border-secondary-700 bg-secondary-50',
   warning: 'border-primary/30 bg-primary-50',
 };
 
@@ -206,9 +206,9 @@ function StepsBlock({
                   {index + 1}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold leading-tight text-secondary-900">{step.label}</p>
+                  <p className="font-bold leading-tight text-secondary-900 dark:text-white">{step.label}</p>
                   {step.caption ? (
-                    <p className="mt-1.5 text-xs leading-snug text-secondary-700">{step.caption}</p>
+                    <p className="mt-1.5 text-xs leading-snug text-secondary-700 dark:text-secondary-200">{step.caption}</p>
                   ) : null}
                 </div>
               </div>
@@ -217,8 +217,7 @@ function StepsBlock({
                   aria-hidden="true"
                   className="hidden shrink-0 self-center px-1 text-2xl font-light text-secondary-400 lg:flex"
                 >
-                  →
-                </div>
+                  鈫?                </div>
               ) : null}
             </Fragment>
           );

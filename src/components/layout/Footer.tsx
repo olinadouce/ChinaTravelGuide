@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { Mail, MapPin, PhoneCall } from 'lucide-react';
@@ -10,11 +10,18 @@ export default function Footer() {
       <div className="container-main py-16">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
-            <Link href="/" className="mb-6 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-accent to-jade text-2xl font-bold text-white">
-                C
-              </div>
-              <span className="font-serif text-2xl font-bold">China Travel Guide</span>
+            <Link href="/" className="mb-6 inline-flex items-center gap-3" aria-label="seechinaroute home">
+              <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-[#f8f4ec] ring-1 ring-white/10">
+                <img
+                  src="/see-china-route-mark.svg"
+                  alt=""
+                  className="h-full w-full"
+                />
+              </span>
+              <span>
+                <span className="block font-serif text-2xl font-bold leading-tight">seechinaroute</span>
+                <span className="block text-xs uppercase tracking-[0.22em] text-secondary-400">See China Route</span>
+              </span>
             </Link>
 
             <p className="mb-6 max-w-md text-secondary-300">
@@ -63,7 +70,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-secondary-800 pt-8 md:flex-row">
-          <p className="text-sm text-secondary-400">© {new Date().getFullYear()} China Travel Guide. All rights reserved.</p>
+          <p className="text-sm text-secondary-400">漏 {new Date().getFullYear()} China Travel Guide. All rights reserved.</p>
           <div className="flex items-center gap-6 text-sm text-secondary-400">
             <Link href="/privacy" className="transition-colors hover:text-white">
               Privacy

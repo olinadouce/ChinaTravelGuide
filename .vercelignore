@@ -1,0 +1,9 @@
+.git/
+.next/
+node_modules/
+/packet/
+/data/
+new-ishowspeed-images-index.jpg
+*.log
+.env*
+tsconfig.tsbuildinfo

@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { Coins } from 'lucide-react';
-import { useAuth } from '@/components/auth/MockAuthProvider';
+import { useAuth } from '@/components/auth/FirebaseAuthProvider';
 import { cn } from '@/lib/utils';
 
 interface PointsBadgeProps {
@@ -14,7 +14,7 @@ export function PointsBadge({ scrolled }: PointsBadgeProps) {
   if (!isAuthenticated || !user) return null;
   return (
     <Link
-      href="/packages"
+      href="/account/points"
       aria-label={`Current points: ${user.points}`}
       className={cn(
         'hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold shadow-sm transition-colors sm:inline-flex',

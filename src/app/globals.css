@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -8,10 +8,17 @@
   }
 
   body {
-    @apply font-sans antialiased bg-stone-950 text-stone-100;
+    @apply bg-[#f7f1e8] font-sans text-secondary-900 antialiased transition-colors duration-300 dark:bg-[#0b1220] dark:text-secondary-100;
     background-image:
       radial-gradient(circle at top, rgba(245, 158, 11, 0.18), transparent 30%),
-      linear-gradient(180deg, #08111d 0%, #101826 34%, #f7f1e8 34%, #f7f1e8 100%);
+      linear-gradient(180deg, #fff8ed 0%, #f7f1e8 42%, #f7f1e8 100%);
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(circle at 18% 0%, rgba(220, 38, 38, 0.22), transparent 28%),
+      radial-gradient(circle at 84% 12%, rgba(245, 158, 11, 0.16), transparent 26%),
+      linear-gradient(180deg, #050914 0%, #0b1220 48%, #111827 100%);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -38,7 +45,7 @@
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-full px-4 py-2 font-medium text-secondary-700;
+    @apply inline-flex items-center justify-center rounded-full px-4 py-2 font-medium text-secondary-700 dark:text-secondary-200;
     @apply transition-all duration-200 hover:bg-secondary-100 hover:text-primary;
   }
 
@@ -51,16 +58,17 @@
   }
 
   .input-field {
-    @apply w-full rounded-2xl border border-secondary-200 bg-white px-4 py-3 text-secondary-900 transition-all duration-200;
+    @apply w-full rounded-2xl border border-secondary-200 dark:border-secondary-700 bg-white dark:bg-secondary-900 px-4 py-3 text-secondary-900 dark:text-white transition-all duration-200;
     @apply focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30;
     @apply dark:border-secondary-700 dark:bg-secondary-800 dark:text-white;
   }
 
   /* Card styles */
   .card-luxe {
-    @apply rounded-[28px] bg-white p-6 shadow-lg shadow-black/5;
+    @apply rounded-[28px] bg-white dark:bg-secondary-900 p-6 shadow-lg shadow-black/5;
     @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10;
-    @apply border border-black/5;
+    @apply border border-black/5 dark:border-white/10;
+    @apply dark:border-white/10 dark:bg-secondary-900 dark:shadow-black/30;
   }
 
   .card-luxe-dark {
@@ -124,4 +132,26 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+@layer utilities {
+  .theme-page {
+    @apply bg-[#f7f1e8] text-secondary-900 transition-colors duration-300 dark:bg-[#0b1220] dark:text-secondary-100;
+  }
+
+  .theme-section {
+    @apply bg-[#f7f1e8] transition-colors duration-300 dark:bg-[#0b1220];
+  }
+
+  .theme-surface {
+    @apply border border-black/5 bg-white text-secondary-900 shadow-sm transition-colors duration-300 dark:border-white/10 dark:bg-secondary-900 dark:text-secondary-100 dark:shadow-black/30;
+  }
+
+  .theme-soft {
+    @apply bg-stone-50 text-secondary-700 transition-colors duration-300 dark:bg-secondary-800 dark:text-secondary-200;
+  }
+
+  .theme-muted {
+    @apply text-secondary-600 transition-colors duration-300 dark:text-secondary-300;
+  }
 }

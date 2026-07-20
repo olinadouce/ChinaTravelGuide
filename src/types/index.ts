@@ -1,4 +1,4 @@
-export interface Destination {
+﻿export interface Destination {
   id: string;
   name: string;
   slug: string;
@@ -140,7 +140,7 @@ export interface PricingPackage {
   importantNotes?: string[];
 }
 
-// New: Travel Packages — four themes
+// New: Travel Packages 鈥?four themes
 
 export type ThemeId = 'landscape' | 'history' | 'themed' | 'ishowspeed';
 

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { getJourneys } from '@/lib/content';
 
 export function GET(request: NextRequest) {

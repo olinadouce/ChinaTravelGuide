@@ -1,0 +1,42 @@
+<svg width="300" height="332" viewBox="0 0 300 332" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">See China Route</title>
+  <desc id="desc">Ink circle, Chinese mountains, pavilion, red sun, and See China Route wordmark.</desc>
+  <rect width="300" height="332" fill="#F8F4EC"/>
+
+  <path d="M217 42C178 22 128 24 91 51C49 82 35 143 62 190" stroke="#1D2828" stroke-width="9" stroke-linecap="round"/>
+  <path d="M236 69C269 111 258 173 219 207C178 244 113 241 76 200" stroke="#1D2828" stroke-width="4" stroke-linecap="round"/>
+  <path d="M57 184C33 137 49 76 93 47C126 25 167 24 205 37" stroke="#1D2828" stroke-width="3" stroke-linecap="round"/>
+
+  <circle cx="218" cy="92" r="15" fill="url(#sun)"/>
+
+  <path d="M68 142C85 119 96 106 113 133C128 102 146 86 168 130C185 106 199 102 220 140H68Z" fill="url(#mountains)"/>
+  <path d="M73 151C102 139 132 138 162 150C183 158 205 156 225 148" stroke="#90A0A2" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M139 139H177" stroke="#1D2828" stroke-width="4" stroke-linecap="round"/>
+  <path d="M145 139L158 127L172 139" fill="#1D2828"/>
+  <path d="M151 142H169V165H151V142Z" fill="#1D2828"/>
+  <path d="M145 165H176" stroke="#1D2828" stroke-width="4" stroke-linecap="round"/>
+  <path d="M157 148H163V165H157V148Z" fill="#F8F4EC" opacity="0.9"/>
+  <path d="M150 153H168" stroke="#F8F4EC" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+
+  <path d="M76 178C101 169 130 169 157 178C180 186 202 186 225 176" stroke="#445455" stroke-width="4" stroke-linecap="round"/>
+  <path d="M92 194C118 187 146 188 171 196C188 201 207 200 225 193" stroke="#445455" stroke-width="3" stroke-linecap="round"/>
+  <path d="M109 208C132 203 154 204 176 210" stroke="#445455" stroke-width="3" stroke-linecap="round"/>
+
+  <text x="150" y="273" text-anchor="middle" fill="#1E2727" font-family="'Brush Script MT', 'Segoe Script', cursive" font-size="56" font-weight="700" letter-spacing="-1">See China</text>
+  <line x1="56" y1="302" x2="112" y2="302" stroke="#C4473A" stroke-width="2"/>
+  <line x1="188" y1="302" x2="244" y2="302" stroke="#C4473A" stroke-width="2"/>
+  <text x="150" y="309" text-anchor="middle" fill="#B94036" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" letter-spacing="8">ROUTE</text>
+
+  <defs>
+    <linearGradient id="sun" x1="203" y1="77" x2="233" y2="107" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E86E48"/>
+      <stop offset="1" stop-color="#B73A2F"/>
+    </linearGradient>
+    <linearGradient id="mountains" x1="74" y1="91" x2="205" y2="161" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8DA0A2"/>
+      <stop offset="0.48" stop-color="#D5DEDC"/>
+      <stop offset="1" stop-color="#687B7C"/>
+    </linearGradient>
+  </defs>
+</svg>

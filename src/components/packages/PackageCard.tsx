@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,7 +18,7 @@ const accentText: Record<NonNullable<PackageCardProps['accent']>, string> = {
   primary: 'text-primary',
   accent: 'text-accent',
   jade: 'text-jade',
-  secondary: 'text-secondary-700',
+  secondary: 'text-secondary-700 dark:text-secondary-200',
 };
 
 const accentBg: Record<NonNullable<PackageCardProps['accent']>, string> = {
@@ -39,7 +39,7 @@ export function PackageCard({ pkg, index = 0, accent = 'primary' }: PackageCardP
     >
       <Link
         href={`/packages/${pkg.slug}`}
-        className="group flex h-full flex-col overflow-hidden rounded-3xl border border-black/5 bg-white shadow-lg shadow-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10"
+        className="group flex h-full flex-col overflow-hidden rounded-3xl border border-black/5 dark:border-white/10 bg-white dark:bg-secondary-900 shadow-lg shadow-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10"
       >
         <div className="relative aspect-[16/10] overflow-hidden">
           <Image
@@ -54,7 +54,7 @@ export function PackageCard({ pkg, index = 0, accent = 'primary' }: PackageCardP
           {/* Top badges */}
           <div className="absolute left-3 top-3 flex flex-col gap-2">
             {pkg.badge && (
-              <div className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-secondary-900 shadow-sm">
+              <div className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-secondary-900 shadow-sm dark:bg-secondary-950/85 dark:text-secondary-100 dark:ring-1 dark:ring-white/10">
                 {pkg.badge}
               </div>
             )}
@@ -74,7 +74,7 @@ export function PackageCard({ pkg, index = 0, accent = 'primary' }: PackageCardP
         </div>
 
         <div className="flex flex-1 flex-col p-5">
-          <div className="mb-3 flex items-center gap-3 text-xs text-secondary-500">
+          <div className="mb-3 flex items-center gap-3 text-xs text-secondary-500 dark:text-secondary-400">
             <span className="inline-flex items-center gap-1">
               <MapPin className={cn('h-3.5 w-3.5', accentText[accent])} />
               {pkg.destination}
@@ -85,10 +85,10 @@ export function PackageCard({ pkg, index = 0, accent = 'primary' }: PackageCardP
             </span>
           </div>
 
-          <h3 className="line-clamp-1 font-serif text-lg font-bold text-secondary-900">
+          <h3 className="line-clamp-1 font-serif text-lg font-bold text-secondary-900 dark:text-white">
             {pkg.name}
           </h3>
-          <p className="mt-1 line-clamp-2 text-sm text-secondary-600">
+          <p className="mt-1 line-clamp-2 text-sm text-secondary-600 dark:text-secondary-300">
             {pkg.shortDescription}
           </p>
 
@@ -96,14 +96,14 @@ export function PackageCard({ pkg, index = 0, accent = 'primary' }: PackageCardP
             {pkg.highlights.slice(0, 3).map((h) => (
               <span
                 key={h}
-                className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-secondary-700"
+                className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-secondary-700 dark:bg-secondary-800 dark:text-secondary-200"
               >
                 {h}
               </span>
             ))}
           </div>
 
-          <div className="mt-auto flex items-center justify-between border-t border-secondary-100 pt-4">
+          <div className="mt-auto flex items-center justify-between border-t border-secondary-100 dark:border-secondary-700 pt-4">
             <div
               className={cn(
                 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold text-white shadow-sm',

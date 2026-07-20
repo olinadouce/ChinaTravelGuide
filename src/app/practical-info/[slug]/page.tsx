@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, FileCheck2 } from 'lucide-react';
 import { practicalGuides } from '@/data/content';
@@ -14,7 +14,7 @@ const accentClassMap: Record<string, string> = {
   primary: 'bg-primary/10 text-primary',
   accent: 'bg-accent/10 text-accent',
   jade: 'bg-emerald-500/10 text-emerald-600',
-  secondary: 'bg-secondary-100 text-secondary-700',
+  secondary: 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-200',
 };
 
 export default function PracticalGuidePage({ params }: { params: { slug: string } }) {
@@ -28,12 +28,12 @@ export default function PracticalGuidePage({ params }: { params: { slug: string 
   const iconWrap = accentClassMap[guide.accent] ?? accentClassMap.secondary;
 
   return (
-    <div className="min-h-screen bg-[#f7f1e8] pt-20">
-      <section className="bg-white py-14">
+    <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220] pt-20">
+      <section className="bg-white dark:bg-secondary-900 py-14">
         <div className="container-main max-w-4xl">
           <Link
             href="/practical-info"
-            className="mb-6 inline-flex items-center gap-2 text-sm text-secondary-500 hover:text-primary"
+            className="mb-6 inline-flex items-center gap-2 text-sm text-secondary-500 dark:text-secondary-400 hover:text-primary"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to practical info
@@ -42,19 +42,19 @@ export default function PracticalGuidePage({ params }: { params: { slug: string 
             <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${iconWrap}`}>
               <Icon className="h-7 w-7" />
             </div>
-            <span className="rounded-full bg-secondary-50 px-3 py-1 text-xs uppercase tracking-[0.16em] text-secondary-500">
+            <span className="rounded-full bg-secondary-50 px-3 py-1 text-xs uppercase tracking-[0.16em] text-secondary-500 dark:text-secondary-400">
               {guide.readMinutes} min read
             </span>
           </div>
-          <p className="text-sm uppercase tracking-[0.24em] text-secondary-500">Guide module</p>
-          <h1 className="mt-3 text-5xl font-bold text-secondary-900">{guide.title}</h1>
-          <p className="mt-6 text-lg leading-8 text-secondary-700">{guide.summary}</p>
+          <p className="text-sm uppercase tracking-[0.24em] text-secondary-500 dark:text-secondary-400">Guide module</p>
+          <h1 className="mt-3 text-5xl font-bold text-secondary-900 dark:text-white">{guide.title}</h1>
+          <p className="mt-6 text-lg leading-8 text-secondary-700 dark:text-secondary-200">{guide.summary}</p>
         </div>
       </section>
 
       <section className="py-12">
         <div className="container-main max-w-4xl">
-          <div className="rounded-[32px] bg-white p-8 shadow-sm sm:p-10">
+          <div className="rounded-[32px] bg-white dark:bg-secondary-900 p-8 shadow-sm sm:p-10">
             <RichBlocks blocks={guide.body} />
           </div>
         </div>

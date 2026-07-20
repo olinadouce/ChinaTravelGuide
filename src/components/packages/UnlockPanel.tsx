@@ -1,11 +1,12 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Coins, Lock, Sparkles, Unlock, Check, AlertTriangle } from 'lucide-react';
+import { Coins, Lock, Sparkles, Unlock, Check, AlertTriangle, TrendingUp } from 'lucide-react';
 
 import type { ClientPackage } from '@/data/packages';
-import { useAuth } from '@/components/auth/MockAuthProvider';
+import { useAuth } from '@/components/auth/FirebaseAuthProvider';
+import { POINTS_RULES, getNextTier, getUserTier } from '@/lib/points-rules';
 import { cn } from '@/lib/utils';
 
 interface UnlockPanelProps {
@@ -18,14 +19,15 @@ export function UnlockPanel({ pkg, variant = 'sidebar' }: UnlockPanelProps) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const cost = pkg.pointsCost || POINTS_RULES.FULL_GUIDE_COST;
   const unlocked = isAuthenticated && hasPackageUnlocked(pkg.id);
-  const insufficient =
-    isAuthenticated && (user?.points ?? 0) < pkg.pointsCost;
+  const insufficient = isAuthenticated && (user?.points ?? 0) < cost;
+  const needed = Math.max(0, cost - (user?.points ?? 0));
 
-  const handleUnlock = () => {
+  const handleUnlock = async () => {
     setError(null);
     setPending(true);
-    const result = unlockPackage(pkg.id, pkg.pointsCost);
+    const result = await unlockPackage(pkg.id, cost);
     setPending(false);
     if (!result.ok) {
       setError(result.reason);
@@ -38,7 +40,6 @@ export function UnlockPanel({ pkg, variant = 'sidebar' }: UnlockPanelProps) {
     return `/login?${params.toString()}`;
   })();
 
-  // Already unlocked
   if (unlocked) {
     return (
       <div
@@ -52,9 +53,9 @@ export function UnlockPanel({ pkg, variant = 'sidebar' }: UnlockPanelProps) {
             <Check className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-base font-bold text-secondary-900">Full version unlocked</p>
-            <p className="text-xs text-secondary-600">
-              {user?.points} pts remaining — keep unlocking more guides
+            <p className="text-base font-bold text-secondary-900 dark:text-white">Full version unlocked</p>
+            <p className="text-xs text-secondary-600 dark:text-secondary-300">
+              {user?.points} pts remaining - keep unlocking more guides
             </p>
           </div>
         </div>
@@ -62,12 +63,11 @@ export function UnlockPanel({ pkg, variant = 'sidebar' }: UnlockPanelProps) {
     );
   }
 
-  // Not signed in
   if (!isAuthenticated) {
     return (
       <div
         className={cn(
-          'overflow-hidden rounded-3xl border border-black/5 bg-white p-6 shadow-lg shadow-black/5',
+          'overflow-hidden rounded-3xl border border-black/5 dark:border-white/10 bg-white dark:bg-secondary-900 p-6 shadow-lg shadow-black/5',
           variant === 'inline' && 'rounded-2xl'
         )}
       >
@@ -76,11 +76,12 @@ export function UnlockPanel({ pkg, variant = 'sidebar' }: UnlockPanelProps) {
             <Lock className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-base font-bold text-secondary-900">
-              Sign in to unlock with {pkg.pointsCost} pts
+            <p className="text-base font-bold text-secondary-900 dark:text-white">
+              Sign in to unlock with {cost} pts
             </p>
-            <p className="text-xs text-secondary-600">
-              New users get 200 pts — enough for {Math.floor(200 / pkg.pointsCost)} paid guides
+            <p className="text-xs text-secondary-600 dark:text-secondary-300">
+              New users get {POINTS_RULES.SIGNUP_BONUS} pts. Earn{' '}
+              {Math.max(0, cost - POINTS_RULES.SIGNUP_BONUS)} more by reading and saving the Free Guide.
             </p>
           </div>
         </div>
@@ -90,14 +91,16 @@ export function UnlockPanel({ pkg, variant = 'sidebar' }: UnlockPanelProps) {
         >
           Sign in / Sign up
         </Link>
-        <p className="mt-3 text-center text-xs text-secondary-500">
-          You'll be returned to this page automatically after signing in.
+        <p className="mt-3 text-center text-xs text-secondary-500 dark:text-secondary-400">
+          You will be returned to this page automatically after signing in.
         </p>
       </div>
     );
   }
 
-  // Signed in but not unlocked
+  const tier = getUserTier(user?.points ?? 0);
+  const nextTier = getNextTier(user?.points ?? 0);
+
   return (
     <div
       className={cn(
@@ -110,25 +113,25 @@ export function UnlockPanel({ pkg, variant = 'sidebar' }: UnlockPanelProps) {
           <Unlock className="h-5 w-5" />
         </div>
         <div className="flex-1">
-          <p className="text-base font-bold text-secondary-900">
+          <p className="text-base font-bold text-secondary-900 dark:text-white">
             Redeem points for the full guide
           </p>
-          <p className="mt-1 text-xs text-secondary-600">
-            Get the full 14-day itinerary, hotel/restaurant picks and contingency plans.
+          <p className="mt-1 text-xs text-secondary-600 dark:text-secondary-300">
+            Get the full itinerary, hotel and restaurant picks, and contingency plans.
           </p>
         </div>
       </div>
 
-      <div className="mt-5 flex items-center justify-between rounded-2xl bg-white/80 p-4 ring-1 ring-black/5">
+      <div className="mt-5 grid grid-cols-2 gap-3 rounded-2xl bg-white/80 p-4 ring-1 ring-black/5">
         <div>
-          <p className="text-xs font-medium text-secondary-500">Cost</p>
+          <p className="text-xs font-medium text-secondary-500 dark:text-secondary-400">Cost</p>
           <p className="inline-flex items-center gap-1 text-xl font-bold text-primary">
             <Coins className="h-5 w-5" />
-            {pkg.pointsCost} pts
+            {cost} pts
           </p>
         </div>
         <div className="text-right">
-          <p className="text-xs font-medium text-secondary-500">Your balance</p>
+          <p className="text-xs font-medium text-secondary-500 dark:text-secondary-400">Your balance</p>
           <p
             className={cn(
               'inline-flex items-center gap-1 text-xl font-bold',
@@ -141,12 +144,30 @@ export function UnlockPanel({ pkg, variant = 'sidebar' }: UnlockPanelProps) {
         </div>
       </div>
 
-      {insufficient && (
-        <div className="mt-4 flex items-start gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-700">
-          <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-          <p>Not enough points to unlock this guide.</p>
+      {!insufficient && (
+        <div className="mt-3 flex items-center gap-2 rounded-xl bg-jade/5 px-3 py-2 text-xs text-jade">
+          <Check className="h-3.5 w-3.5" />
+          You can unlock this guide now.
         </div>
       )}
+      {insufficient && (
+        <div className="mt-3 flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">
+          <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
+          Earn <span className="font-bold">{needed} more pts</span> to unlock. Scroll down and use the
+          "Earn more points" panel.
+        </div>
+      )}
+
+      <div className="mt-3 flex items-center gap-2 rounded-xl bg-stone-50 dark:bg-secondary-800 px-3 py-2 text-[11px] text-secondary-600 dark:text-secondary-300">
+        <TrendingUp className="h-3 w-3 text-secondary-400" />
+        Current tier: <span className="font-bold text-secondary-800 dark:text-secondary-100">{tier}</span>
+        {nextTier && (
+          <>
+            {' '}
+            - {nextTier.remaining} pts to <span className="font-bold text-secondary-800 dark:text-secondary-100">{nextTier.name}</span>
+          </>
+        )}
+      </div>
 
       {error && !insufficient && (
         <p className="mt-3 text-xs text-red-600">{error}</p>
@@ -164,10 +185,10 @@ export function UnlockPanel({ pkg, variant = 'sidebar' }: UnlockPanelProps) {
         )}
       >
         <Sparkles className="h-4 w-4" />
-        {insufficient ? 'Insufficient points' : `Redeem (${pkg.pointsCost} pts)`}
+        {insufficient ? `Need ${needed} more pts` : `Redeem (${cost} pts)`}
       </button>
 
-      <p className="mt-3 text-center text-[11px] leading-relaxed text-secondary-500">
+      <p className="mt-3 text-center text-[11px] leading-relaxed text-secondary-500 dark:text-secondary-400">
         Once unlocked, the guide stays in your account permanently and survives refreshes.
       </p>
     </div>
