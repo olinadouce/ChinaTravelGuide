@@ -107,6 +107,10 @@ export default function PointsAccountPage() {
   return (
     <main className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220] pt-24">
       <section className="container-main py-8">
+        <div className="mb-6 flex gap-2 border-b border-secondary-200 dark:border-secondary-700">
+          <span className="border-b-2 border-primary px-4 py-3 text-sm font-bold text-primary">Points</span>
+          <Link href="/account/posts" className="px-4 py-3 text-sm font-semibold text-secondary-500 hover:text-primary">My Posts</Link>
+        </div>
         <Link
           href="/packages"
           className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-medium text-secondary-900 dark:text-white shadow-sm transition-colors hover:bg-white"

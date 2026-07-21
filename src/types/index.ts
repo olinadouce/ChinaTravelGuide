@@ -111,6 +111,17 @@ export interface ForumComment {
   likesCount: number;
 }
 
+export interface ForumNotification {
+  id: string;
+  type: 'like' | 'comment';
+  actorName: string;
+  postSlug: string;
+  postTitle: string;
+  message: string;
+  createdAt: string;
+  read: boolean;
+}
+
 export interface PricingPackage {
   id: string;
   name: string;

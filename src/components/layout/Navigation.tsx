@@ -2,19 +2,21 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Menu, Monitor, Moon, Search, Sun, User, X } from 'lucide-react';
+import { Bell, Menu, Monitor, Moon, Search, Sun, User, X } from 'lucide-react';
 import { popularSearches, siteNavigation } from '@/data/content';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
 import { PointsBadge } from '@/components/packages/PointsBadge';
 import { LanguageTranslator } from '@/components/layout/LanguageTranslator';
 import { cn } from '@/lib/utils';
+import { authenticatedGet } from '@/lib/authenticated-api';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [forumUnread, setForumUnread] = useState(0);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
   const { user, isAuthenticated, logout } = useAuth();
@@ -38,6 +40,28 @@ export default function Navigation() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [isUserMenuOpen]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setForumUnread(0);
+      return;
+    }
+    const refresh = () => {
+      authenticatedGet<{ unreadCount: number }>('/api/account/posts')
+        .then((result) => setForumUnread(result.unreadCount))
+        .catch(() => undefined);
+    };
+    const clear = () => setForumUnread(0);
+    refresh();
+    const interval = window.setInterval(refresh, 60_000);
+    window.addEventListener('focus', refresh);
+    window.addEventListener('forum-notifications-read', clear);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('focus', refresh);
+      window.removeEventListener('forum-notifications-read', clear);
+    };
+  }, [isAuthenticated]);
 
   const ThemeIcon = resolvedTheme === 'dark' ? Moon : resolvedTheme === 'light' ? Sun : Monitor;
 
@@ -151,6 +175,14 @@ export default function Navigation() {
                         Points account
                       </Link>
                       <Link
+                        href="/account/posts"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center justify-between px-4 py-3 text-sm font-medium text-secondary-700 transition-colors hover:bg-stone-50 dark:text-secondary-200 dark:hover:bg-secondary-800"
+                      >
+                        <span>My posts</span>
+                        {forumUnread > 0 && <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white">{forumUnread > 99 ? '99+' : forumUnread}</span>}
+                      </Link>
+                      <Link
                         href="/packages"
                         onClick={() => setIsUserMenuOpen(false)}
                         className="block px-4 py-3 text-sm font-medium text-secondary-700 transition-colors hover:bg-stone-50 dark:text-secondary-200 dark:hover:bg-secondary-800"
@@ -249,6 +281,14 @@ export default function Navigation() {
                   className="block rounded-2xl px-4 py-3 font-medium text-secondary-700 transition-colors hover:bg-secondary-100 hover:text-primary dark:text-secondary-100 dark:hover:bg-secondary-800"
                 >
                   Points account
+                </Link>
+                <Link
+                  href="/account/posts"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-between rounded-2xl px-4 py-3 font-medium text-secondary-700 transition-colors hover:bg-secondary-100 hover:text-primary dark:text-secondary-100 dark:hover:bg-secondary-800"
+                >
+                  <span className="inline-flex items-center gap-2"><Bell className="h-4 w-4" />My posts</span>
+                  {forumUnread > 0 && <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-white">{forumUnread}</span>}
                 </Link>
                 <button
                   onClick={() => {

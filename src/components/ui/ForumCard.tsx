@@ -31,11 +31,11 @@ export function ForumCard({ post, index }: ForumCardProps) {
       <Link href={`/forum/${post.slug}`} className="block">
         {post.featuredImage && (
           <div className="relative mb-4 h-48 w-full overflow-hidden rounded-xl">
-            <Image
+            {/* User uploads are already validated and streamed through our image proxy. */}
+            <img
               src={post.featuredImage}
               alt={post.title}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
           </div>

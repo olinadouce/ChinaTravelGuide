@@ -23,6 +23,32 @@ service cloud.firestore {
       }
     }
 
+    // Forum content is read and written only through authenticated server APIs.
+    // This prevents clients from forging authors, timestamps, or counters.
+    match /forumPosts/{postId} {
+      allow read, write: if false;
+    }
+
+    match /forumComments/{postId}/entries/{commentId} {
+      allow read, write: if false;
+    }
+
+    match /forumPostStats/{postId} {
+      allow read, write: if false;
+    }
+
+    match /forumRateLimits/{uid} {
+      allow read, write: if false;
+    }
+
+    match /forumLikes/{likeId} {
+      allow read, write: if false;
+    }
+
+    match /forumNotifications/{notificationId} {
+      allow read, write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
