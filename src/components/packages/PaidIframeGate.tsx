@@ -1,27 +1,65 @@
-﻿'use client';
+'use client';
 
-import { Lock, Check } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { AlertCircle, Check, Loader2, Lock, RefreshCw } from 'lucide-react';
 
-import type { ClientPackage } from '@/data/packages';
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
+import type { ClientPackage } from '@/data/packages';
+import { auth } from '@/lib/firebase';
+import { PackageHtmlFrame } from './PackageHtmlFrame';
 import { UnlockPanel } from './UnlockPanel';
-import { ThemeAwareIframe } from './ThemeAwareIframe';
 
 interface PaidIframeGateProps {
   pkg: ClientPackage;
-  paidUrl: string;
 }
 
 /**
- * Renders the paid packet HTML inside an <iframe src=...> only when the user
- * is signed in AND has redeemed enough points to unlock this package.
- *
- * When locked, shows the unlock panel and a locked placeholder card so the
- * URL of the paid HTML is never leaked to unauthorized clients.
+ * Loads paid HTML through an authenticated API only after the account has
+ * unlocked the package. The private Blob pathname never reaches the client.
  */
-export function PaidIframeGate({ pkg, paidUrl }: PaidIframeGateProps) {
+export function PaidIframeGate({ pkg }: PaidIframeGateProps) {
   const { isAuthenticated, hasPackageUnlocked, user } = useAuth();
   const unlocked = isAuthenticated && hasPackageUnlocked(pkg.id);
+  const [paidHtml, setPaidHtml] = useState('');
+  const [loadingGuide, setLoadingGuide] = useState(false);
+  const [guideError, setGuideError] = useState<string | null>(null);
+
+  const loadPaidGuide = useCallback(async () => {
+    if (!unlocked) return;
+
+    setLoadingGuide(true);
+    setGuideError(null);
+    try {
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser) throw new Error('Your sign-in session is not ready.');
+
+      const token = await firebaseUser.getIdToken();
+      const response = await fetch(`/api/packages/${encodeURIComponent(pkg.slug)}/paid`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(payload?.error || 'The private guide could not be loaded.');
+      }
+
+      setPaidHtml(await response.text());
+    } catch (error: any) {
+      setPaidHtml('');
+      setGuideError(error?.message || 'The private guide could not be loaded.');
+    } finally {
+      setLoadingGuide(false);
+    }
+  }, [pkg.slug, unlocked]);
+
+  useEffect(() => {
+    if (unlocked && !paidHtml) void loadPaidGuide();
+    if (!unlocked) {
+      setPaidHtml('');
+      setGuideError(null);
+    }
+  }, [loadPaidGuide, paidHtml, unlocked]);
 
   if (unlocked) {
     return (
@@ -30,11 +68,33 @@ export function PaidIframeGate({ pkg, paidUrl }: PaidIframeGateProps) {
           <Check className="h-4 w-4" />
           Full version unlocked - {user?.points} pts remaining
         </div>
-        <ThemeAwareIframe
-          src={paidUrl}
-          title={`${pkg.slug}-paid`}
-          minHeight={2200}
-        />
+
+        {loadingGuide ? (
+          <div className="container-main flex min-h-[280px] items-center justify-center py-10">
+            <div className="theme-surface flex items-center gap-3 rounded-2xl px-6 py-5">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              <span className="text-sm font-medium">Loading your private guide…</span>
+            </div>
+          </div>
+        ) : guideError ? (
+          <div className="container-main py-8">
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+              <p className="flex items-center gap-2 font-bold">
+                <AlertCircle className="h-5 w-5" /> Private guide unavailable
+              </p>
+              <p className="mt-2 text-sm">{guideError}</p>
+              <button
+                type="button"
+                onClick={() => void loadPaidGuide()}
+                className="btn-primary mt-4 gap-2"
+              >
+                <RefreshCw className="h-4 w-4" /> Try again
+              </button>
+            </div>
+          </div>
+        ) : paidHtml ? (
+          <PackageHtmlFrame html={paidHtml} minHeight={2200} title={`${pkg.slug}-paid`} />
+        ) : null}
       </div>
     );
   }
@@ -53,7 +113,7 @@ export function PaidIframeGate({ pkg, paidUrl }: PaidIframeGateProps) {
             }}
           />
           <div className="relative max-w-md">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-secondary-200 text-secondary-500 dark:text-secondary-400">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-secondary-200 text-secondary-500 dark:bg-secondary-700 dark:text-secondary-300">
               <Lock className="h-5 w-5" />
             </div>
             <p className="mt-3 font-bold text-secondary-800 dark:text-secondary-100">
@@ -62,8 +122,8 @@ export function PaidIframeGate({ pkg, paidUrl }: PaidIframeGateProps) {
                 : 'Sign in first, then redeem to view the full version'}
             </p>
             <p className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">
-              Once redeemed, you will unlock the complete itinerary, restaurant and hotel picks,
-              and emergency plans. The full HTML only loads for accounts that have unlocked it.
+              Once redeemed, the complete itinerary is loaded from private storage after your
+              account authorization is verified by the server.
             </p>
             <p className="mt-3 inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
               Cost: {pkg.pointsCost} pts

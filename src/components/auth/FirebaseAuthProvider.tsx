@@ -12,15 +12,11 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import {
-  getUserDoc,
-  createUserDoc,
-  unlockPackageForUser,
-  claimPointsForAction,
-  ensureWelcomeBonusForUser,
   getLedger as fetchLedger,
   FirestoreUser,
 } from '@/lib/firestore-users';
-import { POINTS_RULES, PointsActionType, PointsLedgerEntry } from '@/lib/points-rules';
+import { authenticatedPost } from '@/lib/authenticated-api';
+import { PointsActionType, PointsLedgerEntry } from '@/lib/points-rules';
 
 type Result = { ok: true } | { ok: false; reason: string };
 type EarnPointsOptions = {
@@ -69,53 +65,13 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
     setPointsProfileLoading(true);
     setPointsProfileError(null);
     try {
-      let userDoc = await getUserDoc(fbUser.uid);
-      if (!userDoc) {
-        userDoc = await createUserDoc(fbUser.uid, {
-          email: fbUser.email,
-          displayName: fbUser.displayName || fbUser.email?.split('@')[0] || 'Traveler',
-          photoURL: fbUser.photoURL,
-        });
-      }
-      setUser(userDoc);
-      if (!userDoc) {
-        setPointsProfileError('Firestore user profile was not found.');
-      }
+      const result = await authenticatedPost<{ profile: FirestoreUser }>('/api/account/sync');
+      setUser(result.profile);
     } catch (err: any) {
       setPointsProfileError(err?.message ?? 'Failed to refresh Firestore profile.');
     } finally {
       setPointsProfileLoading(false);
     }
-  }, []);
-
-  const awardDailyLoginIfNeeded = useCallback(async (userDoc: FirestoreUser) => {
-    const today = new Date().toISOString().slice(0, 10);
-    if (userDoc.lastDailyLoginDate === today) return userDoc;
-
-    const result = await claimPointsForAction(userDoc.uid, {
-      actionType: 'daily_login',
-      pointsChange: POINTS_RULES.DAILY_LOGIN,
-      dailyLoginDate: today,
-      note: `Daily login bonus - ${today}`,
-    });
-
-    if (!result.ok) return userDoc;
-    return {
-      ...userDoc,
-      points: (userDoc.points ?? 0) + POINTS_RULES.DAILY_LOGIN,
-      lastDailyLoginDate: today,
-    };
-  }, []);
-
-  const ensureWelcomeBonusIfNeeded = useCallback(async (userDoc: FirestoreUser) => {
-    const result = await ensureWelcomeBonusForUser(userDoc.uid, userDoc.displayName);
-    if (!result.ok || !result.granted) return userDoc;
-
-    return {
-      ...userDoc,
-      points: POINTS_RULES.SIGNUP_BONUS,
-      actionsUsed: { ...(userDoc.actionsUsed || {}), signup_bonus: true as const },
-    };
   }, []);
 
   useEffect(() => {
@@ -166,41 +122,12 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
         ]);
 
       try {
-        const firstRead = await withTimeout(getUserDoc(fbUser.uid), FIRESTORE_TIMEOUT_MS);
-        if (firstRead === timeoutResult) {
-          throw new Error('Timed out while loading your Firestore points profile.');
-        }
-
-        let userDoc = firstRead;
-        if (!userDoc) {
-          const created = await withTimeout(
-            createUserDoc(fbUser.uid, {
-              email: fbUser.email,
-              displayName: minimalUser.displayName,
-              photoURL: fbUser.photoURL,
-            }),
-            FIRESTORE_TIMEOUT_MS
-          );
-          if (created === timeoutResult) {
-            throw new Error('Timed out while creating your Firestore points profile.');
-          }
-          userDoc = created;
-          setUser(userDoc);
-        }
-        if (userDoc) {
-          const withWelcomeBonus = await withTimeout(ensureWelcomeBonusIfNeeded(userDoc), FIRESTORE_TIMEOUT_MS);
-          if (withWelcomeBonus === timeoutResult) {
-            throw new Error('Timed out while applying your welcome bonus.');
-          }
-          const withDailyLogin = await withTimeout(
-            awardDailyLoginIfNeeded(withWelcomeBonus),
-            FIRESTORE_TIMEOUT_MS
-          );
-          if (withDailyLogin === timeoutResult) {
-            throw new Error('Timed out while applying your daily-login bonus.');
-          }
-          setUser(withDailyLogin);
-        }
+        const synced = await withTimeout(
+          authenticatedPost<{ profile: FirestoreUser }>('/api/account/sync'),
+          FIRESTORE_TIMEOUT_MS
+        );
+        if (synced === timeoutResult) throw new Error('Timed out while syncing your points profile.');
+        setUser(synced.profile);
       } catch (err: any) {
         setPointsProfileError(err?.message ?? 'Failed to sync your Firestore points profile.');
         console.error('[FirebaseAuth] Failed to load user doc (UI still works):', err);
@@ -213,7 +140,7 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
       clearTimeout(timeoutId);
       unsubscribe();
     };
-  }, [awardDailyLoginIfNeeded, ensureWelcomeBonusIfNeeded]);
+  }, []);
 
   const signUp = useCallback(async (email: string, password: string, name: string): Promise<Result> => {
     try {
@@ -288,52 +215,33 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
           return { ok: false, reason: 'You have already claimed this reward for this city.' };
         }
       }
-      const today = new Date().toISOString().slice(0, 10);
-      if (actionType === 'daily_login' && user.lastDailyLoginDate === today) {
-        return { ok: false, reason: 'Daily login bonus already claimed today.' };
+      try {
+        await authenticatedPost('/api/points/claim', {
+          actionType,
+          city: opts.city,
+          evidence: {
+            readSeconds: opts.readSeconds,
+            scrollPercent: opts.scrollPercent,
+            wordDownloaded: opts.wordDownloaded,
+          },
+        });
+        await refreshUser();
+        return { ok: true };
+      } catch (err: any) {
+        return { ok: false, reason: err?.message ?? 'Points claim failed.' };
       }
-
-      const pointsMap: Partial<Record<PointsActionType, number>> = {
-        browse_free_guide: POINTS_RULES.BROWSE_FREE_GUIDE,
-        save_free_guide: POINTS_RULES.SAVE_FREE_GUIDE,
-        share_valid_click: POINTS_RULES.SHARE_VALID_CLICK,
-        invite_signup: POINTS_RULES.INVITE_SIGNUP,
-        invite_full_guide_unlock: POINTS_RULES.INVITE_FULL_GUIDE_UNLOCK,
-        submit_feedback: POINTS_RULES.SUBMIT_FEEDBACK,
-        daily_login: POINTS_RULES.DAILY_LOGIN,
-      };
-      const points = pointsMap[actionType];
-      if (!points) return { ok: false, reason: 'This action is not available yet.' };
-
-      const result = await claimPointsForAction(user.uid, {
-        actionType,
-        pointsChange: points,
-        city: opts.city,
-        productId: opts.productId,
-        note: opts.note,
-        actionKey,
-        dailyLoginDate: actionType === 'daily_login' ? today : undefined,
-      });
-      if (!result.ok) return result;
-
-      await refreshUser();
-      return { ok: true };
     },
     [user, refreshUser]
   );
 
   const unlockPackage = useCallback(
-    async (packageId: string, cost: number = POINTS_RULES.FULL_GUIDE_COST): Promise<Result> => {
+    async (packageId: string, _displayCost?: number): Promise<Result> => {
       if (!user) return { ok: false, reason: 'Please sign in first to redeem' };
       if (user.unlockedPackages?.includes(packageId)) {
         return { ok: false, reason: 'This package is already unlocked' };
       }
-      if (user.points < cost) {
-        return { ok: false, reason: `Not enough points (you have ${user.points}, need ${cost})` };
-      }
       try {
-        const result = await unlockPackageForUser(user.uid, packageId, cost);
-        if (!result.ok) return result;
+        await authenticatedPost('/api/packages/unlock', { packageId });
         await refreshUser();
         return { ok: true };
       } catch (err: any) {

@@ -16,7 +16,7 @@ const firebaseConfig = {
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-export const FIRESTORE_DATABASE_ID = 'default';
+export const FIRESTORE_DATABASE_ID = '(default)';
 
 // Firestore transport config.
 // Some networks block or stall Firestore's default streaming transport. Force

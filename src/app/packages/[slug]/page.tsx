@@ -24,7 +24,7 @@ export async function generateMetadata({
 }
 /**
  * Theme to static-asset URL mapping.
- * Each theme's HTML files live under /public/<theme>/<slug>/{free,paid}.html.
+ * Free previews remain public. Paid guides are fetched through an authenticated API.
  */
 const themeToAssetBase: Record<string, string> = {
   ishowspeed: '/ishowspeed',
@@ -48,9 +48,8 @@ export default function PackageDetailPage({
     ? params.slug.replace(/^ishowspeed-/, '')
     : params.slug;
   const freeUrl = assetBase ? `${assetBase}/${slug}/free.html` : null;
-  const paidUrl = assetBase ? `${assetBase}/${slug}/${slug === 'shenzhen' ? 'free' : 'paid'}.html` : null;
 
-  const cityName = pkg.destination.split(' - ')[0].split(' 路 ')[0];
+  const cityName = pkg.destination.split(' - ')[0].split(' · ')[0];
 
   return (
     <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220]">
@@ -66,7 +65,7 @@ export default function PackageDetailPage({
         </Link>
       </div>
 
-      {freeUrl && paidUrl ? (
+      {freeUrl ? (
         <>
           <ThemeAwareIframe
             src={freeUrl}
@@ -76,7 +75,7 @@ export default function PackageDetailPage({
 
           <PointsEarnPanel citySlug={slug} cityName={cityName} freeUrl={freeUrl} />
 
-          <PaidIframeGate pkg={pkg} paidUrl={paidUrl} />
+          <PaidIframeGate pkg={pkg} />
         </>
       ) : (
         <div className="container-main">
