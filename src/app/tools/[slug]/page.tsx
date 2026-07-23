@@ -28,9 +28,10 @@ const toolGuides: Record<string, { headline: string; details: string[] }> = {
   },
 };
 
-export default function ToolGuidePage({ params }: { params: { slug: string } }) {
-  const tool = travelTools.find((item) => item.slug === params.slug);
-  const guide = toolGuides[params.slug];
+export default async function ToolGuidePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const tool = travelTools.find((item) => item.slug === slug);
+  const guide = toolGuides[slug];
 
   if (!tool || !guide) {
     notFound();

@@ -5,9 +5,10 @@ import { readForumImage } from '@/lib/server/forum-image-storage';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function GET(_request: Request, { params }: { params: { path: string[] } }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ path: string[] }> }) {
   try {
-    const pathname = params.path.join('/');
+    const { path } = await params;
+    const pathname = path.join('/');
     const result = await readForumImage(pathname);
     if (!result || result.statusCode !== 200) {
       return NextResponse.json({ error: 'Image not found.' }, { status: 404 });

@@ -6,18 +6,20 @@ import { ForumInputError, getForumLikeState, toggleForumLike } from '@/lib/serve
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const identity = await verifyRequestUser(request.headers.get('authorization'));
   if (!identity) return NextResponse.json({ error: 'Valid sign-in is required.' }, { status: 401 });
-  const liked = await getForumLikeState(identity.uid, params.slug);
+  const liked = await getForumLikeState(identity.uid, slug);
   return NextResponse.json({ liked }, { headers: { 'Cache-Control': 'no-store' } });
 }
 
-export async function POST(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
+    const { slug } = await params;
     const identity = await verifyRequestUser(request.headers.get('authorization'));
     if (!identity) return NextResponse.json({ error: 'Valid sign-in is required.' }, { status: 401 });
-    const result = await toggleForumLike(identity, params.slug);
+    const result = await toggleForumLike(identity, slug);
     return NextResponse.json(result, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof ForumInputError) return NextResponse.json({ error: error.message }, { status: error.status });

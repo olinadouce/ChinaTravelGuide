@@ -11,9 +11,10 @@ const PAID_GUIDES_STORE_ID = 'store_Qu89PDZ4WlNNieex';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
-  const pkg = getPackageBySlug(params.slug);
+  const { slug } = await params;
+  const pkg = getPackageBySlug(slug);
   if (!pkg) {
     return NextResponse.json({ error: 'Guide not found.' }, { status: 404 });
   }

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 import { useTheme } from '@/hooks/useTheme';
-import { applyIframeTheme } from './iframeTheme';
 
 interface ThemeAwareIframeProps {
   src: string;
@@ -25,18 +24,28 @@ export function ThemeAwareIframe({
     if (!iframe) return;
 
     const syncTheme = () => {
-      try {
-        if (iframe.contentDocument) {
-          applyIframeTheme(iframe.contentDocument, resolvedTheme);
-        }
-      } catch {
-        // The packaged guides are same-origin. Keep the iframe usable if that changes.
+      iframe.contentWindow?.postMessage(
+        { type: 'ctg:set-theme', theme: resolvedTheme },
+        '*'
+      );
+    };
+
+    const handleMessage = (event: MessageEvent) => {
+      if (
+        event.source === iframe.contentWindow &&
+        event.data?.type === 'ctg:frame-ready'
+      ) {
+        syncTheme();
       }
     };
 
     iframe.addEventListener('load', syncTheme);
+    window.addEventListener('message', handleMessage);
     syncTheme();
-    return () => iframe.removeEventListener('load', syncTheme);
+    return () => {
+      iframe.removeEventListener('load', syncTheme);
+      window.removeEventListener('message', handleMessage);
+    };
   }, [resolvedTheme, src]);
 
   return (
@@ -44,6 +53,7 @@ export function ThemeAwareIframe({
       ref={ref}
       src={src}
       title={title}
+      sandbox="allow-scripts allow-downloads allow-top-navigation-by-user-activation"
       className={`${className} bg-white dark:bg-secondary-900`}
       style={{ minHeight }}
     />

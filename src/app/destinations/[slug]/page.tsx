@@ -10,8 +10,9 @@ export function generateStaticParams() {
   return destinations.map((destination) => ({ slug: destination.slug }));
 }
 
-export default function DestinationDetailPage({ params }: { params: { slug: string } }) {
-  const destination = destinations.find((item) => item.slug === params.slug);
+export default async function DestinationDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const destination = destinations.find((item) => item.slug === slug);
 
   if (!destination) {
     notFound();

@@ -10,12 +10,13 @@ interface PointsEarnPanelProps {
   citySlug: string;
   cityName: string;
   freeUrl: string;
+  wordUrl?: string;
 }
 
 const READ_SECONDS_REQUIRED = 180;
 const SCROLL_PERCENT_REQUIRED = 60;
 
-export function PointsEarnPanel({ citySlug, cityName, freeUrl }: PointsEarnPanelProps) {
+export function PointsEarnPanel({ citySlug, cityName, freeUrl, wordUrl }: PointsEarnPanelProps) {
   const { isAuthenticated, user, earnPoints } = useAuth();
   const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -113,15 +114,18 @@ export function PointsEarnPanel({ citySlug, cityName, freeUrl }: PointsEarnPanel
       setFeedback(null);
       setPendingAction('save_free_guide');
 
-      const response = await fetch(freeUrl);
-      if (!response.ok) throw new Error('Free guide HTML could not be downloaded.');
-      const html = await response.text();
-      const wordHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${cityName} Free Guide</title></head><body>${html}</body></html>`;
-      const blob = new Blob([wordHtml], { type: 'application/msword;charset=utf-8' });
+      const response = await fetch(wordUrl ?? freeUrl);
+      if (!response.ok) throw new Error('Word guide could not be downloaded.');
+      const blob = wordUrl
+        ? await response.blob()
+        : new Blob(
+            [`<!doctype html><html><head><meta charset="utf-8"><title>${cityName} Free Guide</title></head><body>${await response.text()}</body></html>`],
+            { type: 'application/msword;charset=utf-8' }
+          );
       const objectUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = objectUrl;
-      link.download = `${citySlug}-free-guide.doc`;
+      link.download = `${citySlug}-free-guide.${wordUrl ? 'docx' : 'doc'}`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -224,7 +228,7 @@ export function PointsEarnPanel({ citySlug, cityName, freeUrl }: PointsEarnPanel
                   Word download reward
                 </p>
                 <p className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">
-                  Download this free HTML guide as a Word .doc file to earn points.
+                  Download this free guide as a Word {wordUrl ? '.docx' : '.doc'} file to earn points.
                 </p>
               </div>
               <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-jade/15 px-2 py-0.5 text-xs font-bold text-jade">

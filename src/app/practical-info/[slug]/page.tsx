@@ -17,8 +17,9 @@ const accentClassMap: Record<string, string> = {
   secondary: 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-200',
 };
 
-export default function PracticalGuidePage({ params }: { params: { slug: string } }) {
-  const guide = getGuideBySlug(params.slug);
+export default async function PracticalGuidePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const guide = getGuideBySlug(slug);
 
   if (!guide) {
     notFound();

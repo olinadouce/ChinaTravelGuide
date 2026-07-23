@@ -8,8 +8,9 @@ export function generateStaticParams() {
   return journeys.map((journey) => ({ slug: journey.slug }));
 }
 
-export default function JourneyDetailPage({ params }: { params: { slug: string } }) {
-  const journey = journeys.find((item) => item.slug === params.slug);
+export default async function JourneyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const journey = journeys.find((item) => item.slug === slug);
 
   if (!journey) {
     notFound();

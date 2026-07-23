@@ -1,6 +1,3 @@
-﻿import fs from 'node:fs';
-import path from 'node:path';
-
 import type { PackageTheme, ThemeId, TravelPackage } from '@/types';
 
 import { themes } from './themes';
@@ -55,30 +52,4 @@ export function getPackagesByTheme(themeId: ThemeId): ClientPackage[] {
 export function getPackageBySlug(slug: string): ClientPackage | undefined {
   const p = allPackages.find((p) => p.slug === slug);
   return p ? toClient(p) : undefined;
-}
-
-/**
- * Server-only: read the free HTML content for the given slug.
- * Returns empty string if the file is missing or unreadable.
- */
-export function getFreeHtml(slug: string): string {
-  const p = allPackages.find((p) => p.slug === slug);
-  if (!p) return '';
-  return readSafe(p.freeHtmlPath);
-}
-
-/** Server-only: read the paid HTML content for the given slug. */
-export function getPaidHtml(slug: string): string {
-  const p = allPackages.find((p) => p.slug === slug);
-  if (!p) return '';
-  return readSafe(p.paidHtmlPath);
-}
-
-function readSafe(relPath: string): string {
-  try {
-    const abs = path.join(process.cwd(), relPath);
-    return fs.readFileSync(abs, 'utf8');
-  } catch {
-    return '';
-  }
 }

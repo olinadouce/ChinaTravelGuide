@@ -13,9 +13,10 @@ export const dynamicParams = true;
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const pkg = getPackageBySlug(params.slug);
+  const { slug } = await params;
+  const pkg = getPackageBySlug(slug);
   if (!pkg) return { title: 'Package not found - China Travel Guide' };
   return {
     title: `${pkg.name} - Travel Packages - China Travel Guide`,
@@ -33,20 +34,27 @@ const themeToAssetBase: Record<string, string> = {
   history: '/history',
 };
 
+const packageWordDownloads: Record<string, string> = {
+  guangzhou: '/themed/guangzhou/free-guide.docx',
+  'guilin-yangshuo-longji': '/themed/guilin-yangshuo-longji/free-guide.docx',
+  tibet: '/themed/tibet/free-guide.docx',
+};
 
-export default function PackageDetailPage({
+
+export default async function PackageDetailPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const pkg = getPackageBySlug(params.slug);
+  const { slug: packageSlug } = await params;
+  const pkg = getPackageBySlug(packageSlug);
   if (!pkg) notFound();
 
   const assetBase = themeToAssetBase[pkg.themeId];
   // IShowSpeed package slugs are stable even when destination labels change.
   const slug = pkg.themeId === 'ishowspeed'
-    ? params.slug.replace(/^ishowspeed-/, '')
-    : params.slug;
+    ? packageSlug.replace(/^ishowspeed-/, '')
+    : packageSlug;
   const freeUrl = assetBase ? `${assetBase}/${slug}/free.html` : null;
 
   const cityName = pkg.destination.split(' - ')[0].split(' · ')[0];
@@ -73,7 +81,12 @@ export default function PackageDetailPage({
             minHeight={1800}
           />
 
-          <PointsEarnPanel citySlug={slug} cityName={cityName} freeUrl={freeUrl} />
+          <PointsEarnPanel
+            citySlug={slug}
+            cityName={cityName}
+            freeUrl={freeUrl}
+            wordUrl={packageWordDownloads[packageSlug]}
+          />
 
           <PaidIframeGate pkg={pkg} />
         </>
