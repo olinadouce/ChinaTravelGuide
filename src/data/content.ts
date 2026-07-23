@@ -2,8 +2,7 @@ import { Destination, HeroStat, Journey, PracticalGuide, SiteTool } from '@/type
 
 export const siteNavigation = [
   { href: '/', label: 'Home' },
-  { href: '/destinations', label: 'Destinations' },
-  { href: '/journeys', label: 'Journeys' },
+  { href: '/book', label: 'Book' },
   { href: '/practical-info', label: 'Practical Info' },
   { href: '/tools', label: 'Travel Tools' },
   { href: '/forum', label: 'Forum' },
@@ -4362,4 +4361,4 @@ export const travelTools: SiteTool[] = [
   },
 ];
 
-export const popularSearches = ['Great Wall', 'Shanghai', 'Pandas', 'Xi’an', 'West Lake', 'Yangshuo'];
+export const popularSearches = ['Beijing', 'Shanghai', 'Chengdu', "Xi'an", 'Guangzhou', 'Guilin'];

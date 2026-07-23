@@ -37,8 +37,8 @@ export default function Hero({ slides }: HeroProps) {
     return () => window.clearInterval(interval);
   }, [carouselSlides.length]);
 
-  const destinationHref = useMemo(
-    () => `/destinations${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+  const bookHref = useMemo(
+    () => `/book${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
     [searchQuery]
   );
 
@@ -102,10 +102,10 @@ export default function Hero({ slides }: HeroProps) {
                 />
               </div>
               <Link
-                href={destinationHref}
+                href={bookHref}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 text-sm font-bold text-white shadow-lg shadow-primary/25 transition hover:bg-primary-700"
               >
-                Explore China
+                Find bookings
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -115,7 +115,7 @@ export default function Hero({ slides }: HeroProps) {
               {popularSearches.slice(0, 6).map((term) => (
                 <Link
                   key={term}
-                  href={`/destinations?q=${encodeURIComponent(term)}`}
+                  href={`/book?q=${encodeURIComponent(term)}`}
                   className="rounded-full border border-white/20 bg-white/14 px-3 py-1.5 text-sm font-semibold text-white/90 backdrop-blur-md transition hover:bg-white/25"
                 >
                   {term}

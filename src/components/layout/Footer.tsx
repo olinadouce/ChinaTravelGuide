@@ -25,12 +25,12 @@ export default function Footer() {
             </Link>
 
             <p className="mb-6 max-w-md text-secondary-300">
-              A scalable website foundation for attracting, informing, and converting overseas travelers interested in China.
+              Plan China with practical guidance, curated travel packages, and trusted booking partners in one place.
             </p>
 
             <div className="max-w-md rounded-3xl border border-white/10 bg-white/5 p-5">
               <p className="text-sm text-secondary-300">
-                Built as a full-stack MVP with reusable content models and API endpoints for future CMS, booking, and lead-management integration.
+                Booking links may be affiliate links. We may earn a commission at no additional cost to you.
               </p>
             </div>
           </div>

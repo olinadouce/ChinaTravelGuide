@@ -1,6 +1,5 @@
 ﻿import Hero from '@/components/sections/Hero';
-import FeaturedDestinations from '@/components/sections/FeaturedDestinations';
-import FeaturedJourneys from '@/components/sections/FeaturedJourneys';
+import FeaturedBook from '@/components/sections/FeaturedBook';
 import FeaturedPackages from '@/components/sections/FeaturedPackages';
 import TravelInfo from '@/components/sections/TravelInfo';
 import Newsletter from '@/components/sections/Newsletter';
@@ -20,8 +19,7 @@ export default function HomePage() {
   return (
     <div className="bg-[#f7f1e8] dark:bg-[#0b1220]">
       <Hero slides={heroSlides} />
-      <FeaturedDestinations />
-      <FeaturedJourneys />
+      <FeaturedBook />
       <FeaturedPackages />
       <TravelInfo />
       <Newsletter />

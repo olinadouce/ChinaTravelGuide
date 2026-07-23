@@ -313,7 +313,7 @@ export default function Navigation() {
                 <Search className="h-6 w-6 text-secondary-400" />
                 <input
                   type="text"
-                  placeholder="Search destinations, journeys, and practical travel advice"
+                  placeholder="Search booking cities and practical travel advice"
                   className="flex-1 bg-transparent text-lg text-secondary-900 outline-none placeholder:text-secondary-400 dark:text-white"
                   autoFocus
                 />
@@ -328,7 +328,7 @@ export default function Navigation() {
                   {popularSearches.map((term) => (
                     <Link
                       key={term}
-                      href={`/destinations?q=${encodeURIComponent(term)}`}
+                      href={`/book?q=${encodeURIComponent(term)}`}
                       onClick={() => setIsSearchOpen(false)}
                       className="rounded-full bg-secondary-100 px-4 py-2 text-sm text-secondary-700 transition-colors hover:bg-primary hover:text-white dark:bg-secondary-700 dark:text-secondary-100"
                     >
