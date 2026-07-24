@@ -27,13 +27,20 @@ export async function POST(request: Request) {
   }
 
   const target = typeof body.target === 'string' ? body.target.trim() : '';
-  const source = typeof body.source === 'string' ? body.source.trim() : 'en';
+  const source = typeof body.source === 'string' ? body.source.trim() : '';
   const texts = Array.isArray(body.texts)
     ? body.texts.filter((text): text is string => typeof text === 'string')
     : [];
 
   if (!target) {
     return NextResponse.json({ error: 'Target language is required.' }, { status: 400 });
+  }
+  const languageCodePattern = /^[a-z]{2,3}(?:-[a-z]{2})?$/i;
+  if (!languageCodePattern.test(target)) {
+    return NextResponse.json({ error: 'Invalid target language.' }, { status: 400 });
+  }
+  if (source && source !== 'auto' && !languageCodePattern.test(source)) {
+    return NextResponse.json({ error: 'Invalid source language.' }, { status: 400 });
   }
   if (texts.length === 0) {
     return NextResponse.json({ translations: [] });
@@ -54,7 +61,9 @@ export async function POST(request: Request) {
   const params = new URLSearchParams();
   params.set('key', apiKey);
   params.set('target', target);
-  params.set('source', source || 'en');
+  if (source && source !== 'auto') {
+    params.set('source', source);
+  }
   params.set('format', 'text');
   texts.forEach((text) => params.append('q', text));
 
@@ -74,6 +83,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const translations = data?.data?.translations?.map((item: { translatedText?: string }) => item.translatedText ?? '') ?? [];
-  return NextResponse.json({ translations });
+  const translatedItems: Array<{
+    translatedText?: string;
+    detectedSourceLanguage?: string;
+  }> = data?.data?.translations ?? [];
+  const translations = translatedItems.map((item) => item.translatedText ?? '');
+  const detectedSourceLanguages = translatedItems.map(
+    (item) => item.detectedSourceLanguage ?? source
+  );
+  return NextResponse.json({ translations, detectedSourceLanguages });
 }

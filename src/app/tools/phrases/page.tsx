@@ -1,160 +1,305 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Languages, Search, Volume2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import {
+  ArrowRight,
+  Check,
+  Copy,
+  Languages,
+  Loader2,
+  Sparkles,
+  Trash2,
+  Volume2,
+} from 'lucide-react';
 
-type Phrase = {
-  chinese: string;
-  pinyin: string;
-  english: string;
-};
+const MAX_CHARACTERS = 5000;
 
-type PhraseCategory = 'greetings' | 'basics' | 'dining' | 'transport' | 'shopping' | 'emergency';
-
-const phraseCategories: Array<{ id: PhraseCategory; label: string }> = [
-  { id: 'greetings', label: 'Greetings' },
-  { id: 'basics', label: 'Basics' },
-  { id: 'dining', label: 'Dining' },
-  { id: 'transport', label: 'Transport' },
-  { id: 'shopping', label: 'Shopping' },
-  { id: 'emergency', label: 'Emergency' },
+const examples = [
+  'Where is the nearest subway station?',
+  '¿Este plato contiene frutos secos?',
+  '空港までお願いします。',
 ];
 
-const phraseMap: Record<PhraseCategory, Phrase[]> = {
-  greetings: [
-    { chinese: '你好', pinyin: 'Ni hao', english: 'Hello' },
-    { chinese: '早上好', pinyin: 'Zao shang hao', english: 'Good morning' },
-    { chinese: '谢谢', pinyin: 'Xie xie', english: 'Thank you' },
-    { chinese: '再见', pinyin: 'Zai jian', english: 'Goodbye' },
-  ],
-  basics: [
-    { chinese: '是', pinyin: 'Shi', english: 'Yes' },
-    { chinese: '不是', pinyin: 'Bu shi', english: 'No' },
-    { chinese: '我听不懂', pinyin: 'Wo ting bu dong', english: 'I do not understand' },
-    { chinese: '请帮我', pinyin: 'Qing bang wo', english: 'Please help me' },
-  ],
-  dining: [
-    { chinese: '菜单', pinyin: 'Cai dan', english: 'Menu' },
-    { chinese: '买单', pinyin: 'Mai dan', english: 'Bill please' },
-    { chinese: '不要辣', pinyin: 'Bu yao la', english: 'Not spicy, please' },
-    { chinese: '很好吃', pinyin: 'Hen hao chi', english: 'Very delicious' },
-  ],
-  transport: [
-    { chinese: '火车站在哪里？', pinyin: 'Huo che zhan zai na li?', english: 'Where is the train station?' },
-    { chinese: '地铁站在哪里？', pinyin: 'Di tie zhan zai na li?', english: 'Where is the subway station?' },
-    { chinese: '我要去机场', pinyin: 'Wo yao qu ji chang', english: 'I want to go to the airport' },
-    { chinese: '请带我去这里', pinyin: 'Qing dai wo qu zhe li', english: 'Please take me here' },
-  ],
-  shopping: [
-    { chinese: '多少钱？', pinyin: 'Duo shao qian?', english: 'How much is it?' },
-    { chinese: '太贵了', pinyin: 'Tai gui le', english: 'Too expensive' },
-    { chinese: '可以便宜一点吗？', pinyin: 'Ke yi pian yi yi dian ma?', english: 'Can it be cheaper?' },
-    { chinese: '我想试一下', pinyin: 'Wo xiang shi yi xia', english: 'I want to try this' },
-  ],
-  emergency: [
-    { chinese: '救命', pinyin: 'Jiu ming', english: 'Help' },
-    { chinese: '请叫警察', pinyin: 'Qing jiao jing cha', english: 'Please call the police' },
-    { chinese: '我迷路了', pinyin: 'Wo mi lu le', english: 'I am lost' },
-    { chinese: '我需要医生', pinyin: 'Wo xu yao yi sheng', english: 'I need a doctor' },
-  ],
+const languageNames: Record<string, string> = {
+  ar: 'Arabic',
+  de: 'German',
+  en: 'English',
+  es: 'Spanish',
+  fr: 'French',
+  hi: 'Hindi',
+  id: 'Indonesian',
+  it: 'Italian',
+  ja: 'Japanese',
+  ko: 'Korean',
+  ms: 'Malay',
+  pt: 'Portuguese',
+  ru: 'Russian',
+  th: 'Thai',
+  tr: 'Turkish',
+  vi: 'Vietnamese',
+};
+
+type TranslateResponse = {
+  translations?: string[];
+  detectedSourceLanguages?: string[];
+  error?: string;
 };
 
 export default function PhrasesPage() {
-  const [selectedCategory, setSelectedCategory] = useState<PhraseCategory>('greetings');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [input, setInput] = useState('');
+  const [translation, setTranslation] = useState('');
+  const [detectedLanguage, setDetectedLanguage] = useState('');
+  const [error, setError] = useState('');
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const phrases = useMemo<Phrase[]>(() => {
-    if (!searchQuery) {
-      return phraseMap[selectedCategory];
-    }
+  const translate = async () => {
+    const text = input.trim();
+    if (!text || isTranslating) return;
 
-    return Object.values(phraseMap)
-      .flat()
-      .filter(
-        (phrase: Phrase) =>
-          phrase.chinese.includes(searchQuery) ||
-          phrase.pinyin.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          phrase.english.toLowerCase().includes(searchQuery.toLowerCase())
+    setIsTranslating(true);
+    setError('');
+    setCopied(false);
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 30000);
+
+    try {
+      const response = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          texts: [text],
+          target: 'zh-CN',
+          source: 'auto',
+        }),
+        signal: controller.signal,
+      });
+      const data = (await response.json().catch(() => null)) as TranslateResponse | null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Translation failed. Please try again.');
+      }
+
+      setTranslation(decodeHtmlEntities(data?.translations?.[0] || ''));
+      setDetectedLanguage(data?.detectedSourceLanguages?.[0] || '');
+    } catch (requestError) {
+      setTranslation('');
+      setDetectedLanguage('');
+      setError(
+        requestError instanceof DOMException && requestError.name === 'AbortError'
+          ? 'The translation request timed out. Please try again.'
+          : requestError instanceof Error
+            ? requestError.message
+            : 'Translation failed. Please try again.'
       );
-  }, [searchQuery, selectedCategory]);
-
-  const speakPhrase = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'zh-CN';
-      window.speechSynthesis.speak(utterance);
+    } finally {
+      window.clearTimeout(timeoutId);
+      setIsTranslating(false);
     }
   };
 
+  const clear = () => {
+    setInput('');
+    setTranslation('');
+    setDetectedLanguage('');
+    setError('');
+    setCopied(false);
+  };
+
+  const copyTranslation = async () => {
+    if (!translation) return;
+    await navigator.clipboard.writeText(translation);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  };
+
+  const speakTranslation = () => {
+    if (!translation || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(translation);
+    utterance.lang = 'zh-CN';
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const sourceLanguageLabel = detectedLanguage
+    ? languageNames[detectedLanguage] || detectedLanguage.toUpperCase()
+    : '';
+
   return (
-    <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220] pt-20">
-      <section className="bg-gradient-to-br from-jade via-secondary-900 to-secondary-800 py-16 text-white">
-        <div className="container-main max-w-3xl">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm">
+    <main className="min-h-screen bg-[#f7f1e8] pb-16 pt-20 dark:bg-[#0b1220]">
+      <section className="relative overflow-hidden bg-gradient-to-br from-secondary-950 via-secondary-900 to-jade py-16 text-white">
+        <div className="absolute -right-20 -top-28 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
+        <div className="container-main relative max-w-5xl">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm backdrop-blur">
             <Languages className="h-4 w-4" />
-            Phrasebook
+            Chinese Translator
           </div>
-          <h1 className="text-4xl font-bold">Essential Mandarin for smoother day-to-day travel</h1>
-          <p className="mt-4 text-white/75">
-            A lightweight phrase utility helps the site feel genuinely useful for overseas visitors, especially on mobile.
+          <h1 className="max-w-3xl text-4xl font-bold leading-tight md:text-5xl">
+            Turn any language into Chinese
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-white/75 md:text-lg">
+            Type or paste what you want to say. We will detect the language and translate it into
+            Simplified Chinese for you to copy, show, or play aloud.
           </p>
         </div>
       </section>
 
-      <section className="sticky top-16 z-20 border-b border-secondary-200 dark:border-secondary-700 bg-white/95 dark:bg-secondary-900/95 py-5 backdrop-blur">
-        <div className="container-main max-w-3xl">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-secondary-400" />
-            <input
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search by Chinese, pinyin, or English"
-              className="input-field pl-12"
-            />
+      <section className="container-main -mt-7 max-w-5xl">
+        <div className="relative overflow-hidden rounded-[30px] border border-secondary-200/80 bg-white shadow-xl shadow-secondary-900/5 dark:border-secondary-700 dark:bg-secondary-900">
+          <div className="grid lg:grid-cols-2">
+            <div className="border-b border-secondary-200 p-5 dark:border-secondary-700 sm:p-7 lg:border-b-0 lg:border-r">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-secondary-900 dark:text-white">
+                    Any language
+                  </p>
+                  <p className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">
+                    Automatically detected
+                  </p>
+                </div>
+                {input && (
+                  <button
+                    type="button"
+                    onClick={clear}
+                    className="rounded-full p-2 text-secondary-400 transition hover:bg-secondary-100 hover:text-secondary-700 dark:hover:bg-secondary-800 dark:hover:text-white"
+                    aria-label="Clear text"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              <textarea
+                value={input}
+                onChange={(event) => setInput(event.target.value.slice(0, MAX_CHARACTERS))}
+                onKeyDown={(event) => {
+                  if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+                    event.preventDefault();
+                    void translate();
+                  }
+                }}
+                placeholder="Type or paste text in any language…"
+                className="min-h-52 w-full resize-none bg-transparent text-lg leading-8 text-secondary-900 outline-none placeholder:text-secondary-400 dark:text-white"
+                aria-label="Text to translate"
+                maxLength={MAX_CHARACTERS}
+              />
+
+              <div className="mt-4 flex items-center justify-between gap-4">
+                <span className="text-xs text-secondary-400">
+                  {input.length.toLocaleString()} / {MAX_CHARACTERS.toLocaleString()}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => void translate()}
+                  disabled={!input.trim() || isTranslating}
+                  className="inline-flex min-w-36 items-center justify-center gap-2 rounded-full bg-jade px-5 py-3 text-sm font-semibold text-white transition hover:bg-jade/90 disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  {isTranslating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Translating
+                    </>
+                  ) : (
+                    <>
+                      Translate
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex min-h-[355px] flex-col bg-[#fbfaf7] p-5 dark:bg-secondary-950/35 sm:p-7">
+              <div className="mb-4 flex min-h-11 items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-secondary-900 dark:text-white">
+                    简体中文
+                  </p>
+                  <p className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">
+                    Simplified Chinese
+                    {sourceLanguageLabel ? ` · Detected ${sourceLanguageLabel}` : ''}
+                  </p>
+                </div>
+                {translation && (
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={speakTranslation}
+                      className="rounded-full p-2.5 text-jade transition hover:bg-jade/10"
+                      aria-label="Play Chinese translation"
+                    >
+                      <Volume2 className="h-5 w-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void copyTranslation()}
+                      className="rounded-full p-2.5 text-jade transition hover:bg-jade/10"
+                      aria-label="Copy Chinese translation"
+                    >
+                      {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-1 items-start">
+                {translation ? (
+                  <p className="whitespace-pre-wrap text-2xl leading-10 text-secondary-900 dark:text-white">
+                    {translation}
+                  </p>
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center py-12 text-center text-secondary-400">
+                    <Sparkles className="mb-3 h-7 w-7 text-jade/60" />
+                    <p className="max-w-xs text-sm leading-6">
+                      Your Chinese translation will appear here.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {error && (
+                <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">
+                  {error}
+                </p>
+              )}
+            </div>
           </div>
         </div>
-      </section>
 
-      {!searchQuery && (
-        <section className="bg-white dark:bg-secondary-900 py-5">
-          <div className="container-main flex max-w-3xl flex-wrap gap-2">
-            {phraseCategories.map((category) => (
+        <div className="mt-8">
+          <p className="text-sm font-semibold text-secondary-800 dark:text-secondary-200">
+            Try an example
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {examples.map((example) => (
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={cn(
-                  'rounded-full px-4 py-2 text-sm font-medium transition-colors',
-                  selectedCategory === category.id ? 'bg-jade text-white' : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-200 dark:hover:bg-secondary-700'
-                )}
+                key={example}
+                type="button"
+                onClick={() => {
+                  setInput(example);
+                  setTranslation('');
+                  setDetectedLanguage('');
+                  setError('');
+                }}
+                className="rounded-full border border-secondary-200 bg-white px-4 py-2.5 text-left text-sm text-secondary-600 transition hover:border-jade hover:text-jade dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-300"
               >
-                {category.label}
+                {example}
               </button>
             ))}
           </div>
-        </section>
-      )}
-
-      <section className="py-8">
-        <div className="container-main max-w-3xl space-y-3">
-          {phrases.map((phrase) => (
-            <div key={`${phrase.chinese}-${phrase.english}`} className="flex items-start justify-between gap-4 rounded-[28px] bg-white dark:bg-secondary-900 p-5 shadow-sm">
-              <div>
-                <p className="text-2xl font-medium text-secondary-900 dark:text-white">{phrase.chinese}</p>
-                <p className="mt-1 text-secondary-500 dark:text-secondary-400">{phrase.pinyin}</p>
-                <p className="mt-2 text-secondary-700 dark:text-secondary-200">{phrase.english}</p>
-              </div>
-              <button
-                onClick={() => speakPhrase(phrase.chinese)}
-                className="rounded-full bg-jade/10 p-3 text-jade transition-colors hover:bg-jade/20"
-                aria-label={`Play pronunciation for ${phrase.english}`}
-              >
-                <Volume2 className="h-5 w-5" />
-              </button>
-            </div>
-          ))}
+          <p className="mt-6 text-xs leading-5 text-secondary-500 dark:text-secondary-400">
+            Machine translations can make mistakes. For medical, legal, or emergency situations,
+            confirm important details with a fluent speaker.
+          </p>
         </div>
       </section>
-    </div>
+    </main>
   );
+}
+
+function decodeHtmlEntities(value: string) {
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = value;
+  return textarea.value;
 }
