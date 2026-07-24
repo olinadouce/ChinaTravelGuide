@@ -5,19 +5,11 @@ import { travelTools } from '@/data/content';
 
 export function generateStaticParams() {
   return travelTools
-    .filter((tool) => !['currency', 'phrases'].includes(tool.slug))
+    .filter((tool) => !['currency', 'phrases', 'timezone'].includes(tool.slug))
     .map((tool) => ({ slug: tool.slug }));
 }
 
 const toolGuides: Record<string, { headline: string; details: string[] }> = {
-  timezone: {
-    headline: 'China runs on one national time zone, which is useful for trip planning but can still hit long-haul travelers hard on arrival.',
-    details: [
-      'Schedule the first day lightly and avoid tight domestic transfers if possible.',
-      'Use meal timing and daylight exposure to reset more quickly after arrival.',
-      'For multi-city routes, China鈥檚 single time standard keeps internal travel simple once visitors land.',
-    ],
-  },
   distance: {
     headline: 'Strong route planning depends on understanding how China鈥檚 scale affects day count, transport choice, and traveler energy.',
     details: [

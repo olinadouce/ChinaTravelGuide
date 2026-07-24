@@ -4347,10 +4347,10 @@ export const travelTools: SiteTool[] = [
   },
   {
     slug: 'timezone',
-    title: 'Jet Lag and Time Planning',
-    description: 'Explain China Standard Time and how to pace arrival days across long-haul routes.',
+    title: 'World Time Clocks',
+    description: 'Compare live clocks, dates, and time differences between China and major cities worldwide.',
     href: '/tools/timezone',
-    status: 'guide',
+    status: 'live',
   },
   {
     slug: 'distance',
