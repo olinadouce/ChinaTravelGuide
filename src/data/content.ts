@@ -4341,7 +4341,7 @@ export const travelTools: SiteTool[] = [
   {
     slug: 'phrases',
     title: 'Chinese Translator',
-    description: 'Translate text from any language into Simplified Chinese, then copy it or play it aloud.',
+    description: 'Translate Simplified Chinese into your chosen language, then copy it or play it aloud.',
     href: '/tools/phrases',
     status: 'live',
   },

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {
   ArrowRight,
   Check,
+  ChevronDown,
   Copy,
   Languages,
   Loader2,
@@ -15,43 +16,47 @@ import {
 const MAX_CHARACTERS = 5000;
 
 const examples = [
-  'Where is the nearest subway station?',
-  '¿Este plato contiene frutos secos?',
-  '空港までお願いします。',
+  '请带我去这个地址。',
+  '这个菜里有花生吗？',
+  '我需要去最近的地铁站。',
 ];
 
-const languageNames: Record<string, string> = {
-  ar: 'Arabic',
-  de: 'German',
-  en: 'English',
-  es: 'Spanish',
-  fr: 'French',
-  hi: 'Hindi',
-  id: 'Indonesian',
-  it: 'Italian',
-  ja: 'Japanese',
-  ko: 'Korean',
-  ms: 'Malay',
-  pt: 'Portuguese',
-  ru: 'Russian',
-  th: 'Thai',
-  tr: 'Turkish',
-  vi: 'Vietnamese',
-};
+const targetLanguages = [
+  { code: 'en', label: 'English', nativeLabel: 'English' },
+  { code: 'ja', label: 'Japanese', nativeLabel: '日本語' },
+  { code: 'ko', label: 'Korean', nativeLabel: '한국어' },
+  { code: 'es', label: 'Spanish', nativeLabel: 'Español' },
+  { code: 'fr', label: 'French', nativeLabel: 'Français' },
+  { code: 'de', label: 'German', nativeLabel: 'Deutsch' },
+  { code: 'it', label: 'Italian', nativeLabel: 'Italiano' },
+  { code: 'pt', label: 'Portuguese', nativeLabel: 'Português' },
+  { code: 'ru', label: 'Russian', nativeLabel: 'Русский' },
+  { code: 'ar', label: 'Arabic', nativeLabel: 'العربية' },
+  { code: 'th', label: 'Thai', nativeLabel: 'ไทย' },
+  { code: 'vi', label: 'Vietnamese', nativeLabel: 'Tiếng Việt' },
+  { code: 'id', label: 'Indonesian', nativeLabel: 'Bahasa Indonesia' },
+  { code: 'ms', label: 'Malay', nativeLabel: 'Bahasa Melayu' },
+  { code: 'hi', label: 'Hindi', nativeLabel: 'हिन्दी' },
+  { code: 'tr', label: 'Turkish', nativeLabel: 'Türkçe' },
+  { code: 'zh-TW', label: 'Traditional Chinese', nativeLabel: '繁體中文' },
+] as const;
 
 type TranslateResponse = {
   translations?: string[];
-  detectedSourceLanguages?: string[];
   error?: string;
 };
 
 export default function PhrasesPage() {
   const [input, setInput] = useState('');
+  const [targetLanguageCode, setTargetLanguageCode] = useState('en');
   const [translation, setTranslation] = useState('');
-  const [detectedLanguage, setDetectedLanguage] = useState('');
   const [error, setError] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const targetLanguage =
+    targetLanguages.find((language) => language.code === targetLanguageCode) ??
+    targetLanguages[0];
 
   const translate = async () => {
     const text = input.trim();
@@ -70,8 +75,8 @@ export default function PhrasesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           texts: [text],
-          target: 'zh-CN',
-          source: 'auto',
+          target: targetLanguage.code,
+          source: 'zh-CN',
         }),
         signal: controller.signal,
       });
@@ -82,10 +87,8 @@ export default function PhrasesPage() {
       }
 
       setTranslation(decodeHtmlEntities(data?.translations?.[0] || ''));
-      setDetectedLanguage(data?.detectedSourceLanguages?.[0] || '');
     } catch (requestError) {
       setTranslation('');
-      setDetectedLanguage('');
       setError(
         requestError instanceof DOMException && requestError.name === 'AbortError'
           ? 'The translation request timed out. Please try again.'
@@ -102,7 +105,13 @@ export default function PhrasesPage() {
   const clear = () => {
     setInput('');
     setTranslation('');
-    setDetectedLanguage('');
+    setError('');
+    setCopied(false);
+  };
+
+  const changeTargetLanguage = (code: string) => {
+    setTargetLanguageCode(code);
+    setTranslation('');
     setError('');
     setCopied(false);
   };
@@ -118,51 +127,43 @@ export default function PhrasesPage() {
     if (!translation || !('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(translation);
-    utterance.lang = 'zh-CN';
+    utterance.lang = targetLanguage.code;
     window.speechSynthesis.speak(utterance);
   };
 
-  const sourceLanguageLabel = detectedLanguage
-    ? languageNames[detectedLanguage] || detectedLanguage.toUpperCase()
-    : '';
-
   return (
-    <main className="min-h-screen bg-[#f7f1e8] pb-16 pt-20 dark:bg-[#0b1220]">
-      <section className="relative overflow-hidden bg-gradient-to-br from-secondary-950 via-secondary-900 to-jade py-16 text-white">
-        <div className="absolute -right-20 -top-28 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
+    <main className="min-h-screen bg-[#f7f1e8] pb-16 pt-20 text-black">
+      <section className="relative overflow-hidden border-b border-black/10 bg-[#f7f1e8] py-16">
+        <div className="absolute -right-20 -top-28 h-80 w-80 rounded-full bg-jade/10 blur-3xl" />
         <div className="container-main relative max-w-5xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm backdrop-blur">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/60 px-4 py-2 text-sm font-semibold text-black backdrop-blur">
             <Languages className="h-4 w-4" />
             Chinese Translator
           </div>
-          <h1 className="max-w-3xl text-4xl font-bold leading-tight md:text-5xl">
-            Turn any language into Chinese
+          <h1 className="max-w-4xl text-4xl font-bold leading-tight text-black md:text-5xl">
+            Translate Chinese into the language you need
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-white/75 md:text-lg">
-            Type or paste what you want to say. We will detect the language and translate it into
-            Simplified Chinese for you to copy, show, or play aloud.
+          <p className="mt-5 max-w-3xl text-base leading-7 text-black md:text-lg">
+            Enter Simplified Chinese, choose a target language, and get a translation you can copy
+            or play aloud while travelling.
           </p>
         </div>
       </section>
 
       <section className="container-main -mt-7 max-w-5xl">
-        <div className="relative overflow-hidden rounded-[30px] border border-secondary-200/80 bg-white shadow-xl shadow-secondary-900/5 dark:border-secondary-700 dark:bg-secondary-900">
+        <div className="relative overflow-hidden rounded-[30px] border border-black/15 bg-white shadow-xl shadow-black/10">
           <div className="grid lg:grid-cols-2">
-            <div className="border-b border-secondary-200 p-5 dark:border-secondary-700 sm:p-7 lg:border-b-0 lg:border-r">
+            <div className="border-b border-black/15 p-5 sm:p-7 lg:border-b-0 lg:border-r">
               <div className="mb-4 flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-secondary-900 dark:text-white">
-                    Any language
-                  </p>
-                  <p className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">
-                    Automatically detected
-                  </p>
+                  <p className="text-sm font-bold text-black">简体中文</p>
+                  <p className="mt-1 text-xs font-medium text-black">Simplified Chinese input</p>
                 </div>
                 {input && (
                   <button
                     type="button"
                     onClick={clear}
-                    className="rounded-full p-2 text-secondary-400 transition hover:bg-secondary-100 hover:text-secondary-700 dark:hover:bg-secondary-800 dark:hover:text-white"
+                    className="rounded-full p-2 text-black transition hover:bg-black/5"
                     aria-label="Clear text"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -179,21 +180,22 @@ export default function PhrasesPage() {
                     void translate();
                   }
                 }}
-                placeholder="Type or paste text in any language…"
-                className="min-h-52 w-full resize-none bg-transparent text-lg leading-8 text-secondary-900 outline-none placeholder:text-secondary-400 dark:text-white"
-                aria-label="Text to translate"
+                placeholder="请输入或粘贴简体中文……"
+                className="min-h-52 w-full resize-none bg-transparent text-lg leading-8 text-black outline-none placeholder:text-black/50"
+                aria-label="Simplified Chinese text to translate"
+                lang="zh-CN"
                 maxLength={MAX_CHARACTERS}
               />
 
               <div className="mt-4 flex items-center justify-between gap-4">
-                <span className="text-xs text-secondary-400">
+                <span className="text-xs font-medium text-black">
                   {input.length.toLocaleString()} / {MAX_CHARACTERS.toLocaleString()}
                 </span>
                 <button
                   type="button"
                   onClick={() => void translate()}
                   disabled={!input.trim() || isTranslating}
-                  className="inline-flex min-w-36 items-center justify-center gap-2 rounded-full bg-jade px-5 py-3 text-sm font-semibold text-white transition hover:bg-jade/90 disabled:cursor-not-allowed disabled:opacity-45"
+                  className="inline-flex min-w-36 items-center justify-center gap-2 rounded-full bg-jade px-5 py-3 text-sm font-bold text-black transition hover:bg-jade/80 disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   {isTranslating ? (
                     <>
@@ -210,32 +212,47 @@ export default function PhrasesPage() {
               </div>
             </div>
 
-            <div className="flex min-h-[355px] flex-col bg-[#fbfaf7] p-5 dark:bg-secondary-950/35 sm:p-7">
+            <div className="flex min-h-[355px] flex-col bg-[#fbfaf7] p-5 sm:p-7">
               <div className="mb-4 flex min-h-11 items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold text-secondary-900 dark:text-white">
-                    简体中文
-                  </p>
-                  <p className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">
-                    Simplified Chinese
-                    {sourceLanguageLabel ? ` · Detected ${sourceLanguageLabel}` : ''}
-                  </p>
+                <div className="min-w-0">
+                  <label
+                    htmlFor="target-language"
+                    className="text-xs font-bold uppercase tracking-[0.12em] text-black"
+                  >
+                    Translate to
+                  </label>
+                  <div className="relative mt-2">
+                    <select
+                      id="target-language"
+                      value={targetLanguageCode}
+                      onChange={(event) => changeTargetLanguage(event.target.value)}
+                      className="w-full appearance-none rounded-xl border border-black/20 bg-white py-2.5 pl-3 pr-10 text-sm font-bold text-black outline-none transition focus:border-jade focus:ring-2 focus:ring-jade/20"
+                    >
+                      {targetLanguages.map((language) => (
+                        <option key={language.code} value={language.code}>
+                          {language.label} · {language.nativeLabel}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black" />
+                  </div>
                 </div>
+
                 {translation && (
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={speakTranslation}
-                      className="rounded-full p-2.5 text-jade transition hover:bg-jade/10"
-                      aria-label="Play Chinese translation"
+                      className="rounded-full p-2.5 text-black transition hover:bg-jade/15"
+                      aria-label={`Play ${targetLanguage.label} translation`}
                     >
                       <Volume2 className="h-5 w-5" />
                     </button>
                     <button
                       type="button"
                       onClick={() => void copyTranslation()}
-                      className="rounded-full p-2.5 text-jade transition hover:bg-jade/10"
-                      aria-label="Copy Chinese translation"
+                      className="rounded-full p-2.5 text-black transition hover:bg-jade/15"
+                      aria-label={`Copy ${targetLanguage.label} translation`}
                     >
                       {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                     </button>
@@ -245,21 +262,25 @@ export default function PhrasesPage() {
 
               <div className="flex flex-1 items-start">
                 {translation ? (
-                  <p className="whitespace-pre-wrap text-2xl leading-10 text-secondary-900 dark:text-white">
+                  <p
+                    className="whitespace-pre-wrap text-2xl leading-10 text-black"
+                    lang={targetLanguage.code}
+                    dir={targetLanguage.code === 'ar' ? 'rtl' : 'ltr'}
+                  >
                     {translation}
                   </p>
                 ) : (
-                  <div className="flex h-full w-full flex-col items-center justify-center py-12 text-center text-secondary-400">
-                    <Sparkles className="mb-3 h-7 w-7 text-jade/60" />
-                    <p className="max-w-xs text-sm leading-6">
-                      Your Chinese translation will appear here.
+                  <div className="flex h-full w-full flex-col items-center justify-center py-12 text-center text-black">
+                    <Sparkles className="mb-3 h-7 w-7 text-jade" />
+                    <p className="max-w-xs text-sm font-medium leading-6">
+                      Your {targetLanguage.label} translation will appear here.
                     </p>
                   </div>
                 )}
               </div>
 
               {error && (
-                <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">
+                <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-800">
                   {error}
                 </p>
               )}
@@ -267,10 +288,8 @@ export default function PhrasesPage() {
           </div>
         </div>
 
-        <div className="mt-8">
-          <p className="text-sm font-semibold text-secondary-800 dark:text-secondary-200">
-            Try an example
-          </p>
+        <div className="mt-8 text-black">
+          <p className="text-sm font-bold">Try a Chinese example</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {examples.map((example) => (
               <button
@@ -279,16 +298,15 @@ export default function PhrasesPage() {
                 onClick={() => {
                   setInput(example);
                   setTranslation('');
-                  setDetectedLanguage('');
                   setError('');
                 }}
-                className="rounded-full border border-secondary-200 bg-white px-4 py-2.5 text-left text-sm text-secondary-600 transition hover:border-jade hover:text-jade dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-300"
+                className="rounded-full border border-black/20 bg-white px-4 py-2.5 text-left text-sm font-medium text-black transition hover:border-jade hover:bg-jade/10"
               >
                 {example}
               </button>
             ))}
           </div>
-          <p className="mt-6 text-xs leading-5 text-secondary-500 dark:text-secondary-400">
+          <p className="mt-6 text-xs font-medium leading-5 text-black">
             Machine translations can make mistakes. For medical, legal, or emergency situations,
             confirm important details with a fluent speaker.
           </p>
