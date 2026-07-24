@@ -98,3 +98,24 @@ npm run lint     # 代码检查
 *Built with ❤️ for China travelers*
 
 <!-- auto-deploy-test: trigger first GitHub → Vercel auto-deploy on 2026-06-14 -->
+
+---
+
+## AI Travel Assistant
+
+Incremental RAG assistant for published guide knowledge (free/paid entitlements).
+
+### Quick ops
+1. Put reviewed Markdown under `knowledge/<dir>/free|paid/`
+2. `npm run knowledge:validate`
+3. `npm run knowledge:sync`
+4. Deploy to Vercel with OpenAI env vars
+
+### Docs
+See `docs/AI_ASSISTANT_HANDOFF.md` for architecture, file change list (before/after), env vars, Firestore collections, and rollout steps.
+
+### Scripts
+- `npm run knowledge:validate`
+- `npm run knowledge:sync`
+- `npm run knowledge:status`
+- `npm run test`

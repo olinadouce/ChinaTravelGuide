@@ -4,6 +4,7 @@ import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { FirebaseAuthProvider } from "@/components/auth/FirebaseAuthProvider";
+import { AITravelAssistant } from "@/components/ai/AITravelAssistant";
 
 export const metadata: Metadata = {
   title: "China Travel Guide | Travel China with Confidence",
@@ -44,6 +45,8 @@ export default function RootLayout({
             <Navigation />
             <main>{children}</main>
             <Footer />
+            {/* AI Travel Assistant: additive floating widget; hidden on /login and /admin */}
+            <AITravelAssistant />
           </FirebaseAuthProvider>
         </ThemeProvider>
       </body>

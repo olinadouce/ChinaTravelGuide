@@ -49,6 +49,15 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // AI Travel Assistant collections — Admin SDK only.
+    match /unansweredQuestions/{questionId} {
+      allow read, write: if false;
+    }
+
+    match /aiRateLimits/{limitId} {
+      allow read, write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
