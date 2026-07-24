@@ -4353,11 +4353,11 @@ export const travelTools: SiteTool[] = [
     status: 'live',
   },
   {
-    slug: 'distance',
-    title: 'Travel Distance Planner',
-    description: 'Compare sample intercity travel times when shaping a realistic route.',
-    href: '/tools/distance',
-    status: 'guide',
+    slug: 'ai-assistant',
+    title: 'AI Travel Assistant',
+    description: 'Ask our guide-trained AI about China routes, attractions, hotels, food, and transport.',
+    href: '/tools/ai-assistant',
+    status: 'live',
   },
 ];
 

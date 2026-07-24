@@ -31,6 +31,12 @@ type UiMessage = {
 };
 
 const STORAGE_LANG = 'ctg_language';
+const PAGE_STARTER_QUESTIONS = [
+  'Help me plan a first trip to Beijing and Shanghai.',
+  'What is the best route for a 7-day trip in China?',
+  'Compare Chengdu, Chongqing and Xi’an for first-time visitors.',
+  'What should I know about transport, hotels and payments in China?',
+];
 
 function packageIdFromPath(pathname: string): string | null {
   const m = pathname.match(/\/packages\/([a-z0-9-]+)/i);
@@ -43,14 +49,20 @@ function cityFromPackageSlug(slug: string | null): string | null {
   return slug;
 }
 
-export function AITravelAssistant() {
+export function AITravelAssistant({
+  mode = 'floating',
+}: {
+  mode?: 'floating' | 'page';
+}) {
   const pathname = usePathname();
+  const isPage = mode === 'page';
   const hide =
     pathname.startsWith('/login') ||
     pathname.startsWith('/admin') ||
-    pathname.startsWith('/api');
+    pathname.startsWith('/api') ||
+    (!isPage && pathname.startsWith('/tools/ai-assistant'));
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(isPage);
   const [minimized, setMinimized] = useState(false);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -85,6 +97,12 @@ export function AITravelAssistant() {
         : "Ask about this guide's itinerary, attractions or hotels…",
     [isZh]
   );
+
+  const effectivePlaceholder = isPage
+    ? isZh
+      ? '询问中国城市、路线、景点、住宿、美食或交通……'
+      : 'Ask about Chinese cities, routes, attractions, hotels, food or transport…'
+    : placeholder;
 
   const displayMessages = useMemo(
     () =>
@@ -208,8 +226,14 @@ export function AITravelAssistant() {
   }
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[70] flex justify-end p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:p-6">
-      {!open && (
+    <div
+      className={cn(
+        isPage
+          ? 'relative z-10 flex w-full'
+          : 'pointer-events-none fixed inset-x-0 bottom-0 z-[70] flex justify-end p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:p-6'
+      )}
+    >
+      {!isPage && !open && (
         <button
           type="button"
           data-no-translate
@@ -230,9 +254,12 @@ export function AITravelAssistant() {
           data-no-translate
           className={cn(
             'pointer-events-auto flex w-full flex-col overflow-hidden border border-stone-200 bg-white shadow-2xl dark:border-secondary-700 dark:bg-secondary-900',
-            'max-h-[min(720px,calc(100dvh-5rem))] rounded-2xl sm:w-[400px]',
-            'max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:max-h-[min(92dvh,860px)] max-sm:rounded-b-none max-sm:rounded-t-2xl',
-            minimized && 'max-h-14'
+            isPage
+              ? 'min-h-[620px] rounded-[28px]'
+              : 'max-h-[min(720px,calc(100dvh-5rem))] rounded-2xl sm:w-[400px]',
+            !isPage &&
+              'max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:max-h-[min(92dvh,860px)] max-sm:rounded-b-none max-sm:rounded-t-2xl',
+            !isPage && minimized && 'max-h-14'
           )}
         >
           <div className="flex items-center justify-between border-b border-stone-200 px-4 py-3 dark:border-secondary-700">
@@ -244,7 +271,7 @@ export function AITravelAssistant() {
                 {isZh ? '仅基于本站已收录方案' : 'Based on published guides only'}
               </p>
             </div>
-            <div className="flex items-center gap-1">
+            {!isPage && <div className="flex items-center gap-1">
               <button
                 type="button"
                 className="rounded-lg p-2 text-secondary-500 hover:bg-stone-100 dark:hover:bg-secondary-800"
@@ -261,7 +288,7 @@ export function AITravelAssistant() {
               >
                 <X className="h-4 w-4" />
               </button>
-            </div>
+            </div>}
           </div>
 
           {!minimized && (
@@ -309,6 +336,20 @@ export function AITravelAssistant() {
                     )}
                   </div>
                 ))}
+                {isPage && messages.length === 0 && !loading && (
+                  <div className="grid gap-2 pt-2 sm:grid-cols-2">
+                    {PAGE_STARTER_QUESTIONS.map((question) => (
+                      <button
+                        key={question}
+                        type="button"
+                        onClick={() => void sendMessage(question)}
+                        className="rounded-2xl border border-stone-200 bg-white px-4 py-3 text-left text-sm font-medium leading-6 text-secondary-800 transition hover:border-primary hover:bg-primary/5 dark:border-secondary-600 dark:bg-secondary-900 dark:text-secondary-100"
+                      >
+                        {question}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {loading && (
                   <div className="inline-flex items-center gap-2 rounded-2xl bg-stone-100 px-3 py-2 text-xs text-secondary-600 dark:bg-secondary-800">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -330,8 +371,11 @@ export function AITravelAssistant() {
                       }
                     }}
                     rows={2}
-                    placeholder={placeholder}
-                    className="min-h-[64px] flex-1 resize-none rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-primary focus:ring-2 dark:border-secondary-600 dark:bg-secondary-950"
+                    placeholder={effectivePlaceholder}
+                    className={cn(
+                      'flex-1 resize-none rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-primary focus:ring-2 dark:border-secondary-600 dark:bg-secondary-950',
+                      isPage ? 'min-h-[88px]' : 'min-h-[64px]'
+                    )}
                   />
                   <button
                     type="submit"

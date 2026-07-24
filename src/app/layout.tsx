@@ -45,7 +45,7 @@ export default function RootLayout({
             <Navigation />
             <main>{children}</main>
             <Footer />
-            {/* AI Travel Assistant: additive floating widget; hidden on /login and /admin */}
+            {/* Floating AI widget; hidden where auth/admin or the full-page AI tool is shown. */}
             <AITravelAssistant />
           </FirebaseAuthProvider>
         </ThemeProvider>
