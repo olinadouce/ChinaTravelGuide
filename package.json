@@ -23,7 +23,7 @@
     "@vercel/blob": "^2.6.1",
     "clsx": "^2.1.1",
     "firebase": "^12.16.0",
-    "firebase-admin": "14.2.0",
+    "firebase-admin": "13.10.0",
     "framer-motion": "^11.0.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.400.0",
