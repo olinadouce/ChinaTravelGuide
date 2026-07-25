@@ -140,7 +140,7 @@ export default function Hero({ slides }: HeroProps) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
               {currentSlide.badge && (
-                <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-secondary-900 dark:text-white shadow-sm">
+                <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-secondary-900 shadow-sm dark:bg-white/95 dark:text-secondary-900">
                   {currentSlide.badge}
                 </span>
               )}

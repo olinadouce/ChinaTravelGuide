@@ -69,7 +69,7 @@ export default function FeaturedPackages() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
                 <div className="absolute left-3 top-3 flex flex-col gap-2">
                   {pkg.badge && (
-                    <div className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-secondary-900 shadow-sm dark:bg-secondary-950/85 dark:text-secondary-100 dark:ring-1 dark:ring-white/10">
+                    <div className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-secondary-900 shadow-sm dark:bg-white/95 dark:text-secondary-900 dark:ring-1 dark:ring-white/10">
                       {pkg.badge}
                     </div>
                   )}

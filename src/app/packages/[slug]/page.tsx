@@ -66,7 +66,7 @@ export default async function PackageDetailPage({
       <div className="container-main mb-4">
         <Link
           href="/packages"
-          className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-medium text-secondary-900 dark:text-white shadow-sm transition-colors hover:bg-white"
+          className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-medium text-secondary-900 shadow-sm transition-colors hover:bg-white dark:bg-white/90 dark:text-secondary-900"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to all packages

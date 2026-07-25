@@ -54,7 +54,7 @@ export function PackageCard({ pkg, index = 0, accent = 'primary' }: PackageCardP
           {/* Top badges */}
           <div className="absolute left-3 top-3 flex flex-col gap-2">
             {pkg.badge && (
-              <div className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-secondary-900 shadow-sm dark:bg-secondary-950/85 dark:text-secondary-100 dark:ring-1 dark:ring-white/10">
+              <div className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-secondary-900 shadow-sm dark:bg-white/95 dark:text-secondary-900 dark:ring-1 dark:ring-white/10">
                 {pkg.badge}
               </div>
             )}
