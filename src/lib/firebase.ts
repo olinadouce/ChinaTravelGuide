@@ -13,15 +13,15 @@ const firebaseConfig = {
 };
 
 // Prevent HMR re-initialization
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
+export const auth = getAuth(firebaseApp);
 export const FIRESTORE_DATABASE_ID = '(default)';
 
 // Firestore transport config.
 // Some networks block or stall Firestore's default streaming transport. Force
 // long-polling so reads/writes fail or succeed deterministically instead of
 // leaving the points profile in a perpetual "syncing" state.
-export const db = initializeFirestore(app, {
+export const db = initializeFirestore(firebaseApp, {
   experimentalForceLongPolling: true,
 }, FIRESTORE_DATABASE_ID);

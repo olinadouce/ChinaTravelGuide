@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { FirebaseAuthProvider } from "@/components/auth/FirebaseAuthProvider";
 import { AITravelAssistant } from "@/components/ai/AITravelAssistant";
+import { FirebaseAnalytics } from "@/components/analytics/FirebaseAnalytics";
 
 export const metadata: Metadata = {
   title: "China Travel Guide | Travel China with Confidence",
@@ -42,6 +43,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ThemeProvider>
           <FirebaseAuthProvider>
+            <FirebaseAnalytics />
             <Navigation />
             <main>{children}</main>
             <Footer />
