@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, ArrowLeft, CheckCircle2, Coins, Gift, Loader2, LockKeyhole, RefreshCw, TrendingUp } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Check, CheckCircle2, Coins, Copy, Gift, Loader2, LockKeyhole, RefreshCw, TrendingUp, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
@@ -28,10 +28,19 @@ export default function PointsAccountPage() {
   const [ledger, setLedger] = useState<PointsLedgerEntry[]>([]);
   const [ledgerLoading, setLedgerLoading] = useState(false);
   const [syncStale, setSyncStale] = useState(false);
+  const [inviteCopied, setInviteCopied] = useState(false);
+  const [referralNotice, setReferralNotice] = useState<string | null>(null);
   const effectiveProfileError = pointsProfileError
     || (syncStale ? 'Firebase points sync is taking longer than expected. Showing local account data for now.' : null);
   const showSyncing = pointsProfileLoading && !syncStale;
   const profileReady = isAuthenticated && !!user && !pointsProfileLoading && !effectiveProfileError;
+
+  useEffect(() => {
+    const notice = window.sessionStorage.getItem('referral_notice');
+    if (!notice) return;
+    window.sessionStorage.removeItem('referral_notice');
+    queueMicrotask(() => setReferralNotice(notice));
+  }, []);
 
   useEffect(() => {
     if (!pointsProfileLoading) {
@@ -165,6 +174,12 @@ export default function PointsAccountPage() {
                 </button>
               </div>
             )}
+            {referralNotice && (
+              <div className="mt-5 flex items-start gap-2 rounded-xl bg-jade/10 px-4 py-3 text-sm text-jade">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <span>{referralNotice}</span>
+              </div>
+            )}
 
             <div className="mt-6 rounded-2xl bg-stone-50 dark:bg-secondary-800 p-4">
               <div className="flex items-center justify-between gap-3">
@@ -197,7 +212,51 @@ export default function PointsAccountPage() {
               <RuleRow label="Daily login" points={POINTS_RULES.DAILY_LOGIN} />
               <RuleRow label="Read a free guide" points={POINTS_RULES.BROWSE_FREE_GUIDE} />
               <RuleRow label="Save a free guide" points={POINTS_RULES.SAVE_FREE_GUIDE} />
+              <RuleRow label="Invite a new friend" points={POINTS_RULES.INVITE_SIGNUP} />
               <RuleRow label="Submit feedback" points={POINTS_RULES.SUBMIT_FEEDBACK} />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-jade/20 bg-gradient-to-br from-jade/10 to-white p-6 shadow-sm dark:from-jade/10 dark:to-secondary-900">
+          <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 text-sm font-bold text-jade">
+                <Users className="h-4 w-4" />
+                Invite friends
+              </div>
+              <h2 className="mt-2 text-xl font-bold text-secondary-900 dark:text-white">
+                Earn {POINTS_RULES.INVITE_SIGNUP} points for every new friend
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-secondary-600 dark:text-secondary-300">
+                Share your personal link. When a new user creates an account with your code, the points are added automatically.
+              </p>
+              <p className="mt-2 text-xs text-secondary-500 dark:text-secondary-400">
+                Successful invites: {user?.successfulInvites ?? 0}
+              </p>
+            </div>
+            <div className="min-w-0 rounded-2xl bg-white p-4 ring-1 ring-black/5 dark:bg-secondary-800 dark:ring-white/10 sm:min-w-72">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-secondary-500 dark:text-secondary-400">
+                Your invite code
+              </p>
+              <p className="mt-2 truncate font-mono text-2xl font-black tracking-[0.16em] text-secondary-900 dark:text-white">
+                {user?.referralCode || (showSyncing ? 'Syncing...' : 'Unavailable')}
+              </p>
+              <button
+                type="button"
+                disabled={!user?.referralCode}
+                onClick={async () => {
+                  if (!user?.referralCode) return;
+                  const inviteUrl = `${window.location.origin}/login?mode=signup&ref=${user.referralCode}`;
+                  await navigator.clipboard.writeText(inviteUrl);
+                  setInviteCopied(true);
+                  window.setTimeout(() => setInviteCopied(false), 1800);
+                }}
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-jade px-4 py-2.5 text-sm font-bold text-white transition hover:bg-jade/90 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {inviteCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {inviteCopied ? 'Invite link copied' : 'Copy invite link'}
+              </button>
             </div>
           </div>
         </div>

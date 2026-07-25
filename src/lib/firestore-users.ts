@@ -11,6 +11,9 @@ export interface FirestoreUser {
   points: number;
   unlockedPackages: string[];
   actionsUsed: Record<string, true>;
+  referralCode?: string | null;
+  referredBy?: string | null;
+  successfulInvites?: number;
   lastDailyLoginDate?: string;
   createdAt: any;
   updatedAt: any;
@@ -128,6 +131,9 @@ function restDocToUser(entry: RestDocument, uid: string): FirestoreUser {
     points: data.points ?? 0,
     unlockedPackages: data.unlockedPackages ?? [],
     actionsUsed: data.actionsUsed ?? {},
+    referralCode: data.referralCode ?? null,
+    referredBy: data.referredBy ?? null,
+    successfulInvites: data.successfulInvites ?? 0,
     lastDailyLoginDate: data.lastDailyLoginDate,
     createdAt: data.createdAt ?? entry.createTime ?? null,
     updatedAt: data.updatedAt ?? entry.updateTime ?? null,

@@ -65,6 +65,8 @@ export const POINTS_RULES = {
     BROWSE_SAVE_ONCE_PER_CITY: true,
     /** Daily login bonus is once per calendar day. */
     DAILY_LOGIN_ONCE_PER_DAY: true,
+    /** Each new account can apply one invite code during its first 24 hours. */
+    INVITE_CODE_ONCE_PER_NEW_ACCOUNT: true,
     /** Share reward requires external click verification (mock = manual). */
     SHARE_REQUIRES_EXTERNAL_CLICK: true,
   },

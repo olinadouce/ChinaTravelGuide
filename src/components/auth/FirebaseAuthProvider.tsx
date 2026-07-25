@@ -20,7 +20,9 @@ import { authenticatedPost } from '@/lib/authenticated-api';
 import { PointsActionType, PointsLedgerEntry } from '@/lib/points-rules';
 import { trackAnalyticsEvent } from '@/components/analytics/FirebaseAnalytics';
 
-type Result = { ok: true } | { ok: false; reason: string };
+type Result =
+  | { ok: true; referralApplied?: boolean; referralError?: string }
+  | { ok: false; reason: string };
 type EarnPointsOptions = {
   city?: string;
   productId?: string;
@@ -36,9 +38,9 @@ interface AuthContextType {
   loading: boolean;
   pointsProfileLoading: boolean;
   pointsProfileError: string | null;
-  signUp: (email: string, password: string, name: string) => Promise<Result>;
+  signUp: (email: string, password: string, name: string, referralCode?: string) => Promise<Result>;
   signIn: (email: string, password: string) => Promise<Result>;
-  signInWithGoogle: () => Promise<Result>;
+  signInWithGoogle: (referralCode?: string) => Promise<Result>;
   logout: () => Promise<void>;
   hasPackageUnlocked: (packageId: string) => boolean;
   earnPoints: (
@@ -144,18 +146,37 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
     };
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string, name: string): Promise<Result> => {
+  const redeemInviteCode = useCallback(async (referralCode?: string) => {
+    if (!referralCode?.trim()) return {};
+    try {
+      await authenticatedPost('/api/referrals/redeem', { referralCode });
+      return { referralApplied: true };
+    } catch (error: unknown) {
+      return {
+        referralApplied: false,
+        referralError: error instanceof Error ? error.message : 'Invite code could not be applied.',
+      };
+    }
+  }, []);
+
+  const signUp = useCallback(async (
+    email: string,
+    password: string,
+    name: string,
+    referralCode?: string
+  ): Promise<Result> => {
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       trackAnalyticsEvent('sign_up', { method: 'email' });
       if (name) {
         await updateProfile(cred.user, { displayName: name });
       }
-      return { ok: true };
+      const referralResult = await redeemInviteCode(referralCode);
+      return { ok: true, ...referralResult };
     } catch (err: any) {
       return { ok: false, reason: err.message ?? 'Sign-up failed' };
     }
-  }, []);
+  }, [redeemInviteCode]);
 
   const signIn = useCallback(async (email: string, password: string): Promise<Result> => {
     try {
@@ -167,17 +188,26 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
     }
   }, []);
 
-  const signInWithGoogle = useCallback(async (): Promise<Result> => {
+  const signInWithGoogle = useCallback(async (referralCode?: string): Promise<Result> => {
     try {
       const provider = new GoogleAuthProvider();
       const credential = await signInWithPopup(auth, provider);
-      const eventName = getAdditionalUserInfo(credential)?.isNewUser ? 'sign_up' : 'login';
+      const isNewUser = getAdditionalUserInfo(credential)?.isNewUser === true;
+      const eventName = isNewUser ? 'sign_up' : 'login';
       trackAnalyticsEvent(eventName, { method: 'google' });
-      return { ok: true };
+      const referralResult = isNewUser
+        ? await redeemInviteCode(referralCode)
+        : referralCode?.trim()
+          ? {
+              referralApplied: false,
+              referralError: 'Invite codes are only available to newly created accounts.',
+            }
+          : {};
+      return { ok: true, ...referralResult };
     } catch (err: any) {
       return { ok: false, reason: err.message ?? 'Google sign-in failed' };
     }
-  }, []);
+  }, [redeemInviteCode]);
 
   const logout = useCallback(async () => {
     await signOut(auth);

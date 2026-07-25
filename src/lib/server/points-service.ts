@@ -1,7 +1,9 @@
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import { createHash } from 'node:crypto';
 
 import { getAllPackages } from '@/data/packages';
 import { POINTS_RULES, type PointsActionType } from '@/lib/points-rules';
+import { isValidReferralCode, normalizeReferralCode } from '@/lib/referrals';
 
 import { adminDb } from './firebase-admin';
 
@@ -26,6 +28,13 @@ type MutationResult =
   | { ok: true; points: number; unlockedPackages: string[] }
   | { ok: false; reason: string };
 
+type ReferralResult =
+  | { ok: true; inviterPoints: number }
+  | { ok: false; reason: string };
+
+const REFERRAL_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+export const NEW_ACCOUNT_REFERRAL_WINDOW_MS = 24 * 60 * 60 * 1000;
+
 const CLAIMABLE_POINTS: Partial<Record<PointsActionType, number>> = {
   browse_free_guide: POINTS_RULES.BROWSE_FREE_GUIDE,
   save_free_guide: POINTS_RULES.SAVE_FREE_GUIDE,
@@ -33,6 +42,14 @@ const CLAIMABLE_POINTS: Partial<Record<PointsActionType, number>> = {
 
 function utcDate(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+export function createReferralCode(uid: string): string {
+  const digest = createHash('sha256')
+    .update(`cchinaroute-referral:${uid}`)
+    .digest();
+
+  return Array.from(digest.subarray(0, 12), (byte) => REFERRAL_ALPHABET[byte & 31]).join('');
 }
 
 function profileView(uid: string, data: Record<string, any>) {
@@ -46,6 +63,9 @@ function profileView(uid: string, data: Record<string, any>) {
     points: Number(data.points ?? 0),
     unlockedPackages: Array.isArray(data.unlockedPackages) ? data.unlockedPackages : [],
     actionsUsed: data.actionsUsed && typeof data.actionsUsed === 'object' ? data.actionsUsed : {},
+    referralCode: data.referralCode ?? null,
+    referredBy: data.referredBy ?? null,
+    successfulInvites: Number(data.successfulInvites ?? 0),
     lastDailyLoginDate: data.lastDailyLoginDate,
     createdAt: toMillis(data.createdAt),
     updatedAt: toMillis(data.updatedAt),
@@ -59,7 +79,25 @@ export async function syncPointsProfile(seed: ProfileSeed) {
 
   await db.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(userRef);
+    const snapshotData = snapshot.data() || {};
+    const storedReferralCode = normalizeReferralCode(snapshotData.referralCode);
+    const referralCode = isValidReferralCode(storedReferralCode)
+      ? storedReferralCode
+      : createReferralCode(seed.uid);
+    const referralRef = db.collection('referralCodes').doc(referralCode);
+    const referralSnapshot = await transaction.get(referralRef);
     const now = FieldValue.serverTimestamp();
+
+    if (referralSnapshot.exists && referralSnapshot.data()?.ownerUid !== seed.uid) {
+      throw new Error('Referral code collision detected.');
+    }
+    if (!referralSnapshot.exists) {
+      transaction.set(referralRef, {
+        code: referralCode,
+        ownerUid: seed.uid,
+        createdAt: now,
+      });
+    }
 
     if (!snapshot.exists) {
       transaction.set(userRef, {
@@ -70,6 +108,8 @@ export async function syncPointsProfile(seed: ProfileSeed) {
         points: POINTS_RULES.SIGNUP_BONUS + POINTS_RULES.DAILY_LOGIN,
         unlockedPackages: [],
         actionsUsed: { signup_bonus: true },
+        referralCode,
+        successfulInvites: 0,
         lastDailyLoginDate: today,
         createdAt: now,
         updatedAt: now,
@@ -93,9 +133,12 @@ export async function syncPointsProfile(seed: ProfileSeed) {
       return;
     }
 
-    const data = snapshot.data() || {};
+    const data = snapshotData;
     const actionsUsed = data.actionsUsed || {};
-    const updates: Record<string, unknown> = { updatedAt: now };
+    const updates: Record<string, unknown> = {
+      updatedAt: now,
+      referralCode,
+    };
     let points = Number(data.points ?? 0);
 
     if (!actionsUsed.signup_bonus) {
@@ -133,6 +176,88 @@ export async function syncPointsProfile(seed: ProfileSeed) {
 
   const current = await userRef.get();
   return profileView(seed.uid, current.data() || {});
+}
+
+export async function redeemReferral(
+  inviteeUid: string,
+  rawCode: string,
+  accountCreatedAtMs: number
+): Promise<ReferralResult> {
+  const referralCode = normalizeReferralCode(rawCode);
+  if (!isValidReferralCode(referralCode)) {
+    return { ok: false, reason: 'Enter a valid 12-character invite code.' };
+  }
+
+  const accountAge = Date.now() - accountCreatedAtMs;
+  if (
+    !Number.isFinite(accountCreatedAtMs) ||
+    accountAge < 0 ||
+    accountAge > NEW_ACCOUNT_REFERRAL_WINDOW_MS
+  ) {
+    return { ok: false, reason: 'Invite codes are only available to newly created accounts.' };
+  }
+
+  const db = adminDb();
+  const codeRef = db.collection('referralCodes').doc(referralCode);
+  const inviteeRef = db.collection('users').doc(inviteeUid);
+
+  return db.runTransaction(async (transaction) => {
+    const codeSnapshot = await transaction.get(codeRef);
+    if (!codeSnapshot.exists) return { ok: false, reason: 'Invite code not found.' };
+
+    const inviterUid = String(codeSnapshot.data()?.ownerUid || '');
+    if (!inviterUid) return { ok: false, reason: 'Invite code is unavailable.' };
+    if (inviterUid === inviteeUid) {
+      return { ok: false, reason: 'You cannot use your own invite code.' };
+    }
+
+    const inviterRef = db.collection('users').doc(inviterUid);
+    const [inviteeSnapshot, inviterSnapshot] = await Promise.all([
+      transaction.get(inviteeRef),
+      transaction.get(inviterRef),
+    ]);
+    if (!inviteeSnapshot.exists) return { ok: false, reason: 'Your points profile is not ready yet.' };
+    if (!inviterSnapshot.exists) return { ok: false, reason: 'Inviter account not found.' };
+
+    const inviteeData = inviteeSnapshot.data() || {};
+    if (inviteeData.referredBy || inviteeData.referralCodeUsed) {
+      return { ok: false, reason: 'This account has already used an invite code.' };
+    }
+
+    const inviterData = inviterSnapshot.data() || {};
+    const inviterActions = inviterData.actionsUsed || {};
+    const actionKey = `invite_signup:${inviteeUid}`;
+    if (inviterActions[actionKey]) {
+      return { ok: false, reason: 'This invitation has already been rewarded.' };
+    }
+
+    const inviterPoints = Number(inviterData.points ?? 0) + POINTS_RULES.INVITE_SIGNUP;
+    const now = FieldValue.serverTimestamp();
+
+    transaction.update(inviteeRef, {
+      referredBy: inviterUid,
+      referralCodeUsed: referralCode,
+      referralRedeemedAt: now,
+      updatedAt: now,
+    });
+    transaction.update(inviterRef, {
+      points: inviterPoints,
+      successfulInvites: Number(inviterData.successfulInvites ?? 0) + 1,
+      actionsUsed: { ...inviterActions, [actionKey]: true },
+      updatedAt: now,
+    });
+    transaction.set(inviterRef.collection('ledger').doc(`invite_signup_${inviteeUid}`), {
+      actionType: 'invite_signup',
+      pointsChange: POINTS_RULES.INVITE_SIGNUP,
+      userId: inviterUid,
+      relatedUserId: inviteeUid,
+      createdAt: now,
+      status: 'confirmed',
+      note: 'A friend joined with your invite code.',
+    });
+
+    return { ok: true, inviterPoints };
+  });
 }
 
 export async function claimPoints(uid: string, input: ClaimInput): Promise<MutationResult> {

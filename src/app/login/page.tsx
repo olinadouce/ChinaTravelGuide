@@ -1,10 +1,11 @@
 'use client';
 import { Suspense, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Coins, Mail, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
+import { Coins, Gift, Mail, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
 import { POINTS_RULES } from '@/lib/points-rules';
+import { normalizeReferralCode } from '@/lib/referrals';
 
 type Mode = 'signin' | 'signup';
 
@@ -15,8 +16,13 @@ function LoginForm() {
 
   const { signIn, signUp, signInWithGoogle, user, loading } = useAuth();
 
-  const [mode, setMode] = useState<Mode>('signin');
+  const [mode, setMode] = useState<Mode>(
+    searchParams.get('mode') === 'signup' || searchParams.has('ref') ? 'signup' : 'signin'
+  );
   const [name, setName] = useState('');
+  const [referralCode, setReferralCode] = useState(
+    normalizeReferralCode(searchParams.get('ref'))
+  );
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -66,11 +72,24 @@ function LoginForm() {
     setPending(true);
     try {
       if (mode === 'signup') {
-        const result = await signUp(email.trim(), password, name.trim() || email.split('@')[0]);
+        const result = await signUp(
+          email.trim(),
+          password,
+          name.trim() || email.split('@')[0],
+          referralCode
+        );
         if (!result.ok) {
           setError(result.reason);
           setPending(false);
           return;
+        }
+        if (result.referralError) {
+          window.sessionStorage.setItem('referral_notice', result.referralError);
+        } else if (result.referralApplied) {
+          window.sessionStorage.setItem(
+            'referral_notice',
+            `Invite code applied. Your friend earned ${POINTS_RULES.INVITE_SIGNUP} welcome points.`
+          );
         }
       } else {
         const result = await signIn(email.trim(), password);
@@ -92,11 +111,19 @@ function LoginForm() {
     setError(null);
     setPending(true);
     try {
-      const result = await signInWithGoogle();
+      const result = await signInWithGoogle(mode === 'signup' ? referralCode : undefined);
       if (!result.ok) {
         setError(result.reason);
         setPending(false);
         return;
+      }
+      if (result.referralError) {
+        window.sessionStorage.setItem('referral_notice', result.referralError);
+      } else if (result.referralApplied) {
+        window.sessionStorage.setItem(
+          'referral_notice',
+          `Invite code applied. Your friend earned ${POINTS_RULES.INVITE_SIGNUP} welcome points.`
+        );
       }
       // useEffect handles redirect once user state propagates
     } catch (err: any) {
@@ -137,6 +164,29 @@ function LoginForm() {
           , redeemable for paid travel packages.
         </p>
       </div>
+
+      {mode === 'signup' && (
+        <div className="mt-6 rounded-2xl bg-jade/5 p-4 ring-1 ring-jade/20">
+          <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-200">
+            Friend&apos;s invite code <span className="font-normal text-secondary-400">(optional)</span>
+          </label>
+          <div className="relative mt-2">
+            <Gift className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-jade" />
+            <input
+              type="text"
+              value={referralCode}
+              onChange={(event) => setReferralCode(normalizeReferralCode(event.target.value))}
+              className="input-field w-full pl-9 font-mono uppercase tracking-[0.16em]"
+              placeholder="Enter 12-character code"
+              maxLength={12}
+              autoComplete="off"
+            />
+          </div>
+          <p className="mt-2 text-xs leading-5 text-secondary-500 dark:text-secondary-400">
+            When your new account is created, your friend receives {POINTS_RULES.INVITE_SIGNUP} welcome points.
+          </p>
+        </div>
+      )}
 
       {/* Google sign-in */}
       <button
