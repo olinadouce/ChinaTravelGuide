@@ -19,7 +19,7 @@ export default function PracticalInfoPage() {
           <p className="mb-4 text-sm uppercase tracking-[0.24em] text-white/55">Practical information</p>
           <h1 className="text-5xl font-bold">Reduce uncertainty before travelers arrive.</h1>
           <p className="mt-6 text-lg leading-8 text-white/75">
-            Accommodation, medical care, food culture, transportation, payment, and language 鈥?the six essentials that decide whether a China trip feels easy on day one.
+            Accommodation, medical care, food culture, transportation, payment, and language — the six essentials that decide whether a China trip feels easy on day one.
           </p>
         </div>
       </section>
@@ -45,9 +45,9 @@ export default function PracticalInfoPage() {
                 </div>
                 <h2 className="text-2xl font-bold text-secondary-900 dark:text-white">{guide.title}</h2>
                 <p className="mt-3 text-sm leading-7 text-secondary-600 dark:text-secondary-300">{guide.summary}</p>
-                <ul className="mt-5 space-y-2 text-sm text-secondary-500 dark:text-secondary-400">
+                <ul className="mt-5 list-disc space-y-2 pl-5 text-sm text-secondary-500 marker:text-primary dark:text-secondary-400">
                   {guide.preview.slice(0, 3).map((point) => (
-                    <li key={point}>鈥?{point}</li>
+                    <li key={point}>{point}</li>
                   ))}
                 </ul>
                 <div className="mt-auto pt-6">

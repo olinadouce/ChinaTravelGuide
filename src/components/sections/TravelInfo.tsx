@@ -34,7 +34,7 @@ export default function TravelInfo() {
             <span className="gradient-text">Friction-reducing</span> guidance.
           </h2>
           <p className="max-w-3xl text-lg leading-8 text-secondary-600 dark:text-secondary-300">
-            Six core topics 鈥?accommodation, medical care, food culture, transportation, payment, and language 鈥?that decide whether a China trip feels easy on day one.
+            Six core topics — accommodation, medical care, food culture, transportation, payment, and language — that decide whether a China trip feels easy on day one.
           </p>
         </motion.div>
 
@@ -64,9 +64,9 @@ export default function TravelInfo() {
                   </div>
                   <h3 className="text-xl font-semibold text-secondary-900 dark:text-white">{guide.title}</h3>
                   <p className="mt-3 text-sm leading-7 text-secondary-600 dark:text-secondary-300">{guide.summary}</p>
-                  <ul className="mt-5 space-y-2 text-sm text-secondary-500 dark:text-secondary-400">
+                  <ul className="mt-5 list-disc space-y-2 pl-5 text-sm text-secondary-500 marker:text-primary dark:text-secondary-400">
                     {guide.preview.slice(0, 2).map((point) => (
-                      <li key={point}>鈥?{point}</li>
+                      <li key={point}>{point}</li>
                     ))}
                   </ul>
                   <div className="mt-auto pt-6">
