@@ -75,12 +75,14 @@ export function PackageCard({ pkg, index = 0, accent = 'primary' }: PackageCardP
 
         <div className="flex flex-1 flex-col p-5">
           <div className="mb-3 flex items-center gap-3 text-xs text-secondary-500 dark:text-secondary-400">
-            <span className="inline-flex items-center gap-1">
-              <MapPin className={cn('h-3.5 w-3.5', accentText[accent])} />
-              {pkg.destination}
+            <span className="inline-flex min-w-0 flex-1 items-center gap-1">
+              <MapPin
+                className={cn('h-3.5 w-3.5 shrink-0', accentText[accent])}
+              />
+              <span className="truncate">{pkg.destination}</span>
             </span>
-            <span className="inline-flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5 text-accent" />
+            <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap">
+              <Clock className="h-3.5 w-3.5 shrink-0 text-accent" />
               {pkg.duration}
             </span>
           </div>
