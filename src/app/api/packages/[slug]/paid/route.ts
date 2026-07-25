@@ -41,15 +41,17 @@ export async function GET(
     const result = await get(
       `paid-guides/${pkg.slug}.html`,
       oidcToken && process.env.VERCEL
-        ? {
-            access: 'private',
-            oidcToken,
-            storeId: PAID_GUIDES_STORE_ID,
-          }
-        : {
-            access: 'private',
-            token: readWriteToken,
-          }
+          ? {
+              access: 'private',
+              oidcToken,
+              storeId: PAID_GUIDES_STORE_ID,
+              useCache: false,
+            }
+          : {
+              access: 'private',
+              token: readWriteToken,
+              useCache: false,
+            }
     );
 
     if (!result || result.statusCode !== 200) {
