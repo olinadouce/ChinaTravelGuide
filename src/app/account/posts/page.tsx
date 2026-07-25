@@ -107,6 +107,7 @@ export default function MyPostsPage() {
         <div className="mt-6 flex gap-2 border-b border-secondary-200 dark:border-secondary-700">
           <Link href="/account/points" className="px-4 py-3 text-sm font-semibold text-secondary-500 hover:text-primary">Points</Link>
           <span className="border-b-2 border-primary px-4 py-3 text-sm font-bold text-primary">My Posts</span>
+          <Link href="/account/packages" className="px-4 py-3 text-sm font-semibold text-secondary-500 hover:text-primary">My Packages</Link>
         </div>
 
         {error && <p className="mt-5 flex items-center gap-2 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700"><AlertCircle className="h-4 w-4" />{error}</p>}

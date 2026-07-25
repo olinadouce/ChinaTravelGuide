@@ -183,11 +183,11 @@ export default function Navigation() {
                         {forumUnread > 0 && <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white">{forumUnread > 99 ? '99+' : forumUnread}</span>}
                       </Link>
                       <Link
-                        href="/packages"
+                        href="/account/packages"
                         onClick={() => setIsUserMenuOpen(false)}
                         className="block px-4 py-3 text-sm font-medium text-secondary-700 transition-colors hover:bg-stone-50 dark:text-secondary-200 dark:hover:bg-secondary-800"
                       >
-                        Browse packages
+                        My packages
                       </Link>
                       <button
                         onClick={() => {
@@ -289,6 +289,13 @@ export default function Navigation() {
                 >
                   <span className="inline-flex items-center gap-2"><Bell className="h-4 w-4" />My posts</span>
                   {forumUnread > 0 && <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-white">{forumUnread}</span>}
+                </Link>
+                <Link
+                  href="/account/packages"
+                  onClick={() => setIsOpen(false)}
+                  className="rounded-2xl px-4 py-3 font-medium text-secondary-700 transition-colors hover:bg-secondary-100 hover:text-primary dark:text-secondary-100 dark:hover:bg-secondary-800"
+                >
+                  My packages
                 </Link>
                 <button
                   onClick={() => {

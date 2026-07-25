@@ -119,6 +119,7 @@ export default function PointsAccountPage() {
         <div className="mb-6 flex gap-2 border-b border-secondary-200 dark:border-secondary-700">
           <span className="border-b-2 border-primary px-4 py-3 text-sm font-bold text-primary">Points</span>
           <Link href="/account/posts" className="px-4 py-3 text-sm font-semibold text-secondary-500 hover:text-primary">My Posts</Link>
+          <Link href="/account/packages" className="px-4 py-3 text-sm font-semibold text-secondary-500 hover:text-primary">My Packages</Link>
         </div>
         <Link
           href="/packages"

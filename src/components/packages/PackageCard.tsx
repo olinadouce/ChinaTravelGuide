@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, Coins, Eye, MapPin, Clock, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Coins, Eye, MapPin, Clock, Sparkles } from 'lucide-react';
 
 import type { ClientPackage } from '@/data/packages';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,7 @@ interface PackageCardProps {
   pkg: ClientPackage;
   index?: number;
   accent?: 'primary' | 'accent' | 'jade' | 'secondary';
+  unlocked?: boolean;
 }
 
 const accentText: Record<NonNullable<PackageCardProps['accent']>, string> = {
@@ -28,7 +29,12 @@ const accentBg: Record<NonNullable<PackageCardProps['accent']>, string> = {
   secondary: 'bg-secondary-700',
 };
 
-export function PackageCard({ pkg, index = 0, accent = 'primary' }: PackageCardProps) {
+export function PackageCard({
+  pkg,
+  index = 0,
+  accent = 'primary',
+  unlocked = false,
+}: PackageCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -112,11 +118,15 @@ export function PackageCard({ pkg, index = 0, accent = 'primary' }: PackageCardP
                 accentBg[accent]
               )}
             >
-              <Coins className="h-3.5 w-3.5" />
-              {pkg.pointsCost} pts to unlock
+              {unlocked ? (
+                <CheckCircle2 className="h-3.5 w-3.5" />
+              ) : (
+                <Coins className="h-3.5 w-3.5" />
+              )}
+              {unlocked ? 'Unlocked' : `${pkg.pointsCost} pts to unlock`}
             </div>
             <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-all group-hover:gap-2">
-              View details
+              {unlocked ? 'Open full guide' : 'View details'}
               <ArrowRight className="h-4 w-4" />
             </span>
           </div>
