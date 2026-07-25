@@ -128,7 +128,7 @@ export default function Hero({ slides }: HeroProps) {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.7 }}
-            className="overflow-hidden rounded-[30px] border border-white/24 bg-white/92 shadow-2xl shadow-black/25 backdrop-blur-xl"
+            className="overflow-hidden rounded-[30px] border border-white/24 bg-white/92 shadow-2xl shadow-black/25 backdrop-blur-xl dark:bg-white/92"
           >
             <div className="relative aspect-[4/3] overflow-hidden">
               <Image
@@ -153,17 +153,17 @@ export default function Hero({ slides }: HeroProps) {
             </div>
 
             <div className="p-5">
-              <div className="flex flex-wrap gap-2 text-sm text-secondary-600 dark:text-secondary-300">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5">
+              <div className="flex flex-wrap gap-2 text-sm text-secondary-600 dark:text-secondary-700">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 dark:bg-stone-100">
                   <MapPin className="h-4 w-4 text-primary" />
                   {currentSlide.destination}
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 dark:bg-stone-100">
                   <CalendarDays className="h-4 w-4 text-jade" />
                   {currentSlide.duration}
                 </span>
               </div>
-              <p className="mt-4 line-clamp-3 text-sm leading-6 text-secondary-600 dark:text-secondary-300">
+              <p className="mt-4 line-clamp-3 text-sm leading-6 text-secondary-600 dark:text-secondary-700">
                 {currentSlide.shortDescription}
               </p>
               <Link
