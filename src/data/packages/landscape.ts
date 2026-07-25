@@ -8,12 +8,12 @@ export const landscapePackages: TravelPackage[] = [
     slug: 'east-china-mountains',
     themeId: 'landscape',
     name: 'East China Mountains: Granite Peaks & Danxia Rivers',
-    destination: 'Huangshan 路 Sanqingshan 路 Wuyishan',
+    destination: 'Huangshan · Sanqingshan · Wuyishan',
     duration: '12-14 days',
     description:
       'A first-time-friendly nature route connecting Huangshan granite peaks and sea of clouds, Sanqingshan cliff walkways, and Wuyishan Danxia cliffs with the Nine-Bend Stream.',
     shortDescription:
-      'Sea of clouds on Huangshan 路 cliff walkways of Sanqingshan 路 bamboo rafts on the Nine-Bend Stream 鈥?a three-icon East China loop.',
+      'Sea of clouds on Huangshan · cliff walkways of Sanqingshan · bamboo rafts on the Nine-Bend Stream — a three-icon East China loop.',
     coverImage:
       '/packages/covers/east-china-mountains.png',
     badge: 'Classic Mountains',
@@ -34,12 +34,12 @@ export const landscapePackages: TravelPackage[] = [
     slug: 'gansu-qinghai',
     themeId: 'landscape',
     name: 'Gansu & Qinghai: Plateau Mirror & Desert Stars',
-    destination: 'Lanzhou 路 Qinghai Lake 路 Chaka 路 Dunhuang',
+    destination: 'Lanzhou · Qinghai Lake · Chaka · Dunhuang',
     duration: '8-10 days',
     description:
       'Cross the Qinghai-Tibet plateau edge: mirror-salt lakes, rainbow Danxia, singing sand dunes and starry desert camps.',
     shortDescription:
-      "From Qinghai Lake to Crescent Lake 鈥?a panoramic sweep of plateau, yardang, salt lake and Gobi.",
+      'From Qinghai Lake to Crescent Lake — a panoramic sweep of plateau, yardang, salt lake and Gobi.',
     coverImage:
       '/packages/covers/gansu-qinghai.png',
     badge: 'Plateau Secrets',
@@ -60,12 +60,12 @@ export const landscapePackages: TravelPackage[] = [
     slug: 'northwest-yunnan',
     themeId: 'landscape',
     name: 'Northwest Yunnan: Shangri-La & Snow Mountains',
-    destination: 'Lijiang 路 Shangri-La 路 Meili Snow Mountain',
+    destination: 'Lijiang · Shangri-La · Meili Snow Mountain',
     duration: '7-9 days',
     description:
       'Tiger Leaping Gorge trek, Meili Snow Mountain sunrise, Shangri-La monastery and old-town Lijiang.',
     shortDescription:
-      'Tiger Leaping Gorge trek + Meili sunrise + Old Town of Dukezong 鈥?a deep dive into Yunnan-Tibet culture.',
+      'Tiger Leaping Gorge trek + Meili sunrise + Old Town of Dukezong — a deep dive into Yunnan-Tibet culture.',
     coverImage:
       '/packages/covers/northwest-yunnan.jpg',
     badge: 'Snow Trek',
@@ -85,7 +85,7 @@ export const landscapePackages: TravelPackage[] = [
     slug: 'south-china-karst',
     themeId: 'landscape',
     name: 'South China Karst: Caves & Rice Terraces',
-    destination: 'Libo 路 Xingyi 路 Luoping',
+    destination: 'Libo · Xingyi · Luoping',
     duration: '6-7 days',
     description:
       'UNESCO karst landscapes: the cone peaks of Libo, Maling River canyon and Luoping rapeseed terraces in spring.',
@@ -110,12 +110,12 @@ export const landscapePackages: TravelPackage[] = [
     slug: 'western-sichuan',
     themeId: 'landscape',
     name: 'Western Sichuan: Sacred Mountains & Lakes',
-    destination: 'Chengdu 路 Mt. Siguniang 路 Daocheng Yading',
+    destination: 'Chengdu · Mt. Siguniang · Daocheng Yading',
     duration: '8-10 days',
     description:
       'Daocheng Yading sacred lakes, Siguniang mountain and the Sichuan-Tibet highway panorama loop.',
     shortDescription:
-      'From the Chengdu Plain westward to Daocheng Yading 鈥?"the last pure land on the blue planet".',
+      'From the Chengdu Plain westward to Daocheng Yading — “the last pure land on the blue planet”.',
     coverImage:
       '/packages/covers/western-sichuan.png',
     badge: 'Western Sichuan Loop',
@@ -136,12 +136,12 @@ export const landscapePackages: TravelPackage[] = [
     slug: 'zhangjiajie-enshi',
     themeId: 'landscape',
     name: 'Zhangjiajie & Enshi Canyon',
-    destination: 'Zhangjiajie 路 Enshi',
+    destination: 'Zhangjiajie · Enshi',
     duration: '6-7 days',
     description:
       'Avatar-inspired pillar peaks plus the deepest slot canyons of Enshi: a vertical landscape adventure.',
     shortDescription:
-      'The real-life Avatar mountains paired with Enshi\'s deep slot canyons and Pingshan 鈥?a vertical landscape double-bill.',
+      'The real-life Avatar mountains paired with Enshi\'s deep slot canyons and Pingshan — a vertical landscape double-bill.',
     coverImage:
       '/packages/covers/zhangjiajie-enshi.png',
     badge: 'Floating Peaks',
@@ -149,7 +149,7 @@ export const landscapePackages: TravelPackage[] = [
       'Zhangjiajie National Forest Park',
       'Tianmen Mountain glass skywalk',
       'Enshi Grand Canyon',
-      'Pingshan Canyon (China鈥檚 Semporna)',
+      'Pingshan Canyon (China’s Semporna)',
     ],
     tags: ['Avatar Mountains', 'Glass Bridge', 'Canyon'],
     pointsCost: 120,
