@@ -6,6 +6,7 @@ import { PaidIframeGate } from '@/components/packages/PaidIframeGate';
 import { PointsEarnPanel } from '@/components/packages/PointsEarnPanel';
 import { ThemeAwareIframe } from '@/components/packages/ThemeAwareIframe';
 import { getPackageBySlug } from '@/data/packages';
+import { PackageAnalytics } from '@/components/analytics/PackageAnalytics';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
@@ -61,6 +62,12 @@ export default async function PackageDetailPage({
 
   return (
     <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220]">
+      <PackageAnalytics
+        packageId={pkg.id}
+        packageSlug={pkg.slug}
+        packageName={pkg.name}
+        theme={pkg.themeId}
+      />
       <div className="h-20" />
 
       <div className="container-main mb-4">

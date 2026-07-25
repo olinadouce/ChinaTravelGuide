@@ -24,6 +24,7 @@ import {
   type BookingCity,
 } from '@/data/bookings';
 import { cn } from '@/lib/utils';
+import { trackAnalyticsEvent } from '@/components/analytics/FirebaseAnalytics';
 
 const categoryIcons: Record<BookingCategory, typeof Landmark> = {
   attractions: Landmark,
@@ -189,6 +190,14 @@ export function BookCityProducts({
                         href={product.affiliateUrl}
                         target="_blank"
                         rel="sponsored noopener noreferrer"
+                        onClick={() => {
+                          trackAnalyticsEvent('affiliate_click', {
+                            product_id: product.id,
+                            provider: product.provider,
+                            city: city.slug,
+                            category: product.category,
+                          });
+                        }}
                         className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0f5d62] px-3 py-2.5 text-sm font-bold text-white transition hover:bg-[#0b484c]"
                       >
                         Check availability <ArrowUpRight className="h-4 w-4" />

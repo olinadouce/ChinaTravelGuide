@@ -7,6 +7,7 @@ import { Loader2, MessageCircle, Minimize2, Send, X } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { FOOTER_EN, FOOTER_ZH } from '@/lib/ai/config';
 import { cn } from '@/lib/utils';
+import { trackAnalyticsEvent } from '@/components/analytics/FirebaseAnalytics';
 
 type Source = {
   knowledgeId: string;
@@ -129,6 +130,13 @@ export function AITravelAssistant({
   }, [open]);
 
   useEffect(() => {
+    if (!isPage) return;
+    trackAnalyticsEvent('ai_assistant_open', {
+      entry_point: 'tools_page',
+    });
+  }, [isPage]);
+
+  useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
   }, [displayMessages, loading, open]);
 
@@ -173,6 +181,15 @@ export function AITravelAssistant({
         }),
         cache: 'no-store',
       });
+
+      if (response.ok) {
+        trackAnalyticsEvent('ai_message_sent', {
+          entry_point: isPage ? 'tools_page' : 'floating_widget',
+          message_length: content.length,
+          locale,
+          has_package_context: Boolean(currentPackageId),
+        });
+      }
 
       const payload = (await response.json().catch(() => null)) as {
         status?: ChatStatus;
@@ -241,6 +258,9 @@ export function AITravelAssistant({
           onClick={() => {
             setOpen(true);
             setMinimized(false);
+            trackAnalyticsEvent('ai_assistant_open', {
+              entry_point: 'floating_widget',
+            });
           }}
           aria-label={isZh ? '打开 AI 旅行助手' : 'Open AI travel assistant'}
         >

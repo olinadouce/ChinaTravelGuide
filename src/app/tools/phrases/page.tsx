@@ -12,6 +12,7 @@ import {
   Trash2,
   Volume2,
 } from 'lucide-react';
+import { trackAnalyticsEvent } from '@/components/analytics/FirebaseAnalytics';
 
 const MAX_CHARACTERS = 5000;
 
@@ -86,7 +87,15 @@ export default function PhrasesPage() {
         throw new Error(data?.error || 'Translation failed. Please try again.');
       }
 
-      setTranslation(decodeHtmlEntities(data?.translations?.[0] || ''));
+      const translatedText = decodeHtmlEntities(data?.translations?.[0] || '');
+      setTranslation(translatedText);
+      if (translatedText) {
+        trackAnalyticsEvent('translation_completed', {
+          source_language: 'zh-CN',
+          target_language: targetLanguage.code,
+          character_count: text.length,
+        });
+      }
     } catch (requestError) {
       setTranslation('');
       setError(

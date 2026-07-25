@@ -8,6 +8,7 @@ import type { ClientPackage } from '@/data/packages';
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
 import { POINTS_RULES, getNextTier, getUserTier } from '@/lib/points-rules';
 import { cn } from '@/lib/utils';
+import { trackAnalyticsEvent } from '@/components/analytics/FirebaseAnalytics';
 
 interface UnlockPanelProps {
   pkg: ClientPackage;
@@ -31,7 +32,16 @@ export function UnlockPanel({ pkg, variant = 'sidebar' }: UnlockPanelProps) {
     setPending(false);
     if (!result.ok) {
       setError(result.reason);
+      return;
     }
+    trackAnalyticsEvent('unlock_package', {
+      package_id: pkg.id,
+      package_slug: pkg.slug,
+      package_name: pkg.name,
+      theme: pkg.themeId,
+      unlock_method: 'points',
+      points_used: cost,
+    });
   };
 
   const loginHref = (() => {

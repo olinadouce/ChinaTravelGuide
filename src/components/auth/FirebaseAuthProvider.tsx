@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   GoogleAuthProvider,
+  getAdditionalUserInfo,
   signInWithPopup,
   updateProfile,
   User as FirebaseUser,
@@ -17,6 +18,7 @@ import {
 } from '@/lib/firestore-users';
 import { authenticatedPost } from '@/lib/authenticated-api';
 import { PointsActionType, PointsLedgerEntry } from '@/lib/points-rules';
+import { trackAnalyticsEvent } from '@/components/analytics/FirebaseAnalytics';
 
 type Result = { ok: true } | { ok: false; reason: string };
 type EarnPointsOptions = {
@@ -145,6 +147,7 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
   const signUp = useCallback(async (email: string, password: string, name: string): Promise<Result> => {
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
+      trackAnalyticsEvent('sign_up', { method: 'email' });
       if (name) {
         await updateProfile(cred.user, { displayName: name });
       }
@@ -157,6 +160,7 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
   const signIn = useCallback(async (email: string, password: string): Promise<Result> => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      trackAnalyticsEvent('login', { method: 'email' });
       return { ok: true };
     } catch (err: any) {
       return { ok: false, reason: err.message ?? 'Sign-in failed' };
@@ -166,7 +170,9 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
   const signInWithGoogle = useCallback(async (): Promise<Result> => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const credential = await signInWithPopup(auth, provider);
+      const eventName = getAdditionalUserInfo(credential)?.isNewUser ? 'sign_up' : 'login';
+      trackAnalyticsEvent(eventName, { method: 'google' });
       return { ok: true };
     } catch (err: any) {
       return { ok: false, reason: err.message ?? 'Google sign-in failed' };
