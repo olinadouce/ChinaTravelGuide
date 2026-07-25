@@ -43,7 +43,7 @@ export default async function PracticalGuidePage({ params }: { params: Promise<{
             <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${iconWrap}`}>
               <Icon className="h-7 w-7" />
             </div>
-            <span className="rounded-full bg-secondary-50 px-3 py-1 text-xs uppercase tracking-[0.16em] text-secondary-500 dark:text-secondary-400">
+            <span className="rounded-full bg-secondary-50 px-3 py-1 text-xs uppercase tracking-[0.16em] text-secondary-500 dark:bg-white dark:text-secondary-900">
               {guide.readMinutes} min read
             </span>
           </div>

@@ -17,7 +17,7 @@ export function renderRuns(runs: InlineRun[]): React.ReactNode {
   return runs.map((run, index) => {
     if (run.bold) {
       return (
-        <strong key={index} className="font-semibold text-secondary-900 dark:text-white">
+        <strong key={index} className="font-semibold text-current">
           {run.text}
         </strong>
       );
@@ -47,17 +47,17 @@ function CalloutIcon({ tone }: { tone: 'info' | 'warning' | 'tip' }) {
   if (tone === 'tip') {
     return <Lightbulb className="h-5 w-5 shrink-0 text-emerald-600" />;
   }
-  return <Info className="h-5 w-5 shrink-0 text-secondary-700 dark:text-secondary-200" />;
+  return <Info className="h-5 w-5 shrink-0 text-secondary-700" />;
 }
 
 function calloutClass(tone: 'info' | 'warning' | 'tip'): string {
   if (tone === 'warning') {
-    return 'bg-primary-50 text-secondary-800 dark:text-secondary-100';
+    return 'bg-primary-50 text-secondary-800 dark:bg-white dark:text-secondary-900';
   }
   if (tone === 'tip') {
-    return 'bg-emerald-50 text-secondary-800 dark:text-secondary-100';
+    return 'bg-emerald-50 text-secondary-800 dark:bg-white dark:text-secondary-900';
   }
-  return 'bg-secondary-50 text-secondary-800 dark:text-secondary-100';
+  return 'bg-secondary-50 text-secondary-800 dark:bg-white dark:text-secondary-900';
 }
 
 function Heading({ level, text }: { level: 2 | 3; text: string }) {
@@ -108,7 +108,7 @@ function TableBlock({
     <div className="mt-6 overflow-x-auto rounded-3xl border border-secondary-200 dark:border-secondary-700">
       <table className="w-full text-left text-sm">
         {headers.length > 0 && (
-          <thead className="bg-secondary-50 text-secondary-900 dark:text-white">
+          <thead className="bg-secondary-50 text-secondary-900 dark:bg-white dark:text-secondary-900">
             <tr>
               {headers.map((header, index) => (
                 <th key={index} className="px-4 py-3 font-semibold">
@@ -164,11 +164,11 @@ function DividerBlock() {
 }
 
 const stepToneContainer: Record<string, string> = {
-  primary: 'border-primary/20 bg-primary-50',
-  accent: 'border-accent/30 bg-accent-50',
-  jade: 'border-emerald-300 bg-emerald-50',
-  secondary: 'border-secondary-200 dark:border-secondary-700 bg-secondary-50',
-  warning: 'border-primary/30 bg-primary-50',
+  primary: 'border-primary/20 bg-primary-50 dark:border-secondary-200 dark:bg-white',
+  accent: 'border-accent/30 bg-accent-50 dark:border-secondary-200 dark:bg-white',
+  jade: 'border-emerald-300 bg-emerald-50 dark:border-secondary-200 dark:bg-white',
+  secondary: 'border-secondary-200 bg-secondary-50 dark:border-secondary-200 dark:bg-white',
+  warning: 'border-primary/30 bg-primary-50 dark:border-secondary-200 dark:bg-white',
 };
 
 const stepToneBadge: Record<string, string> = {
@@ -206,9 +206,9 @@ function StepsBlock({
                   {index + 1}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold leading-tight text-secondary-900 dark:text-white">{step.label}</p>
+                  <p className="font-bold leading-tight text-secondary-900">{step.label}</p>
                   {step.caption ? (
-                    <p className="mt-1.5 text-xs leading-snug text-secondary-700 dark:text-secondary-200">{step.caption}</p>
+                    <p className="mt-1.5 text-xs leading-snug text-secondary-700">{step.caption}</p>
                   ) : null}
                 </div>
               </div>
