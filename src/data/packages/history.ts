@@ -1,7 +1,5 @@
 import type { TravelPackage } from '@/types';
 
-const ROOT = 'packet/历史文化-西安/鍘嗗彶鏂囧寲-瑗垮畨';
-
 export const historyPackages: TravelPackage[] = [
   {
     id: 'pkg-xian-history',
@@ -27,8 +25,6 @@ export const historyPackages: TravelPackage[] = [
     ],
     tags: ['History', 'UNESCO', 'Food', 'Day Trip'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/Xian free.html`,
-    paidHtmlPath: `${ROOT}/Xian浠樿垂.html`,
   },
   {
     id: 'pkg-henan-history',
@@ -54,7 +50,5 @@ export const historyPackages: TravelPackage[] = [
     tags: ['History', 'UNESCO', 'Martial Arts', 'Heritage'],
     pointsCost: 120,
     // Files are served from /public/history/henan-history/
-    freeHtmlPath: 'public/history/henan-history/free.html',
-    paidHtmlPath: 'public/history/henan-history/paid.html',
   },
 ];

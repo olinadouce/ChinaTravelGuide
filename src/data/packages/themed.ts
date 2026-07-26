@@ -1,7 +1,5 @@
 import type { TravelPackage } from '@/types';
 
-const ROOT = 'packet/广州、桂林、西藏/广州、桂林、西藏';
-
 export const themedPackages: TravelPackage[] = [
   {
     id: 'pkg-guangzhou',
@@ -26,8 +24,6 @@ export const themedPackages: TravelPackage[] = [
     ],
     tags: ['Cantonese Food', 'Heritage', 'City'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/广州/guangzhou_free.html`,
-    paidHtmlPath: `${ROOT}/广州/guangzhou_paid.html`,
   },
   {
     id: 'pkg-guilin-yangshuo-longji',
@@ -52,8 +48,6 @@ export const themedPackages: TravelPackage[] = [
     ],
     tags: ['Li River', 'Karst', 'Rice Terraces', 'Cycling'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/桂林/guilin_yangshuo_longji_free.html`,
-    paidHtmlPath: `${ROOT}/桂林/guilin_yangshuo_longji_paid.html`,
   },
   {
     id: 'pkg-tibet',
@@ -77,7 +71,5 @@ export const themedPackages: TravelPackage[] = [
     ],
     tags: ['Tibet', 'Plateau', 'Pilgrimage', 'Everest'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/西藏/xizang_free.html`,
-    paidHtmlPath: `${ROOT}/西藏/xizang_paid.html`,
   },
 ];

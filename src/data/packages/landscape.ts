@@ -1,6 +1,4 @@
-﻿import type { TravelPackage } from '@/types';
-
-const ROOT = 'packet/鑷劧涔嬫梾/鑷劧涔嬫梾涓撻6鏉＄嚎璺痺ord+html';
+import type { TravelPackage } from '@/types';
 
 export const landscapePackages: TravelPackage[] = [
   {
@@ -26,8 +24,6 @@ export const landscapePackages: TravelPackage[] = [
     ],
     tags: ['Mountains', 'UNESCO', 'Photography', 'Hiking'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/East_China_Mountains_Web_Guides/East_China_Mountains_Free_Guide.html`,
-    paidHtmlPath: `${ROOT}/East_China_Mountains_Web_Guides/East_China_Mountains_Full_Guide.html`,
   },
   {
     id: 'pkg-gansu-qinghai',
@@ -52,8 +48,6 @@ export const landscapePackages: TravelPackage[] = [
     ],
     tags: ['Plateau', 'Desert', 'Photography', 'Stargazing'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/Gansu_Qinghai_Web_Guides/Gansu_Qinghai_Nature_Free_Guide.html`,
-    paidHtmlPath: `${ROOT}/Gansu_Qinghai_Web_Guides/Gansu_Qinghai_Nature_Full_Guide.html`,
   },
   {
     id: 'pkg-northwest-yunnan',
@@ -77,8 +71,6 @@ export const landscapePackages: TravelPackage[] = [
     ],
     tags: ['Trekking', 'Snow Mountain', 'Tibetan Culture'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/Northwest_Yunnan_Web_Guides/Northwest_Yunnan_Nature_Free_Guide.html`,
-    paidHtmlPath: `${ROOT}/Northwest_Yunnan_Web_Guides/Northwest_Yunnan_Nature_Full_Guide.html`,
   },
   {
     id: 'pkg-south-china-karst',
@@ -102,8 +94,6 @@ export const landscapePackages: TravelPackage[] = [
     ],
     tags: ['Karst', 'Caves', 'Spring Flowers'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/South_China_Karst_Web_Guides/South_China_Karst_Free_Guide.html`,
-    paidHtmlPath: `${ROOT}/South_China_Karst_Web_Guides/South_China_Karst_Full_Guide.html`,
   },
   {
     id: 'pkg-western-sichuan',
@@ -128,8 +118,6 @@ export const landscapePackages: TravelPackage[] = [
     ],
     tags: ['Plateau', 'Sacred Lakes', 'Road Trip'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/Western_Sichuan_Web_Guides/Western_Sichuan_Nature_Free_Guide.html`,
-    paidHtmlPath: `${ROOT}/Western_Sichuan_Web_Guides/Western_Sichuan_Nature_Full_Guide.html`,
   },
   {
     id: 'pkg-zhangjiajie-enshi',
@@ -153,7 +141,5 @@ export const landscapePackages: TravelPackage[] = [
     ],
     tags: ['Avatar Mountains', 'Glass Bridge', 'Canyon'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/Zhangjiajie_Enshi_Web_Guides/Zhangjiajie_Enshi_Canyon_Free_Guide.html`,
-    paidHtmlPath: `${ROOT}/Zhangjiajie_Enshi_Web_Guides/Zhangjiajie_Enshi_Canyon_Full_Guide.html`,
   },
 ];

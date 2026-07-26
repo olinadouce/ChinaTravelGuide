@@ -1,4 +1,8 @@
-import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import {
+  FieldValue,
+  Timestamp,
+  type DocumentData,
+} from 'firebase-admin/firestore';
 import { createHash } from 'node:crypto';
 
 import { getAllPackages } from '@/data/packages';
@@ -52,7 +56,7 @@ export function createReferralCode(uid: string): string {
   return Array.from(digest.subarray(0, 12), (byte) => REFERRAL_ALPHABET[byte & 31]).join('');
 }
 
-function profileView(uid: string, data: Record<string, any>) {
+function profileView(uid: string, data: DocumentData) {
   const toMillis = (value: unknown) =>
     value instanceof Timestamp ? value.toMillis() : value ?? null;
   return {

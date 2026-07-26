@@ -1,43 +1,26 @@
-# Dependencies
+# Installed dependencies and generated builds
 node_modules/
-.pnp/
-.pnp.js
-
-# Next.js
 .next/
 out/
 build/
-
-# Misc
-.DS_Store
-*.pem
-.next-dev*.log
-
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Local env files
-.env
-.env*.local
-
-# Vercel
-.vercel
-
-# TypeScript
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
+# Local configuration and deployment metadata
+.env*
+!.env.example
+.vercel/
+*.pem
 
-# Packet: source assets we don't need at build time
-packet/**/__MACOSX/
-packet/**/*.docx
-packet/**/*.pdf
-packet/**/*.zip
-packet/**/Thumbs.db
-packet/**/.DS_Store
+# Logs and operating-system files
+*.log
+.DS_Store
+Thumbs.db
+
+# Source materials used to prepare the public website assets
+/data/
+/packet/
+/new-ishowspeed-images-index.jpg
 
 .vercel
 .env*

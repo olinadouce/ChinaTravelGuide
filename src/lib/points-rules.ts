@@ -67,7 +67,7 @@ export const POINTS_RULES = {
     DAILY_LOGIN_ONCE_PER_DAY: true,
     /** Each new account can apply one invite code during its first 24 hours. */
     INVITE_CODE_ONCE_PER_NEW_ACCOUNT: true,
-    /** Share reward requires external click verification (mock = manual). */
+    /** Share reward requires external click verification and manual review. */
     SHARE_REQUIRES_EXTERNAL_CLICK: true,
   },
 } as const;

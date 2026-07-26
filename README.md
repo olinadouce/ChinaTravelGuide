@@ -1,121 +1,80 @@
-# 🇨🇳 China Travel Guide - 中国行攻略网站
+# China Travel Guide
 
-面向入境游客的中国旅游攻略网站源码包
+China Travel Guide is a full-stack travel information website for international visitors to China. It provides destination guides, booking links, practical travel tools, a community forum, Firebase authentication, and a points-based guide-unlocking system.
 
-## 📦 项目内容
+## Documentation
 
-```
-ChinaTravelGuide/
-├── package.json          # 项目依赖配置
-├── package-lock.json     # 依赖锁定文件
-├── next.config.mjs       # Next.js 配置
-├── tailwind.config.ts    # Tailwind CSS 配置
-├── postcss.config.mjs    # PostCSS 配置
-├── tsconfig.json         # TypeScript 配置
-├── public/               # 静态资源目录
-│   └── images/           # 图片资源
-└── src/                  # 源代码目录
-    ├── app/              # 页面组件
-    │   ├── layout.tsx    # 根布局
-    │   ├── page.tsx      # 首页
-    │   ├── destinations/ # 目的地模块
-    │   ├── journeys/     # 路线模块
-    │   ├── practical-info/ # 实用信息
-    │   └── tools/        # 实用工具
-    ├── components/       # UI组件
-    ├── data/             # 数据文件
-    ├── hooks/            # React Hooks
-    ├── lib/              # 工具函数
-    └── types/            # TypeScript类型
-```
+- [Developer guide](docs/DEVELOPER_GUIDE.md): installation, configuration, compilation, and run instructions
+- [Architecture guide](docs/ARCHITECTURE.zh-CN.md): system structure and request flows (Chinese)
 
-## 🚀 快速开始
+## Quick start
 
-### 1. 解压项目
+Requirements:
+
+- Node.js 22 or newer
+- npm 10 or newer
+
+Install dependencies:
+
 ```bash
-unzip ChinaTravelGuide.zip
-cd ChinaTravelGuide
+npm ci
 ```
 
-### 2. 安装依赖
+Create the local environment file:
+
 ```bash
-npm install
+cp .env.example .env.local
 ```
 
-### 3. 启动开发服务器
+On Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+Firebase settings are required for login, points, and forum write operations.
+Static pages can still be compiled and viewed without them.
+
+Start the development server:
+
 ```bash
 npm run dev
 ```
 
-### 4. 访问网站
-打开浏览器访问: http://localhost:3000
+Open <http://localhost:3000>.
 
-## 📋 功能模块
-
-| 模块 | 路径 | 说明 |
-|------|------|------|
-| 首页 | `/` | Hero + 精选目的地 + 主题路线 |
-| 目的地 | `/destinations` | 8个精选城市展示 |
-| 目的地详情 | `/destinations/[slug]` | 单个城市完整攻略 |
-| 主题路线 | `/journeys` | 5条精选旅游路线 |
-| 实用信息 | `/practical-info` | 签证/交通/预算等指南 |
-| 货币转换 | `/tools/currency` | 实时汇率换算 |
-| 常用语 | `/tools/phrases` | 中英文常用语翻译 |
-
-## 🛠 技术栈
-
-- **框架**: Next.js 14
-- **语言**: TypeScript
-- **样式**: Tailwind CSS 3.4
-- **动画**: Framer Motion
-- **图标**: Lucide React
-- **主题**: 亮/暗模式切换
-
-## 🎨 设计特色
-
-- 中国红 (#DC2626) + 琉璃金 (#F59E0B) 主色调
-- 流畅的页面过渡动画
-- 响应式布局 (手机/平板/桌面)
-- 深色模式支持
-
-## 📝 注意事项
-
-1. **Node.js 版本**: 需要 Node.js 18+
-2. **首次运行**: `npm install` 可能需要几分钟
-3. **生产部署**: `npm run build` 构建后部署
-
-## 🔧 可用脚本
+## Production build
 
 ```bash
-npm run dev      # 开发服务器
-npm run build    # 生产构建
-npm run start    # 生产服务器
-npm run lint     # 代码检查
+npm run build
+npm run start
 ```
 
----
+The application will run at <http://localhost:3000> by default.
 
-*Built with ❤️ for China travelers*
+## Validation
 
-<!-- auto-deploy-test: trigger first GitHub → Vercel auto-deploy on 2026-06-14 -->
+```bash
+npm run typecheck
+npm run lint
+npm run build
+```
 
----
+Do not submit or commit `.env.local`, Firebase Admin credentials, Vercel tokens, `node_modules`, or `.next`.
 
 ## AI Travel Assistant
 
-Incremental RAG assistant for published guide knowledge (free/paid entitlements).
+The project includes an incremental RAG assistant for published guide
+knowledge, with separate free and paid entitlements.
 
-### Quick ops
-1. Put reviewed Markdown under `knowledge/<dir>/free|paid/`
-2. `npm run knowledge:validate`
-3. `npm run knowledge:sync`
-4. Deploy to Vercel with OpenAI env vars
+Useful commands:
 
-### Docs
-See `docs/AI_ASSISTANT_HANDOFF.md` for architecture, file change list (before/after), env vars, Firestore collections, and rollout steps.
+```bash
+npm run knowledge:validate
+npm run knowledge:sync
+npm run knowledge:status
+npm run test
+```
 
-### Scripts
-- `npm run knowledge:validate`
-- `npm run knowledge:sync`
-- `npm run knowledge:status`
-- `npm run test`
+See `docs/AI_ASSISTANT_HANDOFF.md` for the assistant architecture,
+environment variables, Firestore collections, and rollout steps.

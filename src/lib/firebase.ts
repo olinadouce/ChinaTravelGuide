@@ -2,7 +2,7 @@
 import { getAuth } from 'firebase/auth';
 import { initializeFirestore } from 'firebase/firestore';
 
-const firebaseConfig = {
+const configuredFirebase = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -12,7 +12,27 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Prevent HMR re-initialization
+export const isFirebaseConfigured = Boolean(
+  configuredFirebase.apiKey &&
+    configuredFirebase.authDomain &&
+    configuredFirebase.projectId &&
+    configuredFirebase.appId
+);
+
+// Firebase validates its configuration while Next.js prerenders Client
+// Components. The local fallback keeps public pages buildable from a clean
+// checkout; authentication still requires real environment variables.
+const firebaseConfig = isFirebaseConfigured
+  ? configuredFirebase
+  : {
+      apiKey: 'local-build-key',
+      authDomain: 'localhost',
+      projectId: 'china-travel-guide-local',
+      appId: 'local-build-app',
+      messagingSenderId: '0',
+    };
+
+// Reuse the existing app during development hot reloads.
 export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(firebaseApp);

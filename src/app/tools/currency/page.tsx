@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ArrowRightLeft, Calculator } from 'lucide-react';
 
 const exchangeRates: Record<string, number> = {
@@ -35,12 +35,10 @@ export default function CurrencyPage() {
   const [amount, setAmount] = useState(100);
   const [fromCurrency, setFromCurrency] = useState('CNY');
   const [toCurrency, setToCurrency] = useState('USD');
-  const [result, setResult] = useState(0);
-
-  useEffect(() => {
-    const baseAmount = amount / exchangeRates[fromCurrency];
-    setResult(baseAmount * exchangeRates[toCurrency]);
-  }, [amount, fromCurrency, toCurrency]);
+  // `result` is fully determined by the three inputs. Keeping it as derived
+  // data avoids a second render and prevents state from becoming out of sync.
+  const result =
+    (amount / exchangeRates[fromCurrency]) * exchangeRates[toCurrency];
 
   return (
     <div className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220] pt-20">

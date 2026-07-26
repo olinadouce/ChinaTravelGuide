@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { Mail, MapPin, PhoneCall } from 'lucide-react';
+import { Mail, PhoneCall } from 'lucide-react';
 import { siteNavigation } from '@/data/content';
 
 export default function Footer() {
@@ -51,26 +51,24 @@ export default function Footer() {
           <div>
             <h3 className="mb-4 font-semibold text-primary">Contact</h3>
             <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
-                <span className="text-secondary-300">Beijing operations base for inbound travel partnerships and campaign launches.</span>
-              </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 flex-shrink-0 text-primary" />
-                <a href="mailto:hello@chinatravel.guide" className="text-secondary-300 transition-colors hover:text-white">
-                  hello@chinatravel.guide
+                <a href="mailto:sales@cchinaroute.com" className="text-secondary-300 transition-colors hover:text-white">
+                  sales@cchinaroute.com
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <PhoneCall className="h-5 w-5 flex-shrink-0 text-primary" />
-                <span className="text-secondary-300">+86 10 8888 2026</span>
+                <a href="tel:+85684971668" className="text-secondary-300 transition-colors hover:text-white">
+                  +856 84971668
+                </a>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-secondary-800 pt-8 md:flex-row">
-          <p className="text-sm text-secondary-400">漏 {new Date().getFullYear()} China Travel Guide. All rights reserved.</p>
+          <p className="text-sm text-secondary-400">© {new Date().getFullYear()} China Travel Guide. All rights reserved.</p>
           <div className="flex items-center gap-6 text-sm text-secondary-400">
             <Link href="/privacy" className="transition-colors hover:text-white">
               Privacy

@@ -11,12 +11,13 @@ import {
   updateProfile,
   User as FirebaseUser,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, isFirebaseConfigured } from '@/lib/firebase';
 import {
   getLedger as fetchLedger,
   FirestoreUser,
 } from '@/lib/firestore-users';
 import { authenticatedPost } from '@/lib/authenticated-api';
+import { getErrorMessage } from '@/lib/errors';
 import { PointsActionType, PointsLedgerEntry } from '@/lib/points-rules';
 import { trackAnalyticsEvent } from '@/components/analytics/FirebaseAnalytics';
 
@@ -165,6 +166,9 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
     name: string,
     referralCode?: string
   ): Promise<Result> => {
+    if (!isFirebaseConfigured) {
+      return { ok: false, reason: 'Firebase is not configured for this environment.' };
+    }
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       trackAnalyticsEvent('sign_up', { method: 'email' });
@@ -173,22 +177,28 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
       }
       const referralResult = await redeemInviteCode(referralCode);
       return { ok: true, ...referralResult };
-    } catch (err: any) {
-      return { ok: false, reason: err.message ?? 'Sign-up failed' };
+    } catch (error: unknown) {
+      return { ok: false, reason: getErrorMessage(error, 'Sign-up failed') };
     }
   }, [redeemInviteCode]);
 
   const signIn = useCallback(async (email: string, password: string): Promise<Result> => {
+    if (!isFirebaseConfigured) {
+      return { ok: false, reason: 'Firebase is not configured for this environment.' };
+    }
     try {
       await signInWithEmailAndPassword(auth, email, password);
       trackAnalyticsEvent('login', { method: 'email' });
       return { ok: true };
-    } catch (err: any) {
-      return { ok: false, reason: err.message ?? 'Sign-in failed' };
+    } catch (error: unknown) {
+      return { ok: false, reason: getErrorMessage(error, 'Sign-in failed') };
     }
   }, []);
 
   const signInWithGoogle = useCallback(async (referralCode?: string): Promise<Result> => {
+    if (!isFirebaseConfigured) {
+      return { ok: false, reason: 'Firebase is not configured for this environment.' };
+    }
     try {
       const provider = new GoogleAuthProvider();
       const credential = await signInWithPopup(auth, provider);
@@ -204,8 +214,8 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
             }
           : {};
       return { ok: true, ...referralResult };
-    } catch (err: any) {
-      return { ok: false, reason: err.message ?? 'Google sign-in failed' };
+    } catch (error: unknown) {
+      return { ok: false, reason: getErrorMessage(error, 'Google sign-in failed') };
     }
   }, [redeemInviteCode]);
 

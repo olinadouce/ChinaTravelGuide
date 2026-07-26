@@ -14,12 +14,15 @@ export function getHomePayload() {
 }
 
 export function getDestinations(query?: string, region?: string) {
+  const normalizedQuery = query?.toLowerCase();
   return destinations.filter((destination) => {
     const matchesQuery =
-      !query ||
-      destination.name.toLowerCase().includes(query.toLowerCase()) ||
-      destination.description.toLowerCase().includes(query.toLowerCase()) ||
-      destination.tags.some((tag) => tag.toLowerCase().includes(query.toLowerCase()));
+      !normalizedQuery ||
+      destination.name.toLowerCase().includes(normalizedQuery) ||
+      destination.description.toLowerCase().includes(normalizedQuery) ||
+      destination.tags.some((tag) =>
+        tag.toLowerCase().includes(normalizedQuery)
+      );
 
     const matchesRegion = !region || region === 'all' || destination.region === region;
     return matchesQuery && matchesRegion;
@@ -31,8 +34,12 @@ export function getDestinationBySlug(slug: string) {
 }
 
 export function getJourneys(theme?: string, difficulty?: string) {
+  const normalizedTheme = theme?.toLowerCase();
   return journeys.filter((journey) => {
-    const matchesTheme = !theme || theme === 'all' || journey.theme.toLowerCase().includes(theme.toLowerCase());
+    const matchesTheme =
+      !normalizedTheme ||
+      normalizedTheme === 'all' ||
+      journey.theme.toLowerCase().includes(normalizedTheme);
     const matchesDifficulty = !difficulty || difficulty === 'all' || journey.difficulty === difficulty;
     return matchesTheme && matchesDifficulty;
   });

@@ -191,8 +191,4 @@ export interface TravelPackage {
   tags: string[];
   /** Points required to unlock */
   pointsCost: number;
-  /** Path to free-version HTML on disk (relative to cwd) */
-  freeHtmlPath: string;
-  /** Path to paid-version HTML; falls back to free path if missing */
-  paidHtmlPath: string;
 }

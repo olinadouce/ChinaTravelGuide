@@ -1,4 +1,8 @@
-import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import {
+  FieldValue,
+  Timestamp,
+  type DocumentData,
+} from 'firebase-admin/firestore';
 
 import { forumComments, forumPosts } from '@/data/forum';
 import type { ForumAuthor, ForumComment, ForumNotification, ForumPost } from '@/types';
@@ -80,7 +84,7 @@ function millis(value: unknown): number {
   return Date.now();
 }
 
-function serializePost(id: string, data: Record<string, any>): ForumPost {
+function serializePost(id: string, data: DocumentData): ForumPost {
   return {
     id,
     slug: String(data.slug || id),
@@ -97,7 +101,7 @@ function serializePost(id: string, data: Record<string, any>): ForumPost {
   };
 }
 
-function serializeComment(id: string, data: Record<string, any>): ForumComment {
+function serializeComment(id: string, data: DocumentData): ForumComment {
   return {
     id,
     postId: String(data.postId || ''),
@@ -118,6 +122,9 @@ export async function listForumPosts(): Promise<ForumPost[]> {
     comments: Number(entry.data().additionalCommentsCount || 0),
     likes: Number(entry.data().additionalLikesCount || 0),
   }]));
+  // Editorial posts live in source control, while member posts live in
+  // Firestore. Stats documents add mutable likes/comments to editorial posts
+  // without copying the complete editorial content into the database.
   const seeded = forumPosts.map((post) => ({
     ...post,
     commentsCount: post.commentsCount + (stats.get(post.slug)?.comments || 0),
@@ -188,6 +195,8 @@ export async function createForumPost(
     ...(featuredImage ? { featuredImage } : {}),
   };
 
+  // Rate-limit state and the new post are committed together. Separate writes
+  // would allow two near-simultaneous requests to both pass the cooldown.
   await db.runTransaction(async (transaction) => {
     const rateSnapshot = await transaction.get(rateRef);
     const lastPostAt = millis(rateSnapshot.data()?.lastPostAt || 0);
@@ -212,7 +221,7 @@ export async function createForumComment(
   const db = adminDb();
   const seededPost = forumPosts.find((post) => post.slug === slug);
   const postRef = db.collection('forumPosts').doc(slug);
-  let dynamicPostData: Record<string, any> | null = null;
+  let dynamicPostData: DocumentData | null = null;
   if (!seededPost) {
     const postSnapshot = await postRef.get();
     if (!postSnapshot.exists) throw new ForumInputError('Post not found.', 404);
@@ -236,6 +245,8 @@ export async function createForumComment(
     likesCount: 0,
   };
 
+  // Comment creation, counters and author notification are one logical event;
+  // a transaction prevents partially-created discussions.
   await db.runTransaction(async (transaction) => {
     const rateSnapshot = await transaction.get(rateRef);
     const lastCommentAt = millis(rateSnapshot.data()?.lastCommentAt || 0);
@@ -283,6 +294,8 @@ export async function toggleForumLike(identity: ForumIdentity, slug: string) {
   const likeRef = db.collection('forumLikes').doc(`${slug}_${identity.uid}`);
   const now = Timestamp.now();
 
+  // The like document is the user's durable on/off state. Updating it together
+  // with the aggregate count prevents rapid clicks from drifting the counter.
   return db.runTransaction(async (transaction) => {
     const [likeSnapshot, targetSnapshot] = await Promise.all([
       transaction.get(likeRef),

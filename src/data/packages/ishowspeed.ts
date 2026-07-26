@@ -1,6 +1,4 @@
-﻿import type { TravelPackage } from '@/types';
-
-const ROOT = 'public/ishowspeed';
+import type { TravelPackage } from '@/types';
 
 export const ishowspeedPackages: TravelPackage[] = [
   {
@@ -25,8 +23,6 @@ export const ishowspeedPackages: TravelPackage[] = [
     ],
     tags: ['IShowSpeed', 'Beijing', 'Heritage'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/beijing/free.html`,
-    paidHtmlPath: `${ROOT}/beijing/paid.html`,
   },
   {
     id: 'pkg-ishowspeed-shanghai',
@@ -49,8 +45,6 @@ export const ishowspeedPackages: TravelPackage[] = [
     ],
     tags: ['IShowSpeed', 'Shanghai', 'Food'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/shanghai/free.html`,
-    paidHtmlPath: `${ROOT}/shanghai/paid.html`,
   },
   {
     id: 'pkg-ishowspeed-chengdu',
@@ -74,8 +68,6 @@ export const ishowspeedPackages: TravelPackage[] = [
     ],
     tags: ['IShowSpeed', 'Panda', 'Hotpot'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/chengdu/free.html`,
-    paidHtmlPath: `${ROOT}/chengdu/paid.html`,
   },
   {
     id: 'pkg-ishowspeed-chongqing',
@@ -98,8 +90,6 @@ export const ishowspeedPackages: TravelPackage[] = [
     ],
     tags: ['IShowSpeed', 'Hotpot', 'Cyberpunk'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/chongqing/free.html`,
-    paidHtmlPath: `${ROOT}/chongqing/paid.html`,
   },
   {
     id: 'pkg-ishowspeed-hong-kong',
@@ -122,8 +112,6 @@ export const ishowspeedPackages: TravelPackage[] = [
     ],
     tags: ['IShowSpeed', 'Hong Kong', 'Food'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/hong-kong/free.html`,
-    paidHtmlPath: `${ROOT}/hong-kong/paid.html`,
   },
   {
     id: 'pkg-ishowspeed-shenzhen',
@@ -146,7 +134,5 @@ export const ishowspeedPackages: TravelPackage[] = [
     ],
     tags: ['IShowSpeed', 'Shenzhen', 'Tech'],
     pointsCost: 120,
-    freeHtmlPath: `${ROOT}/shenzhen/free.html`,
-    paidHtmlPath: `${ROOT}/shenzhen/free.html`,
   },
 ];
