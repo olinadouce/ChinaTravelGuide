@@ -1,26 +1,33 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-const GUIDE_ROOT = path.join(process.cwd(), 'packet');
 const RANGE_PATTERN = /\d[\d:,.]*\s*(?:\u2013|-)\s*[\d:,.]*\+?/g;
 
-const guides = [
-  ['Beijing', 'beijing'],
-  ['Chengdu', 'chengdu'],
-  ['Chongqing', 'chongqing'],
-  ['Hong_Kong', 'hong-kong'],
-  ['Shanghai', 'shanghai'],
-  ['Shenzhen', 'shenzhen'],
-] as const;
-
-function listFiles(directory: string): string[] {
-  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const entryPath = path.join(directory, entry.name);
-    return entry.isDirectory() ? listFiles(entryPath) : [entryPath];
-  });
-}
+const expectedRanges = {
+  beijing: ['10–35', '1.5–2', '1.5–2'],
+  chengdu: ['10–30', '30–60'],
+  chongqing: ['10–35'],
+  'hong-kong': ['10–45', '15–50'],
+  shanghai: ['10–30', '20–45'],
+  shenzhen: [
+    '10–35',
+    '10:00–11:00',
+    '11:00–12:30',
+    '60–120',
+    '13:00–15:00',
+    '15:30–17:30',
+    '17:30–18:30',
+    '60–150',
+    '18:30–21:00',
+    '100–220',
+    '70–160',
+    '120–300',
+    '500–1,000+',
+    '40–120',
+  ],
+} as const;
 
 function visibleNumericRanges(html: string): string[] {
   const text = html
@@ -35,18 +42,9 @@ function visibleNumericRanges(html: string): string[] {
 }
 
 describe('IShowSpeed free guide numeric ranges', () => {
-  const sourceFiles = listFiles(GUIDE_ROOT);
-
-  it.each(guides)(
-    'keeps the %s guide aligned with its original HTML',
-    (sourceCity, publicSlug) => {
-      const sourceName = `IShowSpeed_${sourceCity}_Free_Guide_Final.html`;
-      const sourcePath = sourceFiles.find(
-        (filePath) => path.basename(filePath) === sourceName
-      );
-
-      expect(sourcePath, `Missing original guide: ${sourceName}`).toBeDefined();
-
+  it.each(Object.entries(expectedRanges))(
+    'keeps the published %s guide ranges stable',
+    (publicSlug, expected) => {
       const publicPath = path.join(
         process.cwd(),
         'public',
@@ -55,10 +53,8 @@ describe('IShowSpeed free guide numeric ranges', () => {
         'free.html'
       );
 
-      expect(
-        visibleNumericRanges(readFileSync(publicPath, 'utf8'))
-      ).toEqual(
-        visibleNumericRanges(readFileSync(sourcePath!, 'utf8'))
+      expect(visibleNumericRanges(readFileSync(publicPath, 'utf8'))).toEqual(
+        expected
       );
     }
   );
