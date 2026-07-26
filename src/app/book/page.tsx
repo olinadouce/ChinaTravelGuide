@@ -16,33 +16,40 @@ export default async function BookPage({
 }) {
   const { q = '' } = await searchParams;
   return (
-    <main className="min-h-screen bg-[#f8f5ef] pt-20 dark:bg-[#0b1220]">
-      <section className="relative overflow-hidden border-b border-black/5 py-20 dark:border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(15,93,98,0.16),transparent_24%),radial-gradient(circle_at_80%_20%,rgba(223,116,81,0.13),transparent_22%)]" />
-        <div className="container-main relative text-center">
-          <p className="mb-4 text-sm font-bold uppercase tracking-[0.24em] text-[#0f5d62] dark:text-teal-300">Book with trusted partners</p>
-          <h1 className="mx-auto max-w-4xl text-5xl font-bold tracking-tight text-[#102f46] dark:text-white md:text-7xl">
-            Book China, city by city.
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-secondary-600 dark:text-secondary-300">
-            Compare curated places to stay, attractions, day tours, dining experiences, shows and transfers from Klook, Trip.com and KKday.
-          </p>
+    <main className="min-h-screen bg-[#f7f1e8] dark:bg-[#0b1220]">
+      <section className="relative overflow-hidden bg-gradient-to-br from-white via-stone-50 to-amber-50 py-20 transition-colors duration-300 dark:from-[#111827] dark:via-[#0b1220] dark:to-[#172033]">
+        <div className="absolute -left-16 top-8 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute -right-16 bottom-8 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
+        <div className="absolute left-1/2 top-1/2 h-96 w-96 rounded-full bg-jade/5 blur-3xl" />
 
-          <div className="mx-auto mt-10 grid max-w-3xl gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-black/5 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-secondary-900/80">
-              <Compass className="mx-auto h-6 w-6 text-[#0f5d62] dark:text-teal-300" />
-              <p className="mt-2 text-2xl font-bold text-[#102f46] dark:text-white">{bookingCities.length}</p>
-              <p className="text-xs uppercase tracking-wide text-secondary-500">Cities & regions</p>
+        <div className="container-main relative">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-primary">
+              <BadgeDollarSign className="h-4 w-4" aria-hidden="true" />
+              <span className="text-sm font-medium">Book with trusted partners</span>
             </div>
-            <div className="rounded-2xl border border-black/5 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-secondary-900/80">
-              <Building2 className="mx-auto h-6 w-6 text-[#0f5d62] dark:text-teal-300" />
-              <p className="mt-2 text-2xl font-bold text-[#102f46] dark:text-white">{affiliateProducts.length}</p>
-              <p className="text-xs uppercase tracking-wide text-secondary-500">Booking options</p>
-            </div>
-            <div className="rounded-2xl border border-black/5 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-secondary-900/80">
-              <ShieldCheck className="mx-auto h-6 w-6 text-[#0f5d62] dark:text-teal-300" />
-              <p className="mt-2 text-2xl font-bold text-[#102f46] dark:text-white">3</p>
-              <p className="text-xs uppercase tracking-wide text-secondary-500">Affiliate partners</p>
+            <h1 className="text-5xl font-bold text-secondary-900 dark:text-white md:text-6xl">
+              Book China,{' '}
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                city by city.
+              </span>
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-secondary-600 dark:text-secondary-300">
+              Compare curated places to stay, attractions, day tours, dining experiences, shows and transfers from Klook, Trip.com and KKday.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 font-medium text-secondary-700 shadow-sm dark:bg-secondary-800/80 dark:text-secondary-200">
+                <Compass className="h-4 w-4 text-primary" aria-hidden="true" />
+                {bookingCities.length} cities & regions
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 font-medium text-secondary-700 shadow-sm dark:bg-secondary-800/80 dark:text-secondary-200">
+                <Building2 className="h-4 w-4 text-accent" aria-hidden="true" />
+                {affiliateProducts.length} booking options
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 font-medium text-secondary-700 shadow-sm dark:bg-secondary-800/80 dark:text-secondary-200">
+                <ShieldCheck className="h-4 w-4 text-jade" aria-hidden="true" />
+                3 affiliate partners
+              </span>
             </div>
           </div>
         </div>
