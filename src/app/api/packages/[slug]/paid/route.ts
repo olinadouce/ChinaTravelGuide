@@ -1,4 +1,4 @@
-import { get } from '@vercel/blob';
+import { head, issueSignedToken, presignUrl } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getPackageBySlug } from '@/data/packages';
@@ -8,14 +8,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const PAID_GUIDES_STORE_ID = 'store_Qu89PDZ4WlNNieex';
-const LARGE_GUIDE_BYTES = 4_000_000;
-
-function acceptsGzip(request: NextRequest) {
-  return request.headers
-    .get('accept-encoding')
-    ?.split(',')
-    .some((encoding) => encoding.trim().startsWith('gzip'));
-}
+const SIGNED_URL_LIFETIME_MS = 2 * 60 * 1000;
 
 export async function GET(
   request: NextRequest,
@@ -46,52 +39,51 @@ export async function GET(
       );
     }
 
-    const result = await get(
-      `paid-guides/${pkg.slug}.html`,
+    const pathname = `paid-guides/${pkg.slug}.html`;
+    const blobCredentials =
       oidcToken && process.env.VERCEL
-          ? {
-              access: 'private',
-              oidcToken,
-              storeId: PAID_GUIDES_STORE_ID,
-              useCache: false,
-            }
-          : {
-              access: 'private',
-              token: readWriteToken,
-              useCache: false,
-            }
-    );
+        ? {
+            oidcToken,
+            storeId: PAID_GUIDES_STORE_ID,
+          }
+        : {
+            token: readWriteToken,
+          };
 
-    if (!result || result.statusCode !== 200) {
+    try {
+      await head(pathname, blobCredentials);
+    } catch {
       return NextResponse.json({ error: 'Paid guide content is unavailable.' }, { status: 404 });
     }
 
-    // Some guides contain embedded images and can exceed Vercel's 4.5 MB
-    // function response limit. Compress only large responses and keep the
-    // Blob stream intact so the complete private guide is never buffered.
-    const useGzip =
-      result.blob.size >= LARGE_GUIDE_BYTES && acceptsGzip(request);
-    const responseStream = useGzip
-      ? result.stream.pipeThrough(
-          // Node's CompressionStream accepts Uint8Array at runtime, while its
-          // DOM declaration uses the wider BufferSource input type.
-          new CompressionStream('gzip') as unknown as TransformStream<
-            Uint8Array,
-            Uint8Array
-          >
-        )
-      : result.stream;
-
-    return new NextResponse(responseStream, {
-      headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Content-Disposition': `inline; filename="${pkg.slug}.html"`,
-        'Cache-Control': 'private, no-store',
-        ...(useGzip ? { 'Content-Encoding': 'gzip' } : {}),
-        'X-Content-Type-Options': 'nosniff',
-        Vary: 'Authorization, Accept-Encoding',
-      },
+    // The signed URL is scoped to one private file, permits GET only and
+    // expires quickly. Large guides therefore download directly from Blob
+    // instead of crossing Vercel Function's 4.5 MB response boundary.
+    const validUntil = Date.now() + SIGNED_URL_LIFETIME_MS;
+    const signedToken = await issueSignedToken({
+      ...blobCredentials,
+      pathname,
+      operations: ['get'],
+      validUntil,
     });
+    const { presignedUrl } = await presignUrl(signedToken, {
+      access: 'private',
+      operation: 'get',
+      pathname,
+      validUntil,
+      useCache: false,
+    });
+
+    return NextResponse.json(
+      { url: presignedUrl, expiresAt: validUntil },
+      {
+      headers: {
+        'Cache-Control': 'private, no-store',
+        'X-Content-Type-Options': 'nosniff',
+        Vary: 'Authorization',
+      },
+      }
+    );
   } catch (error) {
     console.error('[PaidGuide] Private Blob read failed:', error);
     return NextResponse.json(

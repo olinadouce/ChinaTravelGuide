@@ -14,8 +14,9 @@ interface PaidIframeGateProps {
 }
 
 /**
- * Loads paid HTML through an authenticated API only after the account has
- * unlocked the package. The private Blob pathname never reaches the client.
+ * Requests a short-lived, read-only URL only after the account has unlocked
+ * the package, then downloads the guide directly from private Blob storage.
+ * This avoids routing large HTML documents through a serverless response.
  */
 export function PaidIframeGate({ pkg }: PaidIframeGateProps) {
   const { isAuthenticated, hasPackageUnlocked, user } = useAuth();
@@ -34,17 +35,26 @@ export function PaidIframeGate({ pkg }: PaidIframeGateProps) {
       if (!firebaseUser) throw new Error('Your sign-in session is not ready.');
 
       const token = await firebaseUser.getIdToken();
-      const response = await fetch(`/api/packages/${encodeURIComponent(pkg.slug)}/paid`, {
+      const accessResponse = await fetch(`/api/packages/${encodeURIComponent(pkg.slug)}/paid`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
 
-      if (!response.ok) {
-        const payload = await response.json().catch(() => null);
+      const payload = await accessResponse.json().catch(() => null);
+      if (!accessResponse.ok) {
         throw new Error(payload?.error || 'The private guide could not be loaded.');
       }
 
-      setPaidHtml(await response.text());
+      if (typeof payload?.url !== 'string') {
+        throw new Error('The private guide download link is invalid.');
+      }
+
+      const guideResponse = await fetch(payload.url, { cache: 'no-store' });
+      if (!guideResponse.ok) {
+        throw new Error('The private guide could not be downloaded.');
+      }
+
+      setPaidHtml(await guideResponse.text());
     } catch (error: any) {
       setPaidHtml('');
       setGuideError(error?.message || 'The private guide could not be loaded.');
