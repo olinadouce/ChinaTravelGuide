@@ -6,6 +6,7 @@ import { AlertCircle, Check, Loader2, Lock, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
 import type { ClientPackage } from '@/data/packages';
 import { auth } from '@/lib/firebase';
+import { materializeGuilinPaidGuide } from '@/lib/guilin-paid-guide';
 import { PackageHtmlFrame } from './PackageHtmlFrame';
 import { UnlockPanel } from './UnlockPanel';
 
@@ -23,8 +24,9 @@ const LEGACY_GUIDE_STYLES: Partial<Record<string, string>> = {
  * stylesheet with a precompiled local file and reveal animated content.
  */
 function prepareGuideHtml(html: string, slug: string) {
+  const staticHtml = materializeGuilinPaidGuide(html, slug);
   const stylesheetPath = LEGACY_GUIDE_STYLES[slug];
-  if (!stylesheetPath) return html;
+  if (!stylesheetPath) return staticHtml;
 
   const stylesheetUrl = new URL(stylesheetPath, window.location.origin).href;
   const staticStyles = [
@@ -32,7 +34,7 @@ function prepareGuideHtml(html: string, slug: string) {
     '<style>.scroll-reveal{opacity:1!important;transform:none!important}</style>',
   ].join('');
 
-  return html
+  return staticHtml
     .replace(
       /<script\b[^>]*\bsrc=["']https:\/\/cdn\.tailwindcss\.com\/?["'][^>]*>\s*<\/script>/i,
       ''
