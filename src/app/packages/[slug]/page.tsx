@@ -7,6 +7,7 @@ import { PointsEarnPanel } from '@/components/packages/PointsEarnPanel';
 import { ThemeAwareIframe } from '@/components/packages/ThemeAwareIframe';
 import { getPackageBySlug } from '@/data/packages';
 import { PackageAnalytics } from '@/components/analytics/PackageAnalytics';
+import { getPackageGuideIdentity } from '@/lib/package-guide-identity';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
@@ -52,11 +53,8 @@ export default async function PackageDetailPage({
   if (!pkg) notFound();
 
   const assetBase = themeToAssetBase[pkg.themeId];
-  // IShowSpeed package slugs are stable even when destination labels change.
-  const slug = pkg.themeId === 'ishowspeed'
-    ? packageSlug.replace(/^ishowspeed-/, '')
-    : packageSlug;
-  const freeUrl = assetBase ? `${assetBase}/${slug}/free.html` : null;
+  const { assetSlug, rewardSlug } = getPackageGuideIdentity(pkg);
+  const freeUrl = assetBase ? `${assetBase}/${assetSlug}/free.html` : null;
 
   const cityName = pkg.destination.split(' - ')[0].split(' · ')[0];
 
@@ -89,7 +87,7 @@ export default async function PackageDetailPage({
           />
 
           <PointsEarnPanel
-            citySlug={slug}
+            guideSlug={rewardSlug}
             cityName={cityName}
             freeUrl={freeUrl}
             wordUrl={packageWordDownloads[packageSlug]}
