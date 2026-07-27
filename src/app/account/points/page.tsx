@@ -6,6 +6,7 @@ import { AlertTriangle, ArrowLeft, Check, CheckCircle2, Coins, Copy, Gift, Loade
 import type { LucideIcon } from 'lucide-react';
 
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
+import { ProfileEditor } from '@/components/auth/ProfileEditor';
 import {
   POINTS_ACTION_LABELS,
   POINTS_RULES,
@@ -128,6 +129,8 @@ export default function PointsAccountPage() {
           <ArrowLeft className="h-4 w-4" />
           Back to packages
         </Link>
+
+        <ProfileEditor key={`${user?.uid}:${user?.displayName}:${user?.photoURL}`} />
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_360px]">
           <div className="rounded-2xl border border-black/5 dark:border-white/10 bg-white dark:bg-secondary-900 p-6 shadow-sm">

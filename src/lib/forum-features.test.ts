@@ -5,6 +5,7 @@ import {
   isOwnedForumImagePath,
   MAX_FORUM_IMAGES,
 } from './server/forum-image-storage';
+import { forumAuthorFromProfile } from './server/forum-service';
 
 describe('forum rewards and image limits', () => {
   it('awards 20 points for a published post', () => {
@@ -20,5 +21,19 @@ describe('forum rewards and image limits', () => {
     expect(isOwnedForumImagePath('user-1', 'forum-images/user-1/photo.jpg')).toBe(true);
     expect(isOwnedForumImagePath('user-1', 'forum-images/user-2/photo.jpg')).toBe(false);
     expect(isOwnedForumImagePath('user-1', 'forum-images/user-1/../photo.jpg')).toBe(false);
+  });
+
+  it('uses the server-side profile nickname and avatar for forum activity', () => {
+    expect(forumAuthorFromProfile(
+      { uid: 'user-1', name: 'Token name', picture: 'https://example.com/token.jpg' },
+      {
+        displayName: 'Custom nickname',
+        photoURL: '/api/forum/images/forum-images/user-1/avatar.jpg',
+      }
+    )).toMatchObject({
+      id: 'user-1',
+      name: 'Custom nickname',
+      avatar: '/api/forum/images/forum-images/user-1/avatar.jpg',
+    });
   });
 });

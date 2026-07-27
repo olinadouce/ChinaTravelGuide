@@ -1,7 +1,6 @@
 'use client';
 
 import { AlertCircle, ArrowLeft, Calendar, Heart, Loader2, MessageSquare, Send, Trash2 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
@@ -148,7 +147,7 @@ export default function ForumPostPage() {
             </div>
             <h1 className="mt-4 text-3xl font-bold text-secondary-900 dark:text-white">{post.title}</h1>
             <div className="mt-6 flex items-center gap-3">
-              <Image src={post.author.avatar} alt={post.author.name} width={48} height={48} className="h-12 w-12 rounded-full object-cover" />
+              <img src={post.author.avatar} alt={post.author.name} className="h-12 w-12 rounded-full object-cover" />
               <div>
                 <p className="font-medium text-secondary-900 dark:text-white">{post.author.name}</p>
                 <p className="text-sm text-secondary-500 dark:text-secondary-400">Member</p>
@@ -181,7 +180,7 @@ export default function ForumPostPage() {
               <p className="rounded-xl bg-secondary-50 px-4 py-8 text-center text-secondary-500 dark:bg-secondary-800 dark:text-secondary-400">No comments yet. Be the first to share your thoughts!</p>
             ) : comments.map((comment) => (
               <div key={comment.id} className="flex gap-4 border-b border-secondary-100 pb-6 last:border-0 dark:border-secondary-800">
-                <Image src={comment.author.avatar} alt={comment.author.name} width={40} height={40} className="h-10 w-10 rounded-full object-cover" />
+                <img src={comment.author.avatar} alt={comment.author.name} className="h-10 w-10 rounded-full object-cover" />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-x-2">
                     <span className="font-medium text-secondary-900 dark:text-white">{comment.author.name}</span>

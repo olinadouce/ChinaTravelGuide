@@ -21,10 +21,11 @@ export class ForumInputError extends Error {
   }
 }
 
-type ForumIdentity = {
+export type ForumIdentity = {
   uid: string;
   name?: string;
   email?: string;
+  picture?: string;
 };
 
 type CreatePostInput = {
@@ -35,11 +36,25 @@ type CreatePostInput = {
   images?: unknown;
 };
 
-function authorFromIdentity(identity: ForumIdentity): ForumAuthor {
+export function forumAuthorFromProfile(
+  identity: ForumIdentity,
+  profile: DocumentData = {}
+): ForumAuthor {
+  const storedAvatar = typeof profile.photoURL === 'string' ? profile.photoURL : '';
+  const tokenAvatar = typeof identity.picture === 'string' ? identity.picture : '';
+  const avatar = [storedAvatar, tokenAvatar].find((value) =>
+    value.startsWith('/api/forum/images/') || value.startsWith('https://')
+  );
   return {
     id: identity.uid,
-    name: cleanSingleLine(identity.name || identity.email?.split('@')[0] || 'Traveler', 60),
-    avatar: '/see-china-route-logo.svg',
+    name: cleanSingleLine(
+      (typeof profile.displayName === 'string' ? profile.displayName : '')
+        || identity.name
+        || identity.email?.split('@')[0]
+        || 'Traveler',
+      60
+    ),
+    avatar: avatar || '/see-china-route-logo.svg',
     isMember: true,
   };
 }
@@ -197,13 +212,14 @@ export async function createForumPost(
   const postRef = db.collection('forumPosts').doc(slug);
   const rateRef = db.collection('forumRateLimits').doc(identity.uid);
   const now = Timestamp.now();
+  const profileSnapshot = await db.collection('users').doc(identity.uid).get();
   const post: ForumPost = {
     id: slug,
     slug,
     title,
     content,
     tags,
-    author: authorFromIdentity(identity),
+    author: forumAuthorFromProfile(identity, profileSnapshot.data()),
     createdAt: now.toDate().toISOString(),
     likesCount: 0,
     commentsCount: 0,
@@ -255,6 +271,7 @@ export async function createForumComment(
   validateLinks(content);
 
   const db = adminDb();
+  const profileSnapshot = await db.collection('users').doc(identity.uid).get();
   const seededPost = forumPosts.find((post) => post.slug === slug);
   const postRef = db.collection('forumPosts').doc(slug);
   let dynamicPostData: DocumentData | null = null;
@@ -275,7 +292,7 @@ export async function createForumComment(
   const comment: ForumComment = {
     id: commentRef.id,
     postId: seededPost?.id || slug,
-    author: authorFromIdentity(identity),
+    author: forumAuthorFromProfile(identity, profileSnapshot.data()),
     content,
     createdAt: now.toDate().toISOString(),
     likesCount: 0,
@@ -324,6 +341,8 @@ export async function getForumLikeState(uid: string, slug: string) {
 
 export async function toggleForumLike(identity: ForumIdentity, slug: string) {
   const db = adminDb();
+  const profileSnapshot = await db.collection('users').doc(identity.uid).get();
+  const actor = forumAuthorFromProfile(identity, profileSnapshot.data());
   const seededPost = forumPosts.find((post) => post.slug === slug);
   const postRef = db.collection('forumPosts').doc(slug);
   const statsRef = db.collection('forumPostStats').doc(slug);
@@ -368,7 +387,7 @@ export async function toggleForumLike(identity: ForumIdentity, slug: string) {
         transaction.set(notificationRef, {
           recipientId: postAuthorId,
           type: 'like',
-          actorName: authorFromIdentity(identity).name,
+          actorName: actor.name,
           actorId: identity.uid,
           postSlug: slug,
           postTitle: String(targetData.title || 'Your post'),
