@@ -15,8 +15,9 @@ interface PackageHtmlFrameProps {
 }
 
 /**
- * Renders a complete HTML travel package via <iframe srcDoc>, preserving
- * the original layout, styles and assets 100%.
+ * Renders a complete HTML travel package in an iframe, preserving the
+ * original layout, styles and assets. A Blob URL is used instead of srcDoc
+ * because several paid guides contain more than 20 MB of embedded images.
  */
 export function PackageHtmlFrame({
   html,
@@ -29,7 +30,25 @@ export function PackageHtmlFrame({
   const [expanded, setExpanded] = useState(false);
   const { resolvedTheme } = useTheme();
 
-  // Auto-fit iframe height to its srcdoc content.
+  // Load the HTML as a real document URL. Passing very large documents through
+  // the iframe srcDoc attribute can leave Chromium with a blank or stalled
+  // frame, while a Blob URL lets the browser parse it as a normal document.
+  useEffect(() => {
+    const iframe = ref.current;
+    if (!iframe || !html) return;
+
+    const documentUrl = URL.createObjectURL(
+      new Blob([html], { type: 'text/html;charset=utf-8' })
+    );
+    iframe.src = documentUrl;
+
+    return () => {
+      iframe.removeAttribute('src');
+      URL.revokeObjectURL(documentUrl);
+    };
+  }, [html]);
+
+  // Auto-fit the iframe height to the loaded guide document.
   useEffect(() => {
     const iframe = ref.current;
     if (!iframe || !html) return;
@@ -98,7 +117,6 @@ export function PackageHtmlFrame({
       <iframe
         ref={ref}
         title={title}
-        srcDoc={html}
         sandbox="allow-same-origin"
         className="block w-full border-0 bg-white dark:bg-secondary-900"
         style={{ height: expanded ? '100%' : `${height}px` }}
