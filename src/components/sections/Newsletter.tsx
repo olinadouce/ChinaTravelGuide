@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, Instagram, Mail, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Facebook, Instagram, Mail, Sparkles, Youtube } from 'lucide-react';
 
 export default function Newsletter() {
   return (
@@ -32,7 +32,7 @@ export default function Newsletter() {
               that fits the way you want to travel.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <motion.a
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -52,6 +52,30 @@ export default function Newsletter() {
               >
                 <Instagram className="h-4 w-4" aria-hidden="true" />
                 @CCHINAROUTE
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              </motion.a>
+              <motion.a
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                href="https://youtube.com/@cchinaroute?si=bjv82--lwNZkrJEc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-secondary-200 bg-white px-6 py-4 font-semibold text-secondary-800 transition-colors hover:border-primary/30 hover:text-primary dark:border-secondary-700 dark:bg-secondary-800 dark:text-white"
+              >
+                <Youtube className="h-4 w-4" aria-hidden="true" />
+                @cchinaroute
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              </motion.a>
+              <motion.a
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                href="https://www.facebook.com/cchinaroute"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-secondary-200 bg-white px-6 py-4 font-semibold text-secondary-800 transition-colors hover:border-primary/30 hover:text-primary dark:border-secondary-700 dark:bg-secondary-800 dark:text-white"
+              >
+                <Facebook className="h-4 w-4" aria-hidden="true" />
+                /cchinaroute
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
               </motion.a>
             </div>
