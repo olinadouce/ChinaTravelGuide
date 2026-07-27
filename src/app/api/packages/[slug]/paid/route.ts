@@ -8,6 +8,14 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const PAID_GUIDES_STORE_ID = 'store_Qu89PDZ4WlNNieex';
+const LARGE_GUIDE_BYTES = 4_000_000;
+
+function acceptsGzip(request: NextRequest) {
+  return request.headers
+    .get('accept-encoding')
+    ?.split(',')
+    .some((encoding) => encoding.trim().startsWith('gzip'));
+}
 
 export async function GET(
   request: NextRequest,
@@ -58,13 +66,30 @@ export async function GET(
       return NextResponse.json({ error: 'Paid guide content is unavailable.' }, { status: 404 });
     }
 
-    return new NextResponse(result.stream, {
+    // Some guides contain embedded images and can exceed Vercel's 4.5 MB
+    // function response limit. Compress only large responses and keep the
+    // Blob stream intact so the complete private guide is never buffered.
+    const useGzip =
+      result.blob.size >= LARGE_GUIDE_BYTES && acceptsGzip(request);
+    const responseStream = useGzip
+      ? result.stream.pipeThrough(
+          // Node's CompressionStream accepts Uint8Array at runtime, while its
+          // DOM declaration uses the wider BufferSource input type.
+          new CompressionStream('gzip') as unknown as TransformStream<
+            Uint8Array,
+            Uint8Array
+          >
+        )
+      : result.stream;
+
+    return new NextResponse(responseStream, {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'Content-Disposition': `inline; filename="${pkg.slug}.html"`,
         'Cache-Control': 'private, no-store',
+        ...(useGzip ? { 'Content-Encoding': 'gzip' } : {}),
         'X-Content-Type-Options': 'nosniff',
-        Vary: 'Authorization',
+        Vary: 'Authorization, Accept-Encoding',
       },
     });
   } catch (error) {
