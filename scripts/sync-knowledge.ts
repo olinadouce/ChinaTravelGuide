@@ -39,7 +39,11 @@ function loadEnvFile() {
 function getClient() {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error('OPENAI_API_KEY is required.');
-  return new OpenAI({ apiKey });
+  return new OpenAI({
+    apiKey,
+    timeout: 120_000,
+    maxRetries: 5,
+  });
 }
 
 function getVectorStoreId() {

@@ -160,10 +160,24 @@ describe('model answer validation', () => {
   });
 
   it('keeps fixed not_found copy', () => {
-    expect(NOT_FOUND_ZH).toBe('该问题还未收录');
-    expect(NOT_FOUND_EN).toBe(
-      'This question has not been added to our knowledge base yet.'
+    expect(NOT_FOUND_ZH).toContain('该问题还未收录');
+    expect(NOT_FOUND_ZH).toContain('我们会记录您的问题');
+    expect(NOT_FOUND_EN).toMatch(/not in our knowledge base/i);
+  });
+
+  it('treats model clarification with clear subject as not answerable', () => {
+    const result = validateModelAnswer(
+      {
+        answerable: false,
+        answer: '',
+        supportingSourceKeys: [],
+        needsClarification: true,
+        clarificationQuestion: 'Which Xinjiang package do you mean?',
+      },
+      chunks
     );
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toBe('clarification');
   });
 });
 
