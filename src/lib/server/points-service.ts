@@ -56,7 +56,7 @@ export function createReferralCode(uid: string): string {
   return Array.from(digest.subarray(0, 12), (byte) => REFERRAL_ALPHABET[byte & 31]).join('');
 }
 
-function profileView(uid: string, data: DocumentData) {
+export function pointsProfileView(uid: string, data: DocumentData) {
   const toMillis = (value: unknown) =>
     value instanceof Timestamp ? value.toMillis() : value ?? null;
   return {
@@ -179,7 +179,7 @@ export async function syncPointsProfile(seed: ProfileSeed) {
   });
 
   const current = await userRef.get();
-  return profileView(seed.uid, current.data() || {});
+  return pointsProfileView(seed.uid, current.data() || {});
 }
 
 export async function redeemReferral(

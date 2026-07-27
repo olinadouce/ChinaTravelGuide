@@ -4,16 +4,25 @@ import { motion } from 'framer-motion';
 import { AlertCircle, ImagePlus, Loader2, MessageCircle, PenLine, Send, Trash2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, Suspense, useEffect, useMemo, useState } from 'react';
+import { FormEvent, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
 import { ForumCard } from '@/components/ui/ForumCard';
 import { Pagination } from '@/components/ui/Pagination';
 import { forumPosts as seededPosts } from '@/data/forum';
-import { authenticatedPostForm } from '@/lib/authenticated-api';
+import { authenticatedPost } from '@/lib/authenticated-api';
+import { POINTS_RULES } from '@/lib/points-rules';
 import type { ForumPost } from '@/types';
 
 const POSTS_PER_PAGE = 6;
+const MAX_POST_IMAGES = 9;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+type SelectedImage = {
+  id: string;
+  file: File;
+  preview: string;
+};
 
 export default function ForumPage() {
   return (
@@ -26,7 +35,7 @@ export default function ForumPage() {
 function ForumPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, refreshUser } = useAuth();
   const [posts, setPosts] = useState<ForumPost[]>(seededPosts);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -34,8 +43,8 @@ function ForumPageContent() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
+  const previewUrls = useRef<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -66,49 +75,85 @@ function ForumPageContent() {
     };
   }, []);
 
-  useEffect(() => {
-    return () => {
-      if (imagePreview) URL.revokeObjectURL(imagePreview);
-    };
-  }, [imagePreview]);
+  useEffect(() => () => {
+    previewUrls.current.forEach((url) => URL.revokeObjectURL(url));
+  }, []);
 
-  const selectImage = (file: File | null) => {
+  const selectImages = (files: File[]) => {
     setSubmitError(null);
-    if (!file) {
-      setImageFile(null);
-      setImagePreview(null);
+    if (selectedImages.length + files.length > MAX_POST_IMAGES) {
+      setSubmitError(`Upload no more than ${MAX_POST_IMAGES} images.`);
       return;
     }
-    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
+    if (files.some((file) => !ALLOWED_IMAGE_TYPES.includes(file.type))) {
       setSubmitError('Use a JPEG, PNG, WebP, or GIF image.');
       return;
     }
-    if (file.size > 4 * 1024 * 1024) {
-      setSubmitError('Image must be smaller than 4 MB.');
+    if (files.some((file) => file.size > 4 * 1024 * 1024)) {
+      setSubmitError('Each image must be smaller than 4 MB.');
       return;
     }
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
+    const additions = files.map((file) => {
+      const preview = URL.createObjectURL(file);
+      previewUrls.current.push(preview);
+      return { id: crypto.randomUUID(), file, preview };
+    });
+    setSelectedImages((current) => [...current, ...additions]);
   };
+
+  const removeImage = (id: string) => {
+    setSelectedImages((current) => {
+      const removed = current.find((image) => image.id === id);
+      if (removed) {
+        URL.revokeObjectURL(removed.preview);
+        previewUrls.current = previewUrls.current.filter((url) => url !== removed.preview);
+      }
+      return current.filter((image) => image.id !== id);
+    });
+  };
+
+  const clearSelectedImages = () => {
+    selectedImages.forEach((image) => URL.revokeObjectURL(image.preview));
+    previewUrls.current = [];
+    setSelectedImages([]);
+  };
+
+  const uploadImages = async () => Promise.all(selectedImages.map(async ({ file }) => {
+    const signed = await authenticatedPost<{ pathname: string; url: string }>(
+      '/api/forum/images/upload-url',
+      { contentType: file.type, size: file.size }
+    );
+    const response = await fetch(signed.url, {
+      method: 'PUT',
+      headers: { 'Content-Type': file.type },
+      body: file,
+    });
+    if (!response.ok) throw new Error(`Image “${file.name}” could not be uploaded.`);
+    return signed.pathname;
+  }));
 
   const handleCreatePost = async (event: FormEvent) => {
     event.preventDefault();
     setSubmitError(null);
     setSubmitting(true);
     try {
-      const form = new FormData();
-      form.set('title', title);
-      form.set('content', content);
-      form.set('tags', JSON.stringify(tags.split(',').map((tag) => tag.trim()).filter(Boolean)));
-      if (imageFile) form.set('image', imageFile);
-      const result = await authenticatedPostForm<{ post: ForumPost }>('/api/forum/posts', form);
+      const images = await uploadImages();
+      const result = await authenticatedPost<{ post: ForumPost; pointsAwarded: number }>(
+        '/api/forum/posts',
+        {
+          title,
+          content,
+          tags: tags.split(',').map((tag) => tag.trim()).filter(Boolean),
+          images,
+        }
+      );
       setPosts((current) => [result.post, ...current]);
+      await refreshUser();
       setShowCreateModal(false);
       setTitle('');
       setContent('');
       setTags('');
-      setImageFile(null);
-      setImagePreview(null);
+      clearSelectedImages();
       router.push(`/forum/${result.post.slug}`);
     } catch (error: any) {
       setSubmitError(error?.message || 'Your post could not be published.');
@@ -189,6 +234,9 @@ function ForumPageContent() {
                 <p className="mt-1 text-sm text-secondary-600 dark:text-secondary-300">
                   Share a useful question, route, experience, or practical travel tip.
                 </p>
+                <p className="mt-2 text-sm font-semibold text-jade">
+                  Earn up to +{POINTS_RULES.CREATE_FORUM_POST} points per day from publishing posts.
+                </p>
               </div>
               <button onClick={() => setShowCreateModal(false)} className="rounded-full p-2 hover:bg-secondary-100 dark:hover:bg-secondary-800" aria-label="Close">
                 <X className="h-5 w-5" />
@@ -232,28 +280,50 @@ function ForumPageContent() {
                   <span className="mt-1 block text-right text-xs text-secondary-400">{content.length}/5000</span>
                 </label>
                 <div>
-                  <span className="text-sm font-medium text-secondary-700 dark:text-secondary-200">Cover image <span className="font-normal text-secondary-400">(optional)</span></span>
-                  {imagePreview ? (
-                    <div className="relative mt-2 overflow-hidden rounded-2xl border border-secondary-200 dark:border-secondary-700">
-                      <img src={imagePreview} alt="Selected cover preview" className="h-56 w-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => selectImage(null)}
-                        className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/70 px-3 py-1.5 text-xs font-bold text-white hover:bg-black"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" /> Remove
-                      </button>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-medium text-secondary-700 dark:text-secondary-200">
+                      Images <span className="font-normal text-secondary-400">(optional)</span>
+                    </span>
+                    <span className="text-xs font-semibold text-secondary-400">
+                      {selectedImages.length}/{MAX_POST_IMAGES}
+                    </span>
+                  </div>
+                  {selectedImages.length > 0 && (
+                    <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      {selectedImages.map((image, index) => (
+                        <div key={image.id} className="relative aspect-square overflow-hidden rounded-2xl border border-secondary-200 dark:border-secondary-700">
+                          <img src={image.preview} alt={`Selected image ${index + 1}`} className="h-full w-full object-cover" />
+                          {index === 0 && (
+                            <span className="absolute left-2 top-2 rounded-full bg-black/65 px-2 py-1 text-[10px] font-bold text-white">
+                              Cover
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => removeImage(image.id)}
+                            className="absolute right-2 top-2 rounded-full bg-black/70 p-2 text-white hover:bg-black"
+                            aria-label={`Remove image ${index + 1}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ) : (
+                  )}
+                  {selectedImages.length < MAX_POST_IMAGES && (
                     <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-secondary-200 px-5 py-8 text-center transition hover:border-primary/60 hover:bg-primary/5 dark:border-secondary-700">
                       <ImagePlus className="h-7 w-7 text-primary" />
-                      <span className="mt-2 text-sm font-semibold text-secondary-700 dark:text-secondary-200">Choose an image</span>
-                      <span className="mt-1 text-xs text-secondary-400">JPEG, PNG, WebP or GIF · max 4 MB</span>
+                      <span className="mt-2 text-sm font-semibold text-secondary-700 dark:text-secondary-200">Choose images</span>
+                      <span className="mt-1 text-xs text-secondary-400">JPEG, PNG, WebP or GIF · max 4 MB each · up to 9</span>
                       <input
                         type="file"
+                        multiple
                         accept="image/jpeg,image/png,image/webp,image/gif"
                         className="sr-only"
-                        onChange={(event) => selectImage(event.target.files?.[0] || null)}
+                        onChange={(event) => {
+                          selectImages(Array.from(event.target.files || []));
+                          event.currentTarget.value = '';
+                        }}
                       />
                     </label>
                   )}

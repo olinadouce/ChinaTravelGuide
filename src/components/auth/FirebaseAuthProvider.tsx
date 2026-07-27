@@ -174,6 +174,7 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
       trackAnalyticsEvent('sign_up', { method: 'email' });
       if (name) {
         await updateProfile(cred.user, { displayName: name });
+        await cred.user.getIdToken(true);
       }
       const referralResult = await redeemInviteCode(referralCode);
       return { ok: true, ...referralResult };

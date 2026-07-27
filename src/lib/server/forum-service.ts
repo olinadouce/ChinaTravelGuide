@@ -5,6 +5,7 @@ import {
 } from 'firebase-admin/firestore';
 
 import { forumComments, forumPosts } from '@/data/forum';
+import { POINTS_RULES } from '@/lib/points-rules';
 import type { ForumAuthor, ForumComment, ForumNotification, ForumPost } from '@/types';
 
 import { adminDb } from './firebase-admin';
@@ -20,10 +21,11 @@ export class ForumInputError extends Error {
   }
 }
 
-type ForumIdentity = {
+export type ForumIdentity = {
   uid: string;
   name?: string;
   email?: string;
+  picture?: string;
 };
 
 type CreatePostInput = {
@@ -31,13 +33,28 @@ type CreatePostInput = {
   content?: unknown;
   tags?: unknown;
   featuredImage?: unknown;
+  images?: unknown;
 };
 
-function authorFromIdentity(identity: ForumIdentity): ForumAuthor {
+export function forumAuthorFromProfile(
+  identity: ForumIdentity,
+  profile: DocumentData = {}
+): ForumAuthor {
+  const storedAvatar = typeof profile.photoURL === 'string' ? profile.photoURL : '';
+  const tokenAvatar = typeof identity.picture === 'string' ? identity.picture : '';
+  const avatar = [storedAvatar, tokenAvatar].find((value) =>
+    value.startsWith('/api/forum/images/') || value.startsWith('https://')
+  );
   return {
     id: identity.uid,
-    name: cleanSingleLine(identity.name || identity.email?.split('@')[0] || 'Traveler', 60),
-    avatar: '/see-china-route-logo.svg',
+    name: cleanSingleLine(
+      (typeof profile.displayName === 'string' ? profile.displayName : '')
+        || identity.name
+        || identity.email?.split('@')[0]
+        || 'Traveler',
+      60
+    ),
+    avatar: avatar || '/see-china-route-logo.svg',
     isMember: true,
   };
 }
@@ -84,7 +101,36 @@ function millis(value: unknown): number {
   return Date.now();
 }
 
+export function forumRewardDay(value: Date | number = new Date()): string {
+  const date = value instanceof Date ? value : new Date(value);
+  return date.toISOString().slice(0, 10);
+}
+
+export function forumPostRewardAvailable({
+  lastRewardDate,
+  lastPostAt,
+  now,
+}: {
+  lastRewardDate?: unknown;
+  lastPostAt: number;
+  now: number;
+}): boolean {
+  const rewardDay = forumRewardDay(now);
+  if (lastRewardDate === rewardDay) return false;
+  // Before the daily cap existed, rewarded posts did not write a daily
+  // marker. A same-day rate-limit timestamp closes that migration gap.
+  if (!lastRewardDate && lastPostAt > 0 && forumRewardDay(lastPostAt) === rewardDay) {
+    return false;
+  }
+  return true;
+}
+
 function serializePost(id: string, data: DocumentData): ForumPost {
+  const images = Array.isArray(data.images)
+    ? data.images.filter((image: unknown): image is string => typeof image === 'string').slice(0, 9)
+    : [];
+  const featuredImage = images[0]
+    || (typeof data.featuredImage === 'string' ? data.featuredImage : undefined);
   return {
     id,
     slug: String(data.slug || id),
@@ -95,9 +141,8 @@ function serializePost(id: string, data: DocumentData): ForumPost {
     likesCount: Number(data.likesCount || 0),
     commentsCount: Number(data.commentsCount || 0),
     tags: Array.isArray(data.tags) ? data.tags.filter((tag: unknown) => typeof tag === 'string') : [],
-    ...(typeof data.featuredImage === 'string' && data.featuredImage
-      ? { featuredImage: data.featuredImage }
-      : {}),
+    ...(featuredImage ? { featuredImage } : {}),
+    ...(images.length ? { images } : {}),
   };
 }
 
@@ -166,13 +211,22 @@ export async function getForumThread(slug: string): Promise<{
 export async function createForumPost(
   identity: ForumIdentity,
   input: CreatePostInput
-): Promise<ForumPost> {
+): Promise<{ post: ForumPost; pointsAwarded: number }> {
   const title = cleanSingleLine(typeof input.title === 'string' ? input.title : '', 120);
   const content = cleanContent(typeof input.content === 'string' ? input.content : '', 5000);
   const tags = normalizeTags(input.tags);
-  const featuredImage = typeof input.featuredImage === 'string' && input.featuredImage.startsWith('/api/forum/images/forum-images/')
-    ? input.featuredImage
-    : undefined;
+  const images = Array.isArray(input.images)
+    ? input.images
+        .filter((image): image is string =>
+          typeof image === 'string' && image.startsWith('/api/forum/images/forum-images/')
+        )
+        .slice(0, 9)
+    : [];
+  const featuredImage = images[0]
+    || (typeof input.featuredImage === 'string'
+      && input.featuredImage.startsWith('/api/forum/images/forum-images/')
+      ? input.featuredImage
+      : undefined);
   if (title.length < 5) throw new ForumInputError('Title must be at least 5 characters.');
   if (content.length < 20) throw new ForumInputError('Post content must be at least 20 characters.');
   validateLinks(`${title}\n${content}`);
@@ -182,31 +236,70 @@ export async function createForumPost(
   const postRef = db.collection('forumPosts').doc(slug);
   const rateRef = db.collection('forumRateLimits').doc(identity.uid);
   const now = Timestamp.now();
+  const profileSnapshot = await db.collection('users').doc(identity.uid).get();
   const post: ForumPost = {
     id: slug,
     slug,
     title,
     content,
     tags,
-    author: authorFromIdentity(identity),
+    author: forumAuthorFromProfile(identity, profileSnapshot.data()),
     createdAt: now.toDate().toISOString(),
     likesCount: 0,
     commentsCount: 0,
     ...(featuredImage ? { featuredImage } : {}),
+    ...(images.length ? { images } : {}),
   };
+  let pointsAwarded = 0;
 
   // Rate-limit state and the new post are committed together. Separate writes
   // would allow two near-simultaneous requests to both pass the cooldown.
   await db.runTransaction(async (transaction) => {
-    const rateSnapshot = await transaction.get(rateRef);
+    const userRef = db.collection('users').doc(identity.uid);
+    const [rateSnapshot, userSnapshot] = await Promise.all([
+      transaction.get(rateRef),
+      transaction.get(userRef),
+    ]);
     const lastPostAt = millis(rateSnapshot.data()?.lastPostAt || 0);
     if (Date.now() - lastPostAt < POST_COOLDOWN_MS) {
       throw new ForumInputError('Please wait 30 seconds before creating another post.', 429);
     }
+    if (!userSnapshot.exists) {
+      throw new ForumInputError('Your points profile is not ready yet. Please try again.', 409);
+    }
+    const userData = userSnapshot.data() || {};
+    const rewardDay = forumRewardDay(now.toMillis());
+    pointsAwarded = forumPostRewardAvailable({
+      lastRewardDate: userData.lastForumPostRewardDate,
+      lastPostAt,
+      now: now.toMillis(),
+    })
+      ? POINTS_RULES.CREATE_FORUM_POST
+      : 0;
+
     transaction.create(postRef, { ...post, createdAt: now, authorId: identity.uid });
     transaction.set(rateRef, { lastPostAt: now, updatedAt: now }, { merge: true });
+    transaction.update(userRef, {
+      ...(pointsAwarded > 0
+        ? { points: Number(userData.points ?? 0) + pointsAwarded }
+        : {}),
+      lastForumPostRewardDate: rewardDay,
+      updatedAt: now,
+    });
+    if (pointsAwarded > 0) {
+      transaction.create(userRef.collection('ledger').doc(`forum_post_daily_${rewardDay}`), {
+        actionType: 'forum_post',
+        pointsChange: pointsAwarded,
+        userId: identity.uid,
+        relatedPostSlug: slug,
+        rewardDate: rewardDay,
+        createdAt: now,
+        status: 'confirmed',
+        note: `Daily post reward — published “${title}”`,
+      });
+    }
   });
-  return post;
+  return { post, pointsAwarded };
 }
 
 export async function createForumComment(
@@ -219,6 +312,7 @@ export async function createForumComment(
   validateLinks(content);
 
   const db = adminDb();
+  const profileSnapshot = await db.collection('users').doc(identity.uid).get();
   const seededPost = forumPosts.find((post) => post.slug === slug);
   const postRef = db.collection('forumPosts').doc(slug);
   let dynamicPostData: DocumentData | null = null;
@@ -239,7 +333,7 @@ export async function createForumComment(
   const comment: ForumComment = {
     id: commentRef.id,
     postId: seededPost?.id || slug,
-    author: authorFromIdentity(identity),
+    author: forumAuthorFromProfile(identity, profileSnapshot.data()),
     content,
     createdAt: now.toDate().toISOString(),
     likesCount: 0,
@@ -288,6 +382,8 @@ export async function getForumLikeState(uid: string, slug: string) {
 
 export async function toggleForumLike(identity: ForumIdentity, slug: string) {
   const db = adminDb();
+  const profileSnapshot = await db.collection('users').doc(identity.uid).get();
+  const actor = forumAuthorFromProfile(identity, profileSnapshot.data());
   const seededPost = forumPosts.find((post) => post.slug === slug);
   const postRef = db.collection('forumPosts').doc(slug);
   const statsRef = db.collection('forumPostStats').doc(slug);
@@ -332,7 +428,7 @@ export async function toggleForumLike(identity: ForumIdentity, slug: string) {
         transaction.set(notificationRef, {
           recipientId: postAuthorId,
           type: 'like',
-          actorName: authorFromIdentity(identity).name,
+          actorName: actor.name,
           actorId: identity.uid,
           postSlug: slug,
           postTitle: String(targetData.title || 'Your post'),
@@ -411,5 +507,9 @@ export async function deleteForumPost(uid: string, slug: string) {
   notificationsSnapshot.docs.forEach((entry) => writer.delete(entry.ref));
   writer.delete(postRef);
   await writer.close();
-  return { featuredImage: typeof data.featuredImage === 'string' ? data.featuredImage : undefined };
+  const images = Array.isArray(data.images)
+    ? data.images.filter((image: unknown): image is string => typeof image === 'string')
+    : [];
+  const featuredImage = typeof data.featuredImage === 'string' ? data.featuredImage : undefined;
+  return { images: images.length ? images : featuredImage ? [featuredImage] : [] };
 }

@@ -24,13 +24,13 @@ export default function Footer() {
               </span>
             </Link>
 
-            <p className="mb-6 max-w-md text-secondary-300">
+            <p className="mb-7 max-w-xl text-base leading-7 text-secondary-300">
               Plan China with practical guidance, curated travel packages, and trusted booking partners in one place.
             </p>
 
-            <div className="max-w-md rounded-3xl border border-white/10 bg-white/5 p-5">
-              <p className="text-sm text-secondary-300">
-                Booking links may be affiliate links. We may earn a commission at no additional cost to you.
+            <div className="max-w-xl rounded-2xl border border-white/10 bg-white/[0.045] px-5 py-4 sm:px-6 sm:py-5">
+              <p className="text-left text-[13px] leading-6 tracking-[0.005em] text-secondary-400 sm:text-sm">
+                Some booking links redirect to third-party websites and may be affiliate links. We may receive a commission from eligible bookings at no additional cost to you. Prices, availability, booking terms and service policies are determined by the third-party provider and may change without notice. Please verify all details before booking.
               </p>
             </div>
           </div>

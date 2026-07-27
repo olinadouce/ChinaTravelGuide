@@ -37,6 +37,9 @@ export const POINTS_RULES = {
   /** Daily login bonus. */
   DAILY_LOGIN: 5,
 
+  /** Maximum forum-post reward per user per UTC calendar day. */
+  CREATE_FORUM_POST: 20,
+
   // === SPENDING ===
 
   /** Cost to unlock a Full Guide. */
@@ -69,6 +72,8 @@ export const POINTS_RULES = {
     INVITE_CODE_ONCE_PER_NEW_ACCOUNT: true,
     /** Share reward requires external click verification and manual review. */
     SHARE_REQUIRES_EXTERNAL_CLICK: true,
+    /** Only the first successfully published post each UTC day earns points. */
+    FORUM_POST_REWARD_ONCE_PER_DAY: true,
   },
 } as const;
 
@@ -82,6 +87,7 @@ export type PointsActionType =
   | 'invite_full_guide_unlock'
   | 'submit_feedback'
   | 'daily_login'
+  | 'forum_post'
   | 'redeem_full_guide'
   | 'admin_adjust';
 
@@ -107,6 +113,7 @@ export const POINTS_ACTION_LABELS: Record<PointsActionType, string> = {
   invite_full_guide_unlock: 'Friend unlocked Full Guide',
   submit_feedback: 'Feedback submitted',
   daily_login: 'Daily login',
+  forum_post: 'Published a forum post',
   redeem_full_guide: 'Unlock Full Guide',
   admin_adjust: 'Admin adjustment',
 };

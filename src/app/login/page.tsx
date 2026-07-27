@@ -1,9 +1,11 @@
 'use client';
 import { Suspense, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Coins, Gift, Mail, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
+import { Camera, Coins, Gift, Mail, Lock, User, AlertCircle, Loader2, Trash2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
+import { authenticatedPostForm } from '@/lib/authenticated-api';
+import { auth } from '@/lib/firebase';
 import { POINTS_RULES } from '@/lib/points-rules';
 import { normalizeReferralCode } from '@/lib/referrals';
 
@@ -14,7 +16,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const returnTo = searchParams.get('returnTo') || '/packages';
 
-  const { signIn, signUp, signInWithGoogle, user, loading } = useAuth();
+  const { signIn, signUp, signInWithGoogle, user, loading, refreshUser } = useAuth();
 
   const [mode, setMode] = useState<Mode>(
     searchParams.get('mode') === 'signup' || searchParams.has('ref') ? 'signup' : 'signin'
@@ -25,6 +27,8 @@ function LoginForm() {
   );
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showDebug, setShowDebug] = useState(false);
 
@@ -61,10 +65,41 @@ function LoginForm() {
 
   // Redirect when auth state becomes available (handles both pre-existing and freshly-signed-in users)
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && user && !pending) {
       router.push(returnTo);
     }
-  }, [user, loading, router, returnTo]);
+  }, [user, loading, pending, router, returnTo]);
+
+  useEffect(() => () => {
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+  }, [avatarPreview]);
+
+  const selectAvatar = (file: File | null) => {
+    setError(null);
+    if (!file) {
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      return;
+    }
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
+      setError('Use a JPEG, PNG, WebP, or GIF avatar.');
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      setError('Avatar must be smaller than 4 MB.');
+      return;
+    }
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const saveProfile = async (displayName: string) => {
+    const form = new FormData();
+    form.set('displayName', displayName);
+    if (avatarFile) form.set('avatar', avatarFile);
+    await authenticatedPostForm('/api/account/profile', form);
+    await refreshUser();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,10 +107,11 @@ function LoginForm() {
     setPending(true);
     try {
       if (mode === 'signup') {
+        const displayName = name.trim();
         const result = await signUp(
           email.trim(),
           password,
-          name.trim() || email.split('@')[0],
+          displayName,
           referralCode
         );
         if (!result.ok) {
@@ -83,6 +119,7 @@ function LoginForm() {
           setPending(false);
           return;
         }
+        await saveProfile(displayName);
         if (result.referralError) {
           window.sessionStorage.setItem('referral_notice', result.referralError);
         } else if (result.referralApplied) {
@@ -99,8 +136,7 @@ function LoginForm() {
           return;
         }
       }
-      // Wait for Firebase auth state to propagate, then redirect
-      // The useEffect above will fire once user state is set
+      setPending(false);
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
       setPending(false);
@@ -117,6 +153,13 @@ function LoginForm() {
         setPending(false);
         return;
       }
+      if (mode === 'signup' && (name.trim() || avatarFile)) {
+        const displayName = name.trim()
+          || auth.currentUser?.displayName
+          || auth.currentUser?.email?.split('@')[0]
+          || 'Traveler';
+        await saveProfile(displayName);
+      }
       if (result.referralError) {
         window.sessionStorage.setItem('referral_notice', result.referralError);
       } else if (result.referralApplied) {
@@ -125,7 +168,7 @@ function LoginForm() {
           `Invite code applied. Your friend earned ${POINTS_RULES.INVITE_SIGNUP} welcome points.`
         );
       }
-      // useEffect handles redirect once user state propagates
+      setPending(false);
     } catch (err: any) {
       setError(err.message || 'Google sign-in failed');
       setPending(false);
@@ -207,20 +250,58 @@ function LoginForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {mode === 'signup' && (
-          <div>
-            <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-200">Display name</label>
-            <div className="relative mt-1">
-              <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary-400" />
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="input-field w-full pl-9"
-                placeholder="How should we call you?"
-                autoComplete="name"
-              />
+          <>
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-200">Display name</label>
+              <div className="relative mt-1">
+                <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary-400" />
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="input-field w-full pl-9"
+                  placeholder="How should we call you?"
+                  autoComplete="nickname"
+                  minLength={2}
+                  maxLength={40}
+                  required
+                />
+              </div>
             </div>
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-200">
+                Profile photo <span className="font-normal text-secondary-400">(optional)</span>
+              </label>
+              {avatarPreview ? (
+                <div className="mt-2 flex items-center gap-4 rounded-2xl border border-secondary-200 p-3 dark:border-secondary-700">
+                  <img src={avatarPreview} alt="Selected profile preview" className="h-20 w-20 rounded-full object-cover" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-secondary-700 dark:text-secondary-200">{avatarFile?.name}</p>
+                    <button
+                      type="button"
+                      onClick={() => selectAvatar(null)}
+                      className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-red-600 hover:underline"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <label className="mt-2 flex cursor-pointer items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-secondary-200 px-4 py-5 text-sm font-semibold text-secondary-600 transition hover:border-primary/60 hover:bg-primary/5 dark:border-secondary-700 dark:text-secondary-300">
+                  <Camera className="h-5 w-5 text-primary" />
+                  Choose one profile image
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="sr-only"
+                    onChange={(event) => selectAvatar(event.target.files?.[0] || null)}
+                  />
+                </label>
+              )}
+              <p className="mt-1 text-xs text-secondary-400">JPEG, PNG, WebP or GIF · max 4 MB.</p>
+            </div>
+          </>
         )}
 
         <div>

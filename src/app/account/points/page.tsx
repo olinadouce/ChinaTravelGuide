@@ -6,6 +6,7 @@ import { AlertTriangle, ArrowLeft, Check, CheckCircle2, Coins, Copy, Gift, Loade
 import type { LucideIcon } from 'lucide-react';
 
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
+import { ProfileEditor } from '@/components/auth/ProfileEditor';
 import {
   POINTS_ACTION_LABELS,
   POINTS_RULES,
@@ -129,6 +130,8 @@ export default function PointsAccountPage() {
           Back to packages
         </Link>
 
+        <ProfileEditor key={`${user?.uid}:${user?.displayName}:${user?.photoURL}`} />
+
         <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_360px]">
           <div className="rounded-2xl border border-black/5 dark:border-white/10 bg-white dark:bg-secondary-900 p-6 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-4">
@@ -211,6 +214,7 @@ export default function PointsAccountPage() {
             <div className="mt-4 space-y-3 text-sm">
               <RuleRow label="Create account" points={POINTS_RULES.SIGNUP_BONUS} />
               <RuleRow label="Daily login" points={POINTS_RULES.DAILY_LOGIN} />
+              <RuleRow label="Publish community posts (daily maximum)" points={POINTS_RULES.CREATE_FORUM_POST} />
               <RuleRow label="Read a free guide" points={POINTS_RULES.BROWSE_FREE_GUIDE} />
               <RuleRow label="Save a free guide" points={POINTS_RULES.SAVE_FREE_GUIDE} />
               <RuleRow label="Invite a new friend" points={POINTS_RULES.INVITE_SIGNUP} />

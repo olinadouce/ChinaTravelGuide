@@ -1,10 +1,8 @@
 ﻿'use client';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Heart, MessageSquare, Calendar, User } from 'lucide-react';
 import { ForumPost } from '@/types';
-import { cn } from '@/lib/utils';
 
 interface ForumCardProps {
   post: ForumPost;
@@ -68,12 +66,10 @@ export function ForumCard({ post, index }: ForumCardProps) {
         <div className="mt-4 flex items-center justify-between border-t border-secondary-100 dark:border-secondary-700 pt-4">
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Image
+              <img
                 src={post.author.avatar}
                 alt={post.author.name}
-                width={32}
-                height={32}
-                className="rounded-full"
+                className="h-8 w-8 rounded-full object-cover"
               />
               {post.author.isMember && (
                 <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary">

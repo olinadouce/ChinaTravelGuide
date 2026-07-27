@@ -7,7 +7,7 @@ import { POINTS_RULES } from '@/lib/points-rules';
 import { cn } from '@/lib/utils';
 
 interface PointsEarnPanelProps {
-  citySlug: string;
+  guideSlug: string;
   cityName: string;
   freeUrl: string;
   wordUrl?: string;
@@ -16,15 +16,15 @@ interface PointsEarnPanelProps {
 const READ_SECONDS_REQUIRED = 180;
 const SCROLL_PERCENT_REQUIRED = 60;
 
-export function PointsEarnPanel({ citySlug, cityName, freeUrl, wordUrl }: PointsEarnPanelProps) {
+export function PointsEarnPanel({ guideSlug, cityName, freeUrl, wordUrl }: PointsEarnPanelProps) {
   const { isAuthenticated, user, earnPoints } = useAuth();
   const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [scrollPercent, setScrollPercent] = useState(0);
   const [pendingAction, setPendingAction] = useState<'browse_free_guide' | 'save_free_guide' | null>(null);
 
-  const browseKey = `browse_free_guide:${citySlug}`;
-  const saveKey = `save_free_guide:${citySlug}`;
+  const browseKey = `browse_free_guide:${guideSlug}`;
+  const saveKey = `save_free_guide:${guideSlug}`;
   const browseClaimed = !!user?.actionsUsed?.[browseKey];
   const saveClaimed = !!user?.actionsUsed?.[saveKey];
   const readTimeReady = elapsedSeconds >= READ_SECONDS_REQUIRED;
@@ -34,7 +34,7 @@ export function PointsEarnPanel({ citySlug, cityName, freeUrl, wordUrl }: Points
   useEffect(() => {
     if (!isAuthenticated || browseClaimed) return;
 
-    const storageKey = `ctg-read-seconds:${citySlug}`;
+    const storageKey = `ctg-read-seconds:${guideSlug}`;
     const storedSeconds = Number(window.localStorage.getItem(storageKey) ?? 0);
     setElapsedSeconds(Number.isFinite(storedSeconds) ? Math.max(0, storedSeconds) : 0);
 
@@ -48,7 +48,7 @@ export function PointsEarnPanel({ citySlug, cityName, freeUrl, wordUrl }: Points
     }, 1000);
 
     return () => window.clearInterval(intervalId);
-  }, [browseClaimed, citySlug, isAuthenticated]);
+  }, [browseClaimed, guideSlug, isAuthenticated]);
 
   useEffect(() => {
     if (!isAuthenticated || browseClaimed) return;
@@ -90,7 +90,7 @@ export function PointsEarnPanel({ citySlug, cityName, freeUrl, wordUrl }: Points
   ) => {
     setFeedback(null);
     setPendingAction(actionType);
-    const result = await earnPoints(actionType, { city: citySlug, note: `${label} - ${cityName}`, ...proof });
+    const result = await earnPoints(actionType, { city: guideSlug, note: `${label} - ${cityName}`, ...proof });
     setPendingAction(null);
     if (result.ok) {
       setFeedback({ ok: true, message: `+${points} points earned!` });
@@ -125,14 +125,14 @@ export function PointsEarnPanel({ citySlug, cityName, freeUrl, wordUrl }: Points
       const objectUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = objectUrl;
-      link.download = `${citySlug}-free-guide.${wordUrl ? 'docx' : 'doc'}`;
+      link.download = `${guideSlug}-free-guide.${wordUrl ? 'docx' : 'doc'}`;
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 
       const result = await earnPoints('save_free_guide', {
-        city: citySlug,
+        city: guideSlug,
         note: `Downloaded Word version - ${cityName}`,
         wordDownloaded: true,
       });

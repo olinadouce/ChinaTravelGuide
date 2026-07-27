@@ -144,7 +144,7 @@ export default function Navigation() {
                     )}
                   >
                     <img
-                      src={user?.photoURL ?? undefined}
+                      src={user?.photoURL || '/see-china-route-logo.svg'}
                       alt={user?.displayName ?? ''}
                       className="h-7 w-7 rounded-full ring-2 ring-white/40"
                     />
@@ -243,7 +243,7 @@ export default function Navigation() {
             {isAuthenticated ? (
               <div className="mb-2 flex items-center gap-3 rounded-2xl bg-stone-50 dark:bg-secondary-800 px-4 py-3">
                 <img
-                  src={user?.photoURL ?? undefined}
+                  src={user?.photoURL || '/see-china-route-logo.svg'}
                   alt={user?.displayName ?? ''}
                   className="h-9 w-9 rounded-full"
                 />

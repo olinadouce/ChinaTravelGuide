@@ -6,11 +6,40 @@ import { AlertCircle, Check, Loader2, Lock, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
 import type { ClientPackage } from '@/data/packages';
 import { auth } from '@/lib/firebase';
+import { materializeGuilinPaidGuide } from '@/lib/guilin-paid-guide';
 import { PackageHtmlFrame } from './PackageHtmlFrame';
 import { UnlockPanel } from './UnlockPanel';
 
 interface PaidIframeGateProps {
   pkg: ClientPackage;
+}
+
+const LEGACY_GUIDE_STYLES: Partial<Record<string, string>> = {
+  'henan-history': '/packages/paid-guide-css/henan-history.css',
+};
+
+/**
+ * Some legacy guides used Tailwind's browser CDN and scroll animations.
+ * Scripts stay disabled inside the package iframe, so replace the runtime
+ * stylesheet with a precompiled local file and reveal animated content.
+ */
+function prepareGuideHtml(html: string, slug: string) {
+  const staticHtml = materializeGuilinPaidGuide(html, slug);
+  const stylesheetPath = LEGACY_GUIDE_STYLES[slug];
+  if (!stylesheetPath) return staticHtml;
+
+  const stylesheetUrl = new URL(stylesheetPath, window.location.origin).href;
+  const staticStyles = [
+    `<link rel="stylesheet" href="${stylesheetUrl}">`,
+    '<style>.scroll-reveal{opacity:1!important;transform:none!important}</style>',
+  ].join('');
+
+  return staticHtml
+    .replace(
+      /<script\b[^>]*\bsrc=["']https:\/\/cdn\.tailwindcss\.com\/?["'][^>]*>\s*<\/script>/i,
+      ''
+    )
+    .replace(/<\/head>/i, `${staticStyles}</head>`);
 }
 
 /**
@@ -54,7 +83,7 @@ export function PaidIframeGate({ pkg }: PaidIframeGateProps) {
         throw new Error('The private guide could not be downloaded.');
       }
 
-      setPaidHtml(await guideResponse.text());
+      setPaidHtml(prepareGuideHtml(await guideResponse.text(), pkg.slug));
     } catch (error: any) {
       setPaidHtml('');
       setGuideError(error?.message || 'The private guide could not be loaded.');
