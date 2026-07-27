@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "China Travel Stories and Traveler Experiences",
+  title: "China Travel Planning Tools",
   description:
-    "Read and share China travel experiences, destination ideas, food discoveries, route feedback, and practical tips from travelers.",
-  alternates: { canonical: "/forum" },
+    "Use practical China travel planning tools: budget estimators, language phrasebooks, and route or timing calculators built for independent travelers.",
+  alternates: { canonical: "/tools" },
 };
 
-export default function ForumLayout({
+export default function ToolsLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return children;
