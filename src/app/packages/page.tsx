@@ -9,9 +9,12 @@ import { POINTS_RULES } from '@/lib/points-rules';
 import type { ThemeId } from '@/types';
 
 export const metadata = {
-  title: 'Travel Packages - China Travel Guide',
+  title: "China Itineraries and Travel Guide Packages",
   description:
-    'Hand-crafted China travel guides organised into four themes: landscape, history, themed routes and IShowSpeed livestream highlights. Free preview always; sign in to unlock the full version with points.',
+    "Browse free previews and detailed China travel guide packages covering nature routes, major cities, transport, accommodation, food, and practical planning.",
+  alternates: {
+    canonical: "/packages",
+  },
 };
 
 const themeMeta: Array<{ id: ThemeId; shortName: string }> = [
