@@ -13,6 +13,33 @@ interface PaidIframeGateProps {
   pkg: ClientPackage;
 }
 
+const LEGACY_GUIDE_STYLES: Partial<Record<string, string>> = {
+  'henan-history': '/packages/paid-guide-css/henan-history.css',
+};
+
+/**
+ * Some legacy guides used Tailwind's browser CDN and scroll animations.
+ * Scripts stay disabled inside the package iframe, so replace the runtime
+ * stylesheet with a precompiled local file and reveal animated content.
+ */
+function prepareGuideHtml(html: string, slug: string) {
+  const stylesheetPath = LEGACY_GUIDE_STYLES[slug];
+  if (!stylesheetPath) return html;
+
+  const stylesheetUrl = new URL(stylesheetPath, window.location.origin).href;
+  const staticStyles = [
+    `<link rel="stylesheet" href="${stylesheetUrl}">`,
+    '<style>.scroll-reveal{opacity:1!important;transform:none!important}</style>',
+  ].join('');
+
+  return html
+    .replace(
+      /<script\b[^>]*\bsrc=["']https:\/\/cdn\.tailwindcss\.com\/?["'][^>]*>\s*<\/script>/i,
+      ''
+    )
+    .replace(/<\/head>/i, `${staticStyles}</head>`);
+}
+
 /**
  * Requests a short-lived, read-only URL only after the account has unlocked
  * the package, then downloads the guide directly from private Blob storage.
@@ -54,7 +81,7 @@ export function PaidIframeGate({ pkg }: PaidIframeGateProps) {
         throw new Error('The private guide could not be downloaded.');
       }
 
-      setPaidHtml(await guideResponse.text());
+      setPaidHtml(prepareGuideHtml(await guideResponse.text(), pkg.slug));
     } catch (error: any) {
       setPaidHtml('');
       setGuideError(error?.message || 'The private guide could not be loaded.');
