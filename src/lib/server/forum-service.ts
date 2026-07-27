@@ -101,6 +101,30 @@ function millis(value: unknown): number {
   return Date.now();
 }
 
+export function forumRewardDay(value: Date | number = new Date()): string {
+  const date = value instanceof Date ? value : new Date(value);
+  return date.toISOString().slice(0, 10);
+}
+
+export function forumPostRewardAvailable({
+  lastRewardDate,
+  lastPostAt,
+  now,
+}: {
+  lastRewardDate?: unknown;
+  lastPostAt: number;
+  now: number;
+}): boolean {
+  const rewardDay = forumRewardDay(now);
+  if (lastRewardDate === rewardDay) return false;
+  // Before the daily cap existed, rewarded posts did not write a daily
+  // marker. A same-day rate-limit timestamp closes that migration gap.
+  if (!lastRewardDate && lastPostAt > 0 && forumRewardDay(lastPostAt) === rewardDay) {
+    return false;
+  }
+  return true;
+}
+
 function serializePost(id: string, data: DocumentData): ForumPost {
   const images = Array.isArray(data.images)
     ? data.images.filter((image: unknown): image is string => typeof image === 'string').slice(0, 9)
@@ -187,7 +211,7 @@ export async function getForumThread(slug: string): Promise<{
 export async function createForumPost(
   identity: ForumIdentity,
   input: CreatePostInput
-): Promise<ForumPost> {
+): Promise<{ post: ForumPost; pointsAwarded: number }> {
   const title = cleanSingleLine(typeof input.title === 'string' ? input.title : '', 120);
   const content = cleanContent(typeof input.content === 'string' ? input.content : '', 5000);
   const tags = normalizeTags(input.tags);
@@ -226,6 +250,7 @@ export async function createForumPost(
     ...(featuredImage ? { featuredImage } : {}),
     ...(images.length ? { images } : {}),
   };
+  let pointsAwarded = 0;
 
   // Rate-limit state and the new post are committed together. Separate writes
   // would allow two near-simultaneous requests to both pass the cooldown.
@@ -243,22 +268,38 @@ export async function createForumPost(
       throw new ForumInputError('Your points profile is not ready yet. Please try again.', 409);
     }
     const userData = userSnapshot.data() || {};
-    const nextPoints = Number(userData.points ?? 0) + POINTS_RULES.CREATE_FORUM_POST;
+    const rewardDay = forumRewardDay(now.toMillis());
+    pointsAwarded = forumPostRewardAvailable({
+      lastRewardDate: userData.lastForumPostRewardDate,
+      lastPostAt,
+      now: now.toMillis(),
+    })
+      ? POINTS_RULES.CREATE_FORUM_POST
+      : 0;
 
     transaction.create(postRef, { ...post, createdAt: now, authorId: identity.uid });
     transaction.set(rateRef, { lastPostAt: now, updatedAt: now }, { merge: true });
-    transaction.update(userRef, { points: nextPoints, updatedAt: now });
-    transaction.create(userRef.collection('ledger').doc(`forum_post_${slug}`), {
-      actionType: 'forum_post',
-      pointsChange: POINTS_RULES.CREATE_FORUM_POST,
-      userId: identity.uid,
-      relatedPostSlug: slug,
-      createdAt: now,
-      status: 'confirmed',
-      note: `Published “${title}”`,
+    transaction.update(userRef, {
+      ...(pointsAwarded > 0
+        ? { points: Number(userData.points ?? 0) + pointsAwarded }
+        : {}),
+      lastForumPostRewardDate: rewardDay,
+      updatedAt: now,
     });
+    if (pointsAwarded > 0) {
+      transaction.create(userRef.collection('ledger').doc(`forum_post_daily_${rewardDay}`), {
+        actionType: 'forum_post',
+        pointsChange: pointsAwarded,
+        userId: identity.uid,
+        relatedPostSlug: slug,
+        rewardDate: rewardDay,
+        createdAt: now,
+        status: 'confirmed',
+        note: `Daily post reward — published “${title}”`,
+      });
+    }
   });
-  return post;
+  return { post, pointsAwarded };
 }
 
 export async function createForumComment(

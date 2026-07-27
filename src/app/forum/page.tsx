@@ -235,7 +235,7 @@ function ForumPageContent() {
                   Share a useful question, route, experience, or practical travel tip.
                 </p>
                 <p className="mt-2 text-sm font-semibold text-jade">
-                  Earn +{POINTS_RULES.CREATE_FORUM_POST} points when your post is published.
+                  Earn up to +{POINTS_RULES.CREATE_FORUM_POST} points per day from publishing posts.
                 </p>
               </div>
               <button onClick={() => setShowCreateModal(false)} className="rounded-full p-2 hover:bg-secondary-100 dark:hover:bg-secondary-800" aria-label="Close">

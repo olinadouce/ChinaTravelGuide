@@ -37,7 +37,7 @@ export const POINTS_RULES = {
   /** Daily login bonus. */
   DAILY_LOGIN: 5,
 
-  /** Reward for each successfully published community post. */
+  /** Maximum forum-post reward per user per UTC calendar day. */
   CREATE_FORUM_POST: 20,
 
   // === SPENDING ===
@@ -72,6 +72,8 @@ export const POINTS_RULES = {
     INVITE_CODE_ONCE_PER_NEW_ACCOUNT: true,
     /** Share reward requires external click verification and manual review. */
     SHARE_REQUIRES_EXTERNAL_CLICK: true,
+    /** Only the first successfully published post each UTC day earns points. */
+    FORUM_POST_REWARD_ONCE_PER_DAY: true,
   },
 } as const;
 

@@ -7,7 +7,6 @@ import {
   uploadForumImage,
   validateOwnedForumImages,
 } from '@/lib/server/forum-image-storage';
-import { POINTS_RULES } from '@/lib/points-rules';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -48,9 +47,9 @@ export async function POST(request: NextRequest) {
       body = await request.json();
       body.images = await validateOwnedForumImages(identity.uid, body.images);
     }
-    const post = await createForumPost(identity, body);
+    const result = await createForumPost(identity, body);
     return NextResponse.json(
-      { post, pointsAwarded: POINTS_RULES.CREATE_FORUM_POST },
+      result,
       { status: 201, headers: { 'Cache-Control': 'no-store' } }
     );
   } catch (error) {
