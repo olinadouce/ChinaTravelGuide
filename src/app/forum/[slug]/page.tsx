@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 
 import { useAuth } from '@/components/auth/FirebaseAuthProvider';
+import { ForumImageGallery } from '@/components/ui/ForumImageGallery';
 import { forumComments, forumPosts } from '@/data/forum';
 import { authenticatedDelete, authenticatedGet, authenticatedPost } from '@/lib/authenticated-api';
 import { cn } from '@/lib/utils';
@@ -120,6 +121,11 @@ export default function ForumPostPage() {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit',
   });
+  const postImages = post.images?.length
+    ? post.images
+    : post.featuredImage
+      ? [post.featuredImage]
+      : [];
 
   return (
     <div className="min-h-screen bg-[#f7f1e8] pt-20 dark:bg-[#0b1220]">
@@ -135,12 +141,7 @@ export default function ForumPostPage() {
         )}
 
         <article className="overflow-hidden rounded-[28px] bg-white shadow-sm dark:bg-secondary-900">
-          {post.featuredImage && (
-            <div className="relative h-80 w-full">
-              {/* User uploads are validated and streamed through our image proxy. */}
-              <img src={post.featuredImage} alt={post.title} className="h-full w-full object-cover" />
-            </div>
-          )}
+          <ForumImageGallery images={postImages} title={post.title} />
           <div className="p-6 sm:p-8">
             <div className="flex items-center gap-2 text-sm text-secondary-500 dark:text-secondary-400">
               <Calendar className="h-4 w-4" /> <span>{formatDate(post.createdAt)}</span>

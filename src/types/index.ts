@@ -100,6 +100,8 @@ export interface ForumPost {
   commentsCount: number;
   tags: string[];
   featuredImage?: string;
+  /** All post images in display order. featuredImage remains for old posts/cards. */
+  images?: string[];
 }
 
 export interface ForumComment {

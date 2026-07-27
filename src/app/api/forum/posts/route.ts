@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { verifyRequestUser } from '@/lib/server/firebase-admin';
 import { createForumPost, ForumInputError, listForumPosts } from '@/lib/server/forum-service';
-import { deleteForumImage, uploadForumImage } from '@/lib/server/forum-image-storage';
+import {
+  deleteForumImage,
+  uploadForumImage,
+  validateOwnedForumImages,
+} from '@/lib/server/forum-image-storage';
+import { POINTS_RULES } from '@/lib/points-rules';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -18,7 +23,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  let uploadedPathname: string | null = null;
+  let serverUploadedPathname: string | null = null;
   try {
     const identity = await verifyRequestUser(request.headers.get('authorization'));
     if (!identity) return NextResponse.json({ error: 'Valid sign-in is required.' }, { status: 401 });
@@ -35,17 +40,22 @@ export async function POST(request: NextRequest) {
       const image = form.get('image');
       if (image instanceof File && image.size > 0) {
         const uploaded = await uploadForumImage(identity.uid, image);
-        uploadedPathname = uploaded.pathname;
+        serverUploadedPathname = uploaded.pathname;
         body.featuredImage = uploaded.proxyUrl;
+        body.images = [uploaded.proxyUrl];
       }
     } else {
       body = await request.json();
+      body.images = await validateOwnedForumImages(identity.uid, body.images);
     }
     const post = await createForumPost(identity, body);
-    return NextResponse.json({ post }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json(
+      { post, pointsAwarded: POINTS_RULES.CREATE_FORUM_POST },
+      { status: 201, headers: { 'Cache-Control': 'no-store' } }
+    );
   } catch (error) {
-    if (uploadedPathname) {
-      await deleteForumImage(uploadedPathname).catch((cleanupError) =>
+    if (serverUploadedPathname) {
+      await deleteForumImage(serverUploadedPathname).catch((cleanupError) =>
         console.error('[Forum] Failed to clean up orphan image:', cleanupError)
       );
     }

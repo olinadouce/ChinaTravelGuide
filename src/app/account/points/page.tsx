@@ -211,6 +211,7 @@ export default function PointsAccountPage() {
             <div className="mt-4 space-y-3 text-sm">
               <RuleRow label="Create account" points={POINTS_RULES.SIGNUP_BONUS} />
               <RuleRow label="Daily login" points={POINTS_RULES.DAILY_LOGIN} />
+              <RuleRow label="Publish a community post" points={POINTS_RULES.CREATE_FORUM_POST} />
               <RuleRow label="Read a free guide" points={POINTS_RULES.BROWSE_FREE_GUIDE} />
               <RuleRow label="Save a free guide" points={POINTS_RULES.SAVE_FREE_GUIDE} />
               <RuleRow label="Invite a new friend" points={POINTS_RULES.INVITE_SIGNUP} />

@@ -37,6 +37,9 @@ export const POINTS_RULES = {
   /** Daily login bonus. */
   DAILY_LOGIN: 5,
 
+  /** Reward for each successfully published community post. */
+  CREATE_FORUM_POST: 20,
+
   // === SPENDING ===
 
   /** Cost to unlock a Full Guide. */
@@ -82,6 +85,7 @@ export type PointsActionType =
   | 'invite_full_guide_unlock'
   | 'submit_feedback'
   | 'daily_login'
+  | 'forum_post'
   | 'redeem_full_guide'
   | 'admin_adjust';
 
@@ -107,6 +111,7 @@ export const POINTS_ACTION_LABELS: Record<PointsActionType, string> = {
   invite_full_guide_unlock: 'Friend unlocked Full Guide',
   submit_feedback: 'Feedback submitted',
   daily_login: 'Daily login',
+  forum_post: 'Published a forum post',
   redeem_full_guide: 'Unlock Full Guide',
   admin_adjust: 'Admin adjustment',
 };

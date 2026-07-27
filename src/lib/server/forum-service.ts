@@ -5,6 +5,7 @@ import {
 } from 'firebase-admin/firestore';
 
 import { forumComments, forumPosts } from '@/data/forum';
+import { POINTS_RULES } from '@/lib/points-rules';
 import type { ForumAuthor, ForumComment, ForumNotification, ForumPost } from '@/types';
 
 import { adminDb } from './firebase-admin';
@@ -31,6 +32,7 @@ type CreatePostInput = {
   content?: unknown;
   tags?: unknown;
   featuredImage?: unknown;
+  images?: unknown;
 };
 
 function authorFromIdentity(identity: ForumIdentity): ForumAuthor {
@@ -85,6 +87,11 @@ function millis(value: unknown): number {
 }
 
 function serializePost(id: string, data: DocumentData): ForumPost {
+  const images = Array.isArray(data.images)
+    ? data.images.filter((image: unknown): image is string => typeof image === 'string').slice(0, 9)
+    : [];
+  const featuredImage = images[0]
+    || (typeof data.featuredImage === 'string' ? data.featuredImage : undefined);
   return {
     id,
     slug: String(data.slug || id),
@@ -95,9 +102,8 @@ function serializePost(id: string, data: DocumentData): ForumPost {
     likesCount: Number(data.likesCount || 0),
     commentsCount: Number(data.commentsCount || 0),
     tags: Array.isArray(data.tags) ? data.tags.filter((tag: unknown) => typeof tag === 'string') : [],
-    ...(typeof data.featuredImage === 'string' && data.featuredImage
-      ? { featuredImage: data.featuredImage }
-      : {}),
+    ...(featuredImage ? { featuredImage } : {}),
+    ...(images.length ? { images } : {}),
   };
 }
 
@@ -170,9 +176,18 @@ export async function createForumPost(
   const title = cleanSingleLine(typeof input.title === 'string' ? input.title : '', 120);
   const content = cleanContent(typeof input.content === 'string' ? input.content : '', 5000);
   const tags = normalizeTags(input.tags);
-  const featuredImage = typeof input.featuredImage === 'string' && input.featuredImage.startsWith('/api/forum/images/forum-images/')
-    ? input.featuredImage
-    : undefined;
+  const images = Array.isArray(input.images)
+    ? input.images
+        .filter((image): image is string =>
+          typeof image === 'string' && image.startsWith('/api/forum/images/forum-images/')
+        )
+        .slice(0, 9)
+    : [];
+  const featuredImage = images[0]
+    || (typeof input.featuredImage === 'string'
+      && input.featuredImage.startsWith('/api/forum/images/forum-images/')
+      ? input.featuredImage
+      : undefined);
   if (title.length < 5) throw new ForumInputError('Title must be at least 5 characters.');
   if (content.length < 20) throw new ForumInputError('Post content must be at least 20 characters.');
   validateLinks(`${title}\n${content}`);
@@ -193,18 +208,39 @@ export async function createForumPost(
     likesCount: 0,
     commentsCount: 0,
     ...(featuredImage ? { featuredImage } : {}),
+    ...(images.length ? { images } : {}),
   };
 
   // Rate-limit state and the new post are committed together. Separate writes
   // would allow two near-simultaneous requests to both pass the cooldown.
   await db.runTransaction(async (transaction) => {
-    const rateSnapshot = await transaction.get(rateRef);
+    const userRef = db.collection('users').doc(identity.uid);
+    const [rateSnapshot, userSnapshot] = await Promise.all([
+      transaction.get(rateRef),
+      transaction.get(userRef),
+    ]);
     const lastPostAt = millis(rateSnapshot.data()?.lastPostAt || 0);
     if (Date.now() - lastPostAt < POST_COOLDOWN_MS) {
       throw new ForumInputError('Please wait 30 seconds before creating another post.', 429);
     }
+    if (!userSnapshot.exists) {
+      throw new ForumInputError('Your points profile is not ready yet. Please try again.', 409);
+    }
+    const userData = userSnapshot.data() || {};
+    const nextPoints = Number(userData.points ?? 0) + POINTS_RULES.CREATE_FORUM_POST;
+
     transaction.create(postRef, { ...post, createdAt: now, authorId: identity.uid });
     transaction.set(rateRef, { lastPostAt: now, updatedAt: now }, { merge: true });
+    transaction.update(userRef, { points: nextPoints, updatedAt: now });
+    transaction.create(userRef.collection('ledger').doc(`forum_post_${slug}`), {
+      actionType: 'forum_post',
+      pointsChange: POINTS_RULES.CREATE_FORUM_POST,
+      userId: identity.uid,
+      relatedPostSlug: slug,
+      createdAt: now,
+      status: 'confirmed',
+      note: `Published “${title}”`,
+    });
   });
   return post;
 }
@@ -411,5 +447,9 @@ export async function deleteForumPost(uid: string, slug: string) {
   notificationsSnapshot.docs.forEach((entry) => writer.delete(entry.ref));
   writer.delete(postRef);
   await writer.close();
-  return { featuredImage: typeof data.featuredImage === 'string' ? data.featuredImage : undefined };
+  const images = Array.isArray(data.images)
+    ? data.images.filter((image: unknown): image is string => typeof image === 'string')
+    : [];
+  const featuredImage = typeof data.featuredImage === 'string' ? data.featuredImage : undefined;
+  return { images: images.length ? images : featuredImage ? [featuredImage] : [] };
 }
