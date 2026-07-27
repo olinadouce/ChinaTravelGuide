@@ -5,8 +5,12 @@ import { BookCityGrid } from '@/components/book/BookCityGrid';
 import { affiliateProducts, bookingCities } from '@/data/bookings';
 
 export const metadata: Metadata = {
-  title: 'Book China - Hotels, Attractions & Tours',
-  description: 'Browse curated hotels, attractions, day tours, food experiences and transfers across China.',
+  title: "Book China Hotels, Tickets, Tours and Transfers",
+  description:
+    "Find curated third-party booking options for China hotels, attraction tickets, local tours, transport, airport transfers, dining experiences, and eSIMs.",
+  alternates: {
+    canonical: "/book",
+  },
 };
 
 export default async function BookPage({

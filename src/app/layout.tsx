@@ -8,11 +8,49 @@ import { AITravelAssistant } from "@/components/ai/AITravelAssistant";
 import { FirebaseAnalytics } from "@/components/analytics/FirebaseAnalytics";
 
 export const metadata: Metadata = {
-  title: "China Travel Guide | Travel China with Confidence",
+  metadataBase: new URL("https://cchinaroute.com"),
+  title: {
+    default: "See China Route | Practical China Travel Guides",
+    template: "%s | See China Route",
+  },
   description:
-    "A modern China inbound-travel website for overseas visitors, with destinations, routes, practical guidance, and planning tools.",
+    "Plan an independent trip to China with curated routes, practical travel guidance, community stories, and trusted third-party booking links.",
+  applicationName: "See China Route",
   keywords:
-    "China travel, China itinerary, China tourism website, overseas visitors to China, Beijing, Shanghai, Xi'an, Chengdu",
+    "China travel, China itinerary, China travel guide, international travelers, China booking links, China practical information",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: "https://cchinaroute.com",
+    siteName: "See China Route",
+    title: "See China Route | Practical China Travel Guides",
+    description:
+      "Curated China routes, practical guidance, community stories, and trusted booking links for international travelers.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "See China Route | Practical China Travel Guides",
+    description:
+      "Curated China routes, practical guidance, community stories, and trusted booking links for international travelers.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+
+  // After obtaining the Search Console HTML-tag token, uncomment and replace:
+  // verification: {
+  //   google: "REPLACE_WITH_GOOGLE_SEARCH_CONSOLE_TOKEN",
+  // },
 };
 
 const themeBootstrapScript = `
