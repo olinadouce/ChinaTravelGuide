@@ -32,9 +32,10 @@ export function getAiConfig() {
   };
 }
 
-export const NOT_FOUND_ZH = '该问题还未收录';
+export const NOT_FOUND_ZH =
+  '对不起，该问题还未收录，暂时无法回答，我们会记录您的问题并持续更新知识库。';
 export const NOT_FOUND_EN =
-  'This question has not been added to our knowledge base yet.';
+  'Sorry, this question is not in our knowledge base yet, so we cannot answer it for now. We have recorded your question and will keep updating our guides.';
 
 export const ERROR_ZH = '暂时无法连接AI助手，请稍后再试。';
 export const ERROR_EN =

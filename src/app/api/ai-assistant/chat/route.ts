@@ -186,14 +186,20 @@ export async function POST(request: NextRequest) {
 
     const model = await generateStructuredAnswer({ message, history, chunks });
 
+    // Clarification is only allowed from resolveQueryScope (missing subject).
+    // If the model asks for clarification after we already had enough scope to
+    // search, it almost always means the topic is outside the knowledge base
+    // (e.g. Xinjiang) — return not_found instead of looping questions.
     if (model.needsClarification) {
-      return NextResponse.json({
-        status: 'clarification',
-        answer:
-          model.clarificationQuestion.trim() ||
-          (lang === 'zh' ? CLARIFICATION_ZH : CLARIFICATION_EN),
-        sources: [],
+      await recordUnansweredQuestion({
+        question: message,
+        language: lang,
+        detectedCity: scope.city,
+        packageId: scope.packageId,
+        userId: entitlements.userId,
+        topRetrievalScore: topScore,
       });
+      return NextResponse.json(notFound(lang));
     }
 
     const validated = validateModelAnswer(model, chunks);
