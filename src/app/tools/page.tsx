@@ -22,7 +22,7 @@ export default function ToolsPage() {
               </span>
             </h1>
             <p className="mt-6 text-lg leading-8 text-secondary-600 dark:text-secondary-300">
-              These modules help travelers estimate budgets, prepare language basics, and understand route or timing tradeoffs.
+              These modules help you estimate budgets, prepare language basics, and understand route or timing tradeoffs.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm">
               {[`${travelTools.length} useful tools`, 'Fast planning help', 'Built for China travel'].map((label) => (
