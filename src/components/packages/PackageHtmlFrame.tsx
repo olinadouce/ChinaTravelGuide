@@ -15,6 +15,20 @@ interface PackageHtmlFrameProps {
 }
 
 /**
+ * Some paid guides ship with anchor links that point at placeholder hashes
+ * (#hotel-detail, …). With allow-popups enabled these open a new tab that goes
+ * nowhere, leaving the traveller staring at a blank page. Inject a small
+ * bridge that finds any <a> with an empty / hash-only href, walks up the DOM
+ * for the nearest heading, and rewrites the href to a Booking.com search
+ * so the new tab lands on a real page.
+ *
+ * Only links whose href is currently empty / a fragment are touched, so
+ * guides that already carry real URLs (or were materialised by the Guilin
+ * helper) are left alone.
+ */
+const PAID_GUIDE_LINK_FALLBACK = `<script>(function(){function r(){var l=document.querySelectorAll('a[href]');l.forEach(function(a){var h=a.getAttribute('href')||'';if(!h||h.charAt(0)==='#'){var n='';var p=a;while(p&&p!==document.body){var hd=p.querySelector('h1,h2,h3,h4,h5,h6');if(hd){n=(hd.textContent||'').trim();break;}p=p.parentElement;}if(n){a.setAttribute('href','https://www.booking.com/searchresults.html?ss='+encodeURIComponent(n));a.setAttribute('target','_blank');a.setAttribute('rel','noopener noreferrer');}}});}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',r);}else{r();}setTimeout(r,200);setTimeout(r,800);})();</script>`;
+
+/**
  * Renders a complete HTML travel package in an iframe, preserving the
  * original layout, styles and assets. A Blob URL is used instead of srcDoc
  * because several paid guides contain more than 20 MB of embedded images.
@@ -38,7 +52,7 @@ export function PackageHtmlFrame({
     if (!iframe || !html) return;
 
     const documentUrl = URL.createObjectURL(
-      new Blob([html], { type: 'text/html;charset=utf-8' })
+      new Blob([PAID_GUIDE_LINK_FALLBACK + html], { type: 'text/html;charset=utf-8' })
     );
     iframe.src = documentUrl;
 
