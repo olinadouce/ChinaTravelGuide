@@ -15,18 +15,19 @@ interface PackageHtmlFrameProps {
 }
 
 /**
- * Some paid guides ship with anchor links that point at placeholder hashes
- * (#hotel-detail, …). With allow-popups enabled these open a new tab that goes
+ * Some paid guides ship with placeholder navigation that point at empty
+ * hashes (#hotel-detail, …) or are bare arrow buttons with no destination
+ * at all. Once allow-popups is enabled these open a new tab that goes
  * nowhere, leaving the traveller staring at a blank page. Inject a small
- * bridge that finds any <a> with an empty / hash-only href, walks up the DOM
- * for the nearest heading (or other named element), and rewrites the href to
- * a Booking.com search so the new tab lands on a real page.
+ * bridge that removes any <a> with an empty / hash-only href and any
+ * bare chevron-only button so the broken controls disappear instead of
+ * silently failing.
  *
- * Only links whose href is currently empty / a fragment are touched, so
- * guides that already carry real URLs (or were materialised by the Guilin
- * helper) are left alone.
+ * Links with real http(s), mailto, or tel URLs are left alone, and
+ * guides that already carry valid URLs (or were materialised by the
+ * Guilin helper) are untouched.
  */
-const PAID_GUIDE_LINK_FALLBACK = `<script>(function(){function pickName(a){var n='';var p=a;while(p&&p!==document.body){var hd=p.querySelector('h1,h2,h3,h4,h5,h6');if(hd){n=(hd.textContent||'').trim();if(n.length>1)return n;}var c=p.querySelector('[class*="name" i],[class*="title" i],[class*="hotel" i],[class*="stay" i],[class*="heading" i]');if(c){n=(c.textContent||'').trim();if(n.length>1)return n;}p=p.parentElement;}var card=a.closest('article,[class*="card" i],[class*="item" i]');if(card){var t=card.querySelector('h1,h2,h3,h4,h5,h6,[class*="name" i],[class*="title" i]');if(t){n=(t.textContent||'').trim();if(n.length>1)return n;}}return (a.getAttribute('aria-label')||a.textContent||'').trim();}function r(){var l=document.querySelectorAll('a[href]');l.forEach(function(a){var h=a.getAttribute('href')||'';if(h&&!/^https?:\\/\\//i.test(h)&&!/^mailto:/i.test(h)&&!/^tel:/i.test(h)){h='';}if(!h){var n=pickName(a);if(n&&n.length>1){a.setAttribute('href','https://www.booking.com/searchresults.html?ss='+encodeURIComponent(n));a.setAttribute('target','_blank');a.setAttribute('rel','noopener noreferrer');}}});}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',r);}else{r();}setTimeout(r,100);setTimeout(r,500);setTimeout(r,1500);})();</script>`;
+const PAID_GUIDE_LINK_FALLBACK = `<script>(function(){function kill(el){if(!el||el.dataset.ctgKilled==='1')return;el.dataset.ctgKilled='1';el.style.display='none';el.style.pointerEvents='none';el.setAttribute('aria-hidden','true');el.removeAttribute('href');}function isPlaceholder(h){if(!h)return true;if(h.charAt(0)==='#')return true;return false;}function run(){var links=document.querySelectorAll('a[href]');links.forEach(function(a){var h=a.getAttribute('href')||'';var isReal=/^https?:\\/\\//i.test(h)||/^mailto:/i.test(h)||/^tel:/i.test(h);if(!isReal&&isPlaceholder(h))kill(a);});var arrowPattern=/^[\\s\\u00A0›»‹«→←↑↓►◄]+$/;document.querySelectorAll('button,a,[role="button"]').forEach(function(el){if(el.tagName==='A'&&el.dataset.ctgKilled==='1')return;var t=(el.textContent||'').replace(/\\u00A0/g,'').trim();if(arrowPattern.test(t)){var hasRealHref=false;if(el.tagName==='A'){var hh=el.getAttribute('href')||'';if(/^https?:\\/\\//i.test(hh)||/^mailto:/i.test(hh)||/^tel:/i.test(hh))hasRealHref=true;}if(!hasRealHref)kill(el);}});}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',run);}else{run();}setTimeout(run,100);setTimeout(run,500);setTimeout(run,1500);})();</script>`;
 
 /**
  * Renders a complete HTML travel package in an iframe, preserving the
