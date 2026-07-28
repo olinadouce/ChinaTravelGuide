@@ -4340,8 +4340,8 @@ export const travelTools: SiteTool[] = [
   },
   {
     slug: 'phrases',
-    title: 'Chinese Translator',
-    description: 'Translate Simplified Chinese into your chosen language, then copy it or play it aloud.',
+    title: 'Universal Translator',
+    description: 'Translate any language into the language you need, then copy it or play it aloud. Auto-detect or pick a source language.',
     href: '/tools/phrases',
     status: 'live',
   },
