@@ -117,7 +117,7 @@ export function PackageHtmlFrame({
       <iframe
         ref={ref}
         title={title}
-        sandbox="allow-same-origin"
+        sandbox="allow-same-origin allow-scripts"
         className="block w-full border-0 bg-white dark:bg-secondary-900"
         style={{ height: expanded ? '100%' : `${height}px` }}
       />
