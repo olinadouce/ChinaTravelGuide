@@ -77,6 +77,28 @@ function safeLink(value: unknown) {
   return /^https?:\/\//i.test(url) ? escapeHtml(url) : '#';
 }
 
+/**
+ * Some stay entries ship without a direct booking URL. Fall back to a generic
+ * Booking.com search so the "Check current rooms" button still leads the
+ * traveller to the property's available rooms rather than a dead link.
+ */
+function bookingSearchUrl(stay: JsonRecord) {
+  const name = text(stay.name);
+  if (!name) return '#';
+  const cityHint =
+    typeof stay.group === 'string' && stay.group
+      ? stay.group.replace(/\s*base\s*$/i, '')
+      : '';
+  const query = cityHint ? `${name} ${cityHint}` : name;
+  return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(query)}`;
+}
+
+function stayHref(stay: JsonRecord) {
+  const direct = text(stay.url);
+  if (/^https?:\/\//i.test(direct)) return escapeHtml(direct);
+  return bookingSearchUrl(stay);
+}
+
 function renderBadges(value: unknown) {
   if (!Array.isArray(value)) return '';
   return value.map((item) => `<span class="guilin-static-badge">${escapeHtml(item)}</span>`).join('');
@@ -152,7 +174,7 @@ function renderStays(html: string) {
                 <p class="guilin-static-budget">${escapeHtml(stay.budget)}</p>
                 <div class="guilin-static-badges">${renderBadges(stay.tags)}</div>
                 <p>${escapeHtml(stay.why)}</p>
-                <a href="${safeLink(stay.url)}" target="_blank" rel="noopener noreferrer">Check current rooms</a>
+                <a href="${stayHref(stay)}" target="_blank" rel="noopener noreferrer">Check current rooms</a>
               </div>
             </article>`
         )
