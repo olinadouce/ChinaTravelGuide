@@ -60,7 +60,7 @@ export default function Footer() {
               <li className="flex items-center gap-3">
                 <PhoneCall className="h-5 w-5 flex-shrink-0 text-primary" />
                 <a href="tel:+85684971668" className="text-secondary-300 transition-colors hover:text-white">
-                  +856 84971668
+                  +852 84971668
                 </a>
               </li>
             </ul>
