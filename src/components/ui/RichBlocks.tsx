@@ -215,9 +215,10 @@ function StepsBlock({
               {index < steps.length - 1 ? (
                 <div
                   aria-hidden="true"
-                  className="hidden shrink-0 self-center px-1 text-2xl font-light text-secondary-400 lg:flex"
+                  className="hidden shrink-0 self-center px-1 text-2xl font-light leading-none text-secondary-400 lg:flex"
                 >
-                  鈫?                </div>
+                  →
+                </div>
               ) : null}
             </Fragment>
           );
