@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, Expand, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Expand, ImageIcon, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ type ForumImageGalleryProps = {
 export function ForumImageGallery({ images, title }: ForumImageGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
   const touchStartX = useRef<number | null>(null);
 
   const showPrevious = useCallback(() => {
@@ -40,6 +41,18 @@ export function ForumImageGallery({ images, title }: ForumImageGalleryProps) {
 
   if (images.length === 0) return null;
 
+  const handleImageError = (src: string) => {
+    setBrokenImages((current) => {
+      if (current.has(src)) return current;
+      const next = new Set(current);
+      next.add(src);
+      return next;
+    });
+  };
+
+  const visibleImages = images.filter((src) => !brokenImages.has(src));
+  const activeSrc = visibleImages[Math.min(activeIndex, visibleImages.length - 1)];
+
   const handleTouchStart = (event: React.TouchEvent) => {
     touchStartX.current = event.touches[0]?.clientX ?? null;
   };
@@ -60,32 +73,44 @@ export function ForumImageGallery({ images, title }: ForumImageGalleryProps) {
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          <button
-            type="button"
-            onClick={() => setLightboxOpen(true)}
-            className="h-full w-full cursor-zoom-in"
-            aria-label={`Open image ${activeIndex + 1} of ${images.length}`}
-          >
-            <img
-              src={images[activeIndex]}
-              alt={`${title} — image ${activeIndex + 1}`}
-              className="h-full w-full object-contain"
-            />
-          </button>
+          {visibleImages.length === 0 ? (
+            <div
+              className="flex h-full w-full flex-col items-center justify-center gap-2 text-secondary-300"
+              role="img"
+              aria-label="Image unavailable"
+            >
+              <ImageIcon className="h-12 w-12 opacity-50" aria-hidden="true" />
+              <span className="text-sm font-medium">Image unavailable</span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setLightboxOpen(true)}
+              className="h-full w-full cursor-zoom-in"
+              aria-label={`Open image ${activeIndex + 1} of ${visibleImages.length}`}
+            >
+              <img
+                src={activeSrc}
+                alt={`${title} — image ${activeIndex + 1}`}
+                className="h-full w-full object-contain"
+                onError={() => activeSrc && handleImageError(activeSrc)}
+              />
+            </button>
+          )}
           <span className="pointer-events-none absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-black/65 px-3 py-1.5 text-xs font-bold text-white">
             <Expand className="h-3.5 w-3.5" />
-            {activeIndex + 1}/{images.length}
+            {visibleImages.length}/{images.length}
           </span>
-          {images.length > 1 && (
+          {visibleImages.length > 1 && (
             <>
               <GalleryArrow direction="previous" onClick={showPrevious} />
               <GalleryArrow direction="next" onClick={showNext} />
             </>
           )}
         </div>
-        {images.length > 1 && (
+        {visibleImages.length > 1 && (
           <div className="flex gap-2 overflow-x-auto px-4 py-3">
-            {images.map((image, index) => (
+            {visibleImages.map((image, index) => (
               <button
                 key={image}
                 type="button"
@@ -97,14 +122,19 @@ export function ForumImageGallery({ images, title }: ForumImageGalleryProps) {
                 aria-label={`Show image ${index + 1}`}
                 aria-current={index === activeIndex}
               >
-                <img src={image} alt="" className="h-full w-full object-cover" />
+                <img
+                  src={image}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  onError={() => handleImageError(image)}
+                />
               </button>
             ))}
           </div>
         )}
       </div>
 
-      {lightboxOpen && (
+      {lightboxOpen && activeSrc && (
         <div
           className="fixed inset-0 z-[100] flex touch-pan-y items-center justify-center bg-black/95 p-3 sm:p-8"
           role="dialog"
@@ -122,14 +152,15 @@ export function ForumImageGallery({ images, title }: ForumImageGalleryProps) {
             <X className="h-6 w-6" />
           </button>
           <img
-            src={images[activeIndex]}
+            src={activeSrc}
             alt={`${title} — image ${activeIndex + 1}`}
             className="max-h-full max-w-full select-none object-contain"
+            onError={() => handleImageError(activeSrc)}
           />
           <span className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1.5 text-sm font-bold text-white">
-            {activeIndex + 1} / {images.length}
+            {activeIndex + 1} / {visibleImages.length}
           </span>
-          {images.length > 1 && (
+          {visibleImages.length > 1 && (
             <>
               <GalleryArrow direction="previous" onClick={showPrevious} large />
               <GalleryArrow direction="next" onClick={showNext} large />
