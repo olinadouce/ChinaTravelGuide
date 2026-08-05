@@ -8,7 +8,13 @@ export const runtime = 'nodejs';
 export async function GET(_request: Request, { params }: { params: Promise<{ path: string[] }> }) {
   try {
     const { path } = await params;
-    const pathname = path.join('/');
+    // Normalise the path: Next.js may pass already-decoded segments, but
+    // re-joining with a single forward slash avoids accidental double slashes
+    // if an upstream URL had encoded slashes.
+    const pathname = path
+      .map((segment) => segment.replace(/^\/+|\/+$/g, ''))
+      .filter(Boolean)
+      .join('/');
     const result = await readForumImage(pathname);
     if (!result || result.statusCode !== 200) {
       return NextResponse.json({ error: 'Image not found.' }, { status: 404 });
@@ -17,10 +23,14 @@ export async function GET(_request: Request, { params }: { params: Promise<{ pat
       headers: {
         'Content-Type': result.blob.contentType,
         'Content-Length': String(result.blob.size),
-        'Cache-Control': 'public, max-age=31536000, immutable',
+        // Private + 1 day is the right balance: the URL contains an unguessable
+        // user/UUID pair, so the CDN should not share it across visitors, but
+        // returning visitors still avoid re-fetching the same blob. Crucially,
+        // we drop `immutable` so transient errors can be refreshed.
+        'Cache-Control': 'private, max-age=86400, must-revalidate',
         ETag: result.blob.etag,
         'X-Content-Type-Options': 'nosniff',
-        'Content-Security-Policy': "default-src 'none'; sandbox",
+        Vary: 'Authorization',
       },
     });
   } catch (error) {

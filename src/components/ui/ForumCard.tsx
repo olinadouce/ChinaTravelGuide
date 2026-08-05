@@ -1,7 +1,8 @@
 ﻿'use client';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Heart, MessageSquare, Calendar, User } from 'lucide-react';
+import { Heart, MessageSquare, Calendar, User, ImageIcon } from 'lucide-react';
+import { useState } from 'react';
 import { ForumPost } from '@/types';
 
 interface ForumCardProps {
@@ -10,6 +11,8 @@ interface ForumCardProps {
 }
 
 export function ForumCard({ post, index }: ForumCardProps) {
+  const [imageBroken, setImageBroken] = useState(false);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -27,15 +30,22 @@ export function ForumCard({ post, index }: ForumCardProps) {
       className="group relative overflow-hidden rounded-[28px] bg-white dark:bg-secondary-900 p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
     >
       <Link href={`/forum/${post.slug}`} className="block">
-        {post.featuredImage && (
-          <div className="relative mb-4 h-48 w-full overflow-hidden rounded-xl">
+        {post.featuredImage && !imageBroken && (
+          <div className="relative mb-4 h-48 w-full overflow-hidden rounded-xl bg-secondary-100 dark:bg-secondary-800">
             {/* User uploads are already validated and streamed through our image proxy. */}
             <img
               src={post.featuredImage}
               alt={post.title}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              onError={() => setImageBroken(true)}
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+          </div>
+        )}
+        {post.featuredImage && imageBroken && (
+          <div className="relative mb-4 flex h-48 w-full items-center justify-center overflow-hidden rounded-xl bg-secondary-100 dark:bg-secondary-800" role="img" aria-label="Image unavailable">
+            <ImageIcon className="h-12 w-12 text-secondary-400" aria-hidden="true" />
           </div>
         )}
 
