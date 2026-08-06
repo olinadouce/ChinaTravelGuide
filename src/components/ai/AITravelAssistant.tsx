@@ -32,11 +32,20 @@ type UiMessage = {
 };
 
 const STORAGE_LANG = 'ctg_language';
-const PAGE_STARTER_QUESTIONS = [
-  'Help me plan a first trip to Beijing and Shanghai.',
-  'What is the best route for a 7-day trip in China?',
-  'Compare Chengdu, Chongqing and Xi’an for first-time visitors.',
-  'What should I know about transport, hotels and payments in China?',
+
+/** Starter prompts grounded in free preview guides (anonymous-safe). */
+const PAGE_STARTER_QUESTIONS_EN = [
+  'What does the Beijing free preview cover?',
+  'What travel tips are in the Shanghai guide?',
+  'What is included in the Chengdu 2-day panda route preview?',
+  'What payment and internet tips do the city guides recommend?',
+];
+
+const PAGE_STARTER_QUESTIONS_ZH = [
+  '北京免费预览方案主要包含哪些内容？',
+  '上海攻略里有哪些出行提示？',
+  '成都两日熊猫路线免费预览包括什么？',
+  '攻略里关于支付和上网有什么建议？',
 ];
 
 function packageIdFromPath(pathname: string): string | null {
@@ -104,6 +113,8 @@ export function AITravelAssistant({
       ? '询问中国城市、路线、景点、住宿、美食或交通……'
       : 'Ask about Chinese cities, routes, attractions, hotels, food or transport…'
     : placeholder;
+
+  const pageStarterQuestions = isZh ? PAGE_STARTER_QUESTIONS_ZH : PAGE_STARTER_QUESTIONS_EN;
 
   const displayMessages = useMemo(
     () =>
@@ -358,7 +369,7 @@ export function AITravelAssistant({
                 ))}
                 {isPage && messages.length === 0 && !loading && (
                   <div className="grid gap-2 pt-2 sm:grid-cols-2">
-                    {PAGE_STARTER_QUESTIONS.map((question) => (
+                    {pageStarterQuestions.map((question) => (
                       <button
                         key={question}
                         type="button"
